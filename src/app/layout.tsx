@@ -1,16 +1,18 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import type { Metadata } from "next";
+import { Noto_Nastaliq_Urdu, Poppins } from "next/font/google";
+import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const urdu = Noto_Nastaliq_Urdu({
+  variable: "--font-noto-nastaliq-urdu",
+  subsets: ["arabic"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -26,13 +28,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${poppins.variable} ${urdu.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SiteLayout>
-        {children}
-        </SiteLayout>
-        </body>
+        <SiteLayout>{children}</SiteLayout>
+      </body>
     </html>
   );
 }
