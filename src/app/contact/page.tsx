@@ -1,8 +1,8 @@
 "use client";
 
-import { PageHero } from "@/components/site/SiteLayout";
 import { Reveal } from "@/components/site/Reveal";
-import { Phone, MapPin, Mail, MessageCircle } from "lucide-react";
+import { PageHero } from "@/components/site/SiteLayout";
+import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ContactPage() {
@@ -38,7 +38,7 @@ export default function ContactPage() {
             {
               icon: MapPin,
               title: "Location",
-              value: "Faisalabad, Pakistan",
+              value: "Taj colony sargodha Road Near MTM Faisalabad, Pakistan",
             },
           ].map((c) => (
             <a
@@ -61,10 +61,12 @@ export default function ContactPage() {
 
           <div className="rounded-2xl overflow-hidden border border-border bg-card">
             <iframe
-              title="Faisalabad map"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=72.95%2C31.35%2C73.20%2C31.50&layer=mapnik&marker=31.4504%2C73.1350"
+              title="Wujood Welfare location map"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3404.0886017096327!2d73.0892656746928!3d31.439227651148077!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39226930a5685e35%3A0x60ba777945ec075d!2sWujood%20Welfare!5e0!3m2!1sen!2s!4v1781953720381!5m2!1sen!2s"
               className="w-full h-64 border-0"
               loading="lazy"
+              allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
         </Reveal>
@@ -119,14 +121,6 @@ export default function ContactPage() {
           </form>
         </Reveal>
       </section>
-
-      <a
-        href="https://wa.me/923295941457"
-        aria-label="WhatsApp"
-        className="fixed bottom-6 right-6 z-40 grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-xl hover:scale-110 transition"
-      >
-        <MessageCircle className="h-6 w-6" />
-      </a>
     </>
   );
 }
