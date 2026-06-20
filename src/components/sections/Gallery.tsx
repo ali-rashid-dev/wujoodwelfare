@@ -1,3 +1,4 @@
+"use client";
 import { Reveal } from "@/components/site/Reveal";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
@@ -33,8 +34,8 @@ export function Gallery() {
             key={c}
             onClick={() => setCat(c)}
             className={`rounded-full px-4 py-2 text-xs font-semibold transition ${cat === c
-                ? "gradient-blue text-primary-foreground shadow-blue"
-                : "border border-border bg-card hover:border-secondary"
+              ? "gradient-blue text-primary-foreground shadow-blue"
+              : "border border-border bg-card hover:border-secondary"
               }`}
           >
             {c}
@@ -53,7 +54,13 @@ export function Gallery() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.35, delay: i * 0.05 }}
           >
-            <Image src={it.src} alt={it.cat} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+            <Image
+              src={it.src}
+              alt={it.cat}
+              fill
+              sizes="(min-width: 768px) 33vw, 50vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
+            />
             <div className="absolute inset-0 bg-linear-to-t from-primary-dark/85 via-primary-dark/10 to-transparent" />
             <span className="absolute bottom-3 left-3 rounded-full bg-secondary/95 text-secondary-foreground px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
               {it.cat}

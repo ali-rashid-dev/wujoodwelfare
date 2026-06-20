@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { Utensils, Stethoscope, GraduationCap, Shirt, Megaphone, Siren, ArrowUpRight } from "lucide-react";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/Reveal";

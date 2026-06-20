@@ -1,3 +1,4 @@
+"use client";
 import { Counter } from "@/components/site/Counter";
 import { motion } from "framer-motion";
 import { ArrowRight, HandHeart, Heart } from "lucide-react";

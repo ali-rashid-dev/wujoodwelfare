@@ -1,3 +1,4 @@
+"use client"; 
 import { Reveal } from "@/components/site/Reveal";
 import { motion } from "framer-motion";
 import { ArrowRight, Baby, GraduationCap, Heart, Megaphone, Stethoscope, Users, Utensils } from "lucide-react";
