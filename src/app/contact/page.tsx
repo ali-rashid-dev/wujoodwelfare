@@ -73,7 +73,7 @@ export default function ContactPage() {
 
         <Reveal delay={1} className="lg:col-span-3">
           <form
-            action="https://formsubmit.co/2ed12b319b37c87baa04652e526a9c99"
+            action="https://formsubmit.co/wujoodwelfare@gmail.com"
             method="POST"
             onSubmit={() => toast.success("Sending your message…")}
             className="rounded-3xl border border-border bg-card p-8 md:p-10 shadow-blue"
