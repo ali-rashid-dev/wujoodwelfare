@@ -5,7 +5,7 @@ import { Impact } from "@/components/sections/Impact";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Programs — Wujood Welfare",
+  title: "Wujood Welfare — Programs",
   description:
     "Six focused welfare programs: food, medical, education, clothes, awareness and emergency relief.",
   openGraph: {

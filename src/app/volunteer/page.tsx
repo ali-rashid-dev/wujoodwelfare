@@ -5,7 +5,7 @@ import { Check, HandHeart } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Volunteer — Wujood Welfare",
+  title: "Wujood Welfare — Volunteer",
   description:
     "Join the Wujood Welfare volunteer team in Faisalabad. Help deliver food, run medical camps and support education.",
   openGraph: {

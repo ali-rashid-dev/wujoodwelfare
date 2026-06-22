@@ -3,7 +3,7 @@ import { Gallery } from "@/components/sections/Gallery";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Gallery — Wujood Welfare",
+  title: "Wujood Welfare — Gallery",
   description:
     "Photos from food drives, medical camps, education support and volunteer activities.",
   openGraph: {
