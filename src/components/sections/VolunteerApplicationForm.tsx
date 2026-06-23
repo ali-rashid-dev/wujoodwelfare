@@ -29,7 +29,7 @@ export function VolunteerApplicationForm() {
 
   return (
     <form
-      action="https://formsubmit.co/wujoodwelfare@gmail.com"
+      action="https://formsubmit.co/6dfc1b2a42c4f7ece057e64fbc9d2416"
       method="POST"
       onSubmit={handleSubmit}
       className="rounded-3xl border border-border bg-card p-8 md:p-10 shadow-blue"
