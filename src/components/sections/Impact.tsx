@@ -2,10 +2,10 @@ import { Counter } from "@/components/site/Counter";
 import { Reveal } from "@/components/site/Reveal";
 
 const items = [
-  { value: 2000, prefix: "", suffix: "+", label: "Donors" },
-  { value: 1000, prefix: "", suffix: "+", label: "Beneficiaries" },
+  { value: 1000, prefix: "", suffix: "+", label: "Donors" },
+  { value: 20000, prefix: "", suffix: "+", label: "Beneficiaries" },
   { value: 50, prefix: "", suffix: "+", label: "Projects" },
-  { value: 100, prefix: "", suffix: "+", label: "Volunteers" },
+  { value: 1000, prefix: "", suffix: "+", label: "Volunteers" },
 ];
 
 export function Impact() {
