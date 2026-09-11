@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn, signUp } from "@/lib/auth-client";
-import { SiteLayout, PageHero } from "@/components/site/SiteLayout";
+import { PageHero } from "@/components/site/SiteLayout";
 import { User, Lock, Mail, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 
@@ -34,18 +34,19 @@ export default function SignUpPage() {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
 
     try {
       const res = await signUp.email({
         name: formData.get("name") as string,
-        email: formData.get("email") as string,
+        email,
         password: formData.get("password") as string,
       });
 
       if (res?.error) {
         setError(res.error.message || "Failed to create account. Please try again.");
       } else {
-        router.push("/dashboard");
+        router.push(`/verify-email?registered=true&email=${encodeURIComponent(email)}`);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");

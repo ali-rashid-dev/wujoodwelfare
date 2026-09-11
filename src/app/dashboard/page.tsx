@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
-import { SiteLayout, PageHero } from "@/components/site/SiteLayout";
+import { PageHero } from "@/components/site/SiteLayout";
 import { Mail, LogOut, Loader2, ShieldCheck } from "lucide-react";
 
 export default function DashboardPage() {
@@ -18,29 +18,25 @@ export default function DashboardPage() {
 
   if (isPending) {
     return (
-      <SiteLayout>
-        <section className="section-y container-x flex flex-col items-center justify-center min-h-[50vh]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-          <p className="text-muted-foreground text-sm font-medium">Verifying session...</p>
-        </section>
-      </SiteLayout>
+      <section className="section-y container-x flex flex-col items-center justify-center min-h-[50vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground text-sm font-medium">Verifying session...</p>
+      </section>
     );
   }
 
   if (!session?.user) {
     return (
-      <SiteLayout>
-        <section className="section-y container-x flex flex-col items-center justify-center min-h-[50vh]">
-          <p className="text-muted-foreground text-sm font-medium">Redirecting to Sign In...</p>
-        </section>
-      </SiteLayout>
+      <section className="section-y container-x flex flex-col items-center justify-center min-h-[50vh]">
+        <p className="text-muted-foreground text-sm font-medium">Redirecting to Sign In...</p>
+      </section>
     );
   }
 
   const { user } = session;
 
   return (
-    <SiteLayout>
+    <>
       <PageHero
         eyebrow="User Area"
         title="Dashboard"
@@ -100,6 +96,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </section>
-    </SiteLayout>
+    </>
   );
 }
