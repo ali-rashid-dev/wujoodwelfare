@@ -3,14 +3,30 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signUp } from "@/lib/auth-client";
+import { signIn, signUp } from "@/lib/auth-client";
 import { SiteLayout, PageHero } from "@/components/site/SiteLayout";
 import { User, Lock, Mail, ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
 
 export default function SignUpPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  async function handleGoogleSignIn() {
+    setError(null);
+    setGoogleLoading(true);
+    try {
+      await signIn.social({
+        provider: "google",
+        callbackURL: "/dashboard",
+      });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred during Google Sign-In.");
+      setGoogleLoading(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -60,6 +76,29 @@ export default function SignUpPage() {
               <span>{error}</span>
             </div>
           )}
+
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={googleLoading || loading}
+            className="w-full flex items-center justify-center gap-3 rounded-xl border border-input bg-background px-5 py-3 text-sm font-semibold text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground transition disabled:opacity-50 mb-6"
+          >
+            {googleLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <FcGoogle className="h-5 w-5" />
+            )}
+            <span>Sign up with Google</span>
+          </button>
+
+          <div className="relative mb-6 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <span className="relative bg-card px-3 text-xs uppercase text-muted-foreground font-medium">
+              Or sign up with email
+            </span>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -113,7 +152,7 @@ export default function SignUpPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || googleLoading}
               className="w-full flex items-center justify-center gap-2 rounded-xl gradient-blue px-5 py-3 text-sm font-semibold text-primary-foreground shadow-blue transition-transform hover:-translate-y-0.5 disabled:opacity-50"
             >
               {loading ? (
