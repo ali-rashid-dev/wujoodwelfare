@@ -1,9 +1,11 @@
 "use client";
+
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Menu, X, Heart } from "lucide-react";
+import { Menu, X, Heart, User } from "lucide-react";
+import { useSession } from "@/lib/auth-client";
 
 const links = [
   { to: "/", label: "Home" },
@@ -20,6 +22,8 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const path = usePathname();
+  const { data: session } = useSession();
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
@@ -31,10 +35,11 @@ export function Navbar() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all ${scrolled
+      className={`fixed inset-x-0 top-0 z-50 transition-all ${
+        scrolled
           ? "backdrop-blur bg-background/85 border-b border-border shadow-sm"
           : "bg-transparent"
-        }`}
+      }`}
     >
       <nav className="container-x flex h-16 md:h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
@@ -64,8 +69,9 @@ export function Navbar() {
               <li key={l.to}>
                 <Link
                   href={l.to}
-                  className={`relative px-3 py-2 text-sm font-medium transition-colors ${active ? "text-primary" : "text-foreground/80 hover:text-primary"
-                    }`}
+                  className={`relative px-3 py-2 text-sm font-medium transition-colors ${
+                    active ? "text-primary" : "text-foreground/80 hover:text-primary"
+                  }`}
                 >
                   {l.label}
                   {active && (
@@ -78,12 +84,29 @@ export function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
+          {session?.user ? (
+            <Link
+              href="/dashboard"
+              className="hidden sm:inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/20 transition"
+            >
+              <User className="h-4 w-4" /> Dashboard
+            </Link>
+          ) : (
+            <Link
+              href="/sign-in"
+              className="hidden sm:inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted transition"
+            >
+              <User className="h-4 w-4" /> Sign In
+            </Link>
+          )}
+
           <Link
             href="/donate"
-            className="hidden sm:inline-flex items-center gap-2 rounded-full gradient-gold px-5 py-2.5 text-sm font-semibold text-secondary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
+            className="hidden sm:inline-flex items-center gap-2 rounded-full gradient-gold px-5 py-2 text-sm font-semibold text-secondary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
           >
             <Heart className="h-4 w-4" /> Donate Now
           </Link>
+
           <button
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
@@ -101,13 +124,39 @@ export function Navbar() {
               <li key={l.to}>
                 <Link
                   href={l.to}
-                  className={`block rounded-md px-3 py-2.5 text-sm font-medium ${path === l.to ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                    }`}
+                  className={`block rounded-md px-3 py-2.5 text-sm font-medium ${
+                    path === l.to ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                  }`}
                 >
                   {l.label}
                 </Link>
               </li>
             ))}
+            <li className="pt-2 border-t border-border mt-2">
+              {session?.user ? (
+                <Link
+                  href="/dashboard"
+                  className="block rounded-md px-3 py-2.5 text-sm font-semibold bg-primary/10 text-primary"
+                >
+                  Dashboard ({session.user.name || session.user.email})
+                </Link>
+              ) : (
+                <div className="flex gap-2">
+                  <Link
+                    href="/sign-in"
+                    className="flex-1 text-center rounded-md border border-border px-3 py-2 text-sm font-medium"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    className="flex-1 text-center rounded-md bg-primary text-primary-foreground px-3 py-2 text-sm font-medium"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+            </li>
             <li>
               <Link
                 href="/donate"
