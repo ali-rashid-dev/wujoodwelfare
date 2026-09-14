@@ -7,15 +7,18 @@ import { signIn, signUp } from "@/lib/auth-client";
 import { PageHero } from "@/components/site/SiteLayout";
 import { User, Lock, Mail, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
+import { signUpSchema } from "@/validation";
 
 export default function SignUpPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
   async function handleGoogleSignIn() {
     setError(null);
+    setFieldErrors({});
     setGoogleLoading(true);
     try {
       await signIn.social({
@@ -31,22 +34,40 @@ export default function SignUpPage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    setLoading(true);
+    setFieldErrors({});
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
+    const rawData = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
+    };
+
+    const validation = signUpSchema.safeParse(rawData);
+    if (!validation.success) {
+      const errors: Record<string, string> = {};
+      validation.error.issues.forEach((issue) => {
+        if (issue.path[0]) {
+          errors[issue.path[0].toString()] = issue.message;
+        }
+      });
+      setFieldErrors(errors);
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await signUp.email({
-        name: formData.get("name") as string,
-        email,
-        password: formData.get("password") as string,
+        name: validation.data.name,
+        email: validation.data.email,
+        password: validation.data.password,
       });
 
       if (res?.error) {
         setError(res.error.message || "Failed to create account. Please try again.");
       } else {
-        router.push(`/verify-email?registered=true&email=${encodeURIComponent(email)}`);
+        router.push(`/verify-email?registered=true&email=${encodeURIComponent(validation.data.email)}`);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");
@@ -116,6 +137,9 @@ export default function SignUpPage() {
                   className="w-full rounded-xl border border-input bg-background pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition"
                 />
               </div>
+              {fieldErrors.name && (
+                <p className="mt-1 text-xs text-destructive">{fieldErrors.name}</p>
+              )}
             </div>
 
             <div>
@@ -132,6 +156,9 @@ export default function SignUpPage() {
                   className="w-full rounded-xl border border-input bg-background pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition"
                 />
               </div>
+              {fieldErrors.email && (
+                <p className="mt-1 text-xs text-destructive">{fieldErrors.email}</p>
+              )}
             </div>
 
             <div>
@@ -149,6 +176,9 @@ export default function SignUpPage() {
                   className="w-full rounded-xl border border-input bg-background pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition"
                 />
               </div>
+              {fieldErrors.password && (
+                <p className="mt-1 text-xs text-destructive">{fieldErrors.password}</p>
+              )}
             </div>
 
             <button

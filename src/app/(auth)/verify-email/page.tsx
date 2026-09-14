@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { verifyEmail, sendVerificationEmail } from "@/lib/auth-client";
 import { PageHero } from "@/components/site/SiteLayout";
 import { Mail, ArrowRight, Loader2, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react";
+import { verifyEmailSchema } from "@/validation";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const token = searchParams.get("token");
   const initialEmail = searchParams.get("email") || "";
@@ -60,15 +60,20 @@ function VerifyEmailContent() {
 
   async function handleResend(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!emailInput) return;
-
     setError(null);
+
+    const validation = verifyEmailSchema.safeParse({ email: emailInput });
+    if (!validation.success) {
+      setError(validation.error.issues[0]?.message || "Please enter a valid email address.");
+      return;
+    }
+
     setResendLoading(true);
     setResendSent(false);
 
     try {
       const res = await sendVerificationEmail({
-        email: emailInput,
+        email: validation.data.email,
         callbackURL: "/dashboard",
       });
 
