@@ -12,7 +12,10 @@ export const contactFormSchema = z.object({
     .trim()
     .optional()
     .refine(
-      (val) => !val || (val.length >= 7 && /^[0-9+\-\s()]+$/.test(val)),
+      (val) =>
+        !val ||
+        (val.replace(/[^0-9]/g, "").length >= 7 &&
+          /^[0-9+\-\s()]+$/.test(val)),
       "Please enter a valid phone number"
     ),
   subject: z.string().trim().min(3, "Subject is required (min 3 characters)"),

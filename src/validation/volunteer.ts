@@ -11,7 +11,10 @@ export const volunteerApplicationSchema = z.object({
   phone: z
     .string()
     .trim()
-    .min(7, "Phone number must be at least 7 digits")
+    .refine(
+      (val) => val.replace(/[^0-9]/g, "").length >= 7,
+      "Phone number must be at least 7 digits"
+    )
     .regex(/^[0-9+\-\s()]+$/, "Please enter a valid phone number"),
   city: z.string().trim().min(2, "City is required"),
   qualification: z.string().trim().min(2, "Qualification is required"),
