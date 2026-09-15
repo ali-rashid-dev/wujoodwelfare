@@ -28,33 +28,41 @@ export async function createStaff(data: StaffFormInput) {
 
     // Auto-generate employee code
     const year = new Date().getFullYear();
-    const count = await prisma.staff.count();
-    const employeeId = `EMP-${year}-${String(count + 1).padStart(4, "0")}`;
+    const staff = await prisma.$transaction(async (tx) => {
+      const [sequence] = await tx.$queryRaw<Array<{ nextValue: number }>>`
+        INSERT INTO "staff_code_sequence" ("year", "nextValue")
+        VALUES (${year}, 1)
+        ON CONFLICT ("year") DO UPDATE
+        SET "nextValue" = "staff_code_sequence"."nextValue" + 1
+        RETURNING "nextValue"
+      `;
+      const employeeId = `EMP-${year}-${String(Number(sequence.nextValue)).padStart(4, "0")}`;
+      const createdStaff = await tx.staff.create({
+        data: {
+          employeeId,
+          name: validated.name,
+          email: validated.email,
+          phone: validated.phone || null,
+          designation: validated.designation,
+          role: validated.role as StaffRole,
+          department: validated.department as StaffDepartment,
+          status: validated.status as StaffStatus,
+          permissions: validated.permissions,
+          joinedAt: validated.joinedAt ? new Date(validated.joinedAt) : new Date(),
+          emergencyContact: validated.emergencyContact || null,
+          notes: validated.notes || null,
+        },
+      });
 
-    const staff = await prisma.staff.create({
-      data: {
-        employeeId,
-        name: validated.name,
-        email: validated.email,
-        phone: validated.phone || null,
-        designation: validated.designation,
-        role: validated.role as StaffRole,
-        department: validated.department as StaffDepartment,
-        status: validated.status as StaffStatus,
-        permissions: validated.permissions,
-        joinedAt: validated.joinedAt ? new Date(validated.joinedAt) : new Date(),
-        emergencyContact: validated.emergencyContact || null,
-        notes: validated.notes || null,
-      },
-    });
+      await tx.staffActivity.create({
+        data: {
+          staffId: createdStaff.id,
+          action: "Staff Profile Created",
+          description: `Registered as ${createdStaff.designation} in ${createdStaff.department}`,
+        },
+      });
 
-    // Create an initial staff activity log
-    await prisma.staffActivity.create({
-      data: {
-        staffId: staff.id,
-        action: "Staff Profile Created",
-        description: `Registered as ${staff.designation} in ${staff.department}`,
-      },
+      return createdStaff;
     });
 
     revalidatePath("/dashboard/staff");
@@ -80,29 +88,33 @@ export async function updateStaff(id: string, data: StaffFormInput) {
       return { success: false, error: "Another staff member with this email already exists." };
     }
 
-    const updated = await prisma.staff.update({
-      where: { id },
-      data: {
-        name: validated.name,
-        email: validated.email,
-        phone: validated.phone || null,
-        designation: validated.designation,
-        role: validated.role as StaffRole,
-        department: validated.department as StaffDepartment,
-        status: validated.status as StaffStatus,
-        permissions: validated.permissions,
-        joinedAt: validated.joinedAt ? new Date(validated.joinedAt) : undefined,
-        emergencyContact: validated.emergencyContact || null,
-        notes: validated.notes || null,
-      },
-    });
+    const updated = await prisma.$transaction(async (tx) => {
+      const updatedStaff = await tx.staff.update({
+        where: { id },
+        data: {
+          name: validated.name,
+          email: validated.email,
+          phone: validated.phone || null,
+          designation: validated.designation,
+          role: validated.role as StaffRole,
+          department: validated.department as StaffDepartment,
+          status: validated.status as StaffStatus,
+          permissions: validated.permissions,
+          joinedAt: validated.joinedAt ? new Date(validated.joinedAt) : undefined,
+          emergencyContact: validated.emergencyContact || null,
+          notes: validated.notes || null,
+        },
+      });
 
-    await prisma.staffActivity.create({
-      data: {
-        staffId: id,
-        action: "Staff Profile Updated",
-        description: `Updated profile details and permissions`,
-      },
+      await tx.staffActivity.create({
+        data: {
+          staffId: id,
+          action: "Staff Profile Updated",
+          description: `Updated profile details and permissions`,
+        },
+      });
+
+      return updatedStaff;
     });
 
     revalidatePath("/dashboard/staff");
@@ -273,26 +285,30 @@ export async function assignCaseToStaff(staffId: string, data: CaseAssignmentInp
     await requireServerSession();
     const validated = caseAssignmentSchema.parse(data);
 
-    const assignment = await prisma.caseAssignment.create({
-      data: {
-        staffId,
-        caseId: validated.caseId,
-        roleInCase: validated.roleInCase,
-        notes: validated.notes || null,
-      },
-      include: {
-        caseItem: true,
-      },
-    });
+    const assignment = await prisma.$transaction(async (tx) => {
+      const createdAssignment = await tx.caseAssignment.create({
+        data: {
+          staffId,
+          caseId: validated.caseId,
+          roleInCase: validated.roleInCase,
+          notes: validated.notes || null,
+        },
+        include: {
+          caseItem: true,
+        },
+      });
 
-    await prisma.staffActivity.create({
-      data: {
-        staffId,
-        action: "Case Assigned",
-        description: `Assigned case "${assignment.caseItem.title}" as ${validated.roleInCase}`,
-        targetType: "BeneficiaryCase",
-        targetId: validated.caseId,
-      },
+      await tx.staffActivity.create({
+        data: {
+          staffId,
+          action: "Case Assigned",
+          description: `Assigned case "${createdAssignment.caseItem.title}" as ${validated.roleInCase}`,
+          targetType: "BeneficiaryCase",
+          targetId: validated.caseId,
+        },
+      });
+
+      return createdAssignment;
     });
 
     revalidatePath(`/dashboard/staff/${staffId}`);
@@ -326,27 +342,47 @@ export async function logStaffActivity(staffId: string, data: StaffActivityInput
   }
 }
 
-export async function getAvailableCasesForStaff() {
+export async function getAvailableCasesForStaff(params?: { search?: string; page?: number; limit?: number }) {
   try {
     await requireServerSession();
-    const cases = await prisma.beneficiaryCase.findMany({
-      where: { isOpen: true },
-      take: 50,
-      orderBy: { openedAt: "desc" },
-      include: {
-        beneficiary: {
-          select: { name: true, cnic: true },
-        },
-      },
-    });
+    const page = Math.max(params?.page || 1, 1);
+    const limit = Math.min(params?.limit || 25, 100);
+    const search = params?.search?.trim();
+    const where = {
+      isOpen: true,
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search, mode: "insensitive" as const } },
+              { beneficiary: { name: { contains: search, mode: "insensitive" as const } } },
+              { beneficiary: { cnic: { contains: search, mode: "insensitive" as const } } },
+            ],
+          }
+        : {}),
+    };
 
-    return cases.map((c) => ({
-      id: c.id,
-      title: c.title,
-      beneficiaryName: c.beneficiary.name,
-      beneficiaryCnic: c.beneficiary.cnic,
-    }));
+    const [cases, total] = await Promise.all([
+      prisma.beneficiaryCase.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: [{ openedAt: "desc" }, { id: "asc" }],
+        include: { beneficiary: { select: { name: true, cnic: true } } },
+      }),
+      prisma.beneficiaryCase.count({ where }),
+    ]);
+
+    return {
+      items: cases.map((c) => ({
+        id: c.id,
+        title: c.title,
+        beneficiaryName: c.beneficiary.name,
+        beneficiaryCnic: c.beneficiary.cnic,
+      })),
+      page,
+      totalPages: Math.max(Math.ceil(total / limit), 1),
+    };
   } catch {
-    return [];
+    return { items: [], page: 1, totalPages: 1 };
   }
 }

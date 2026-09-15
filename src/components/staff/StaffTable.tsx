@@ -112,7 +112,9 @@ export function StaffTable({
         params.delete(key);
       }
     });
-    params.set("page", "1");
+    if (!Object.prototype.hasOwnProperty.call(newParams, "page")) {
+      params.set("page", "1");
+    }
     startTransition(() => {
       router.push(`/dashboard/staff?${params.toString()}`);
     });
@@ -422,7 +424,7 @@ export function StaffTable({
                       <div className="flex items-center gap-1.5 text-xs text-foreground">
                         <FileCheck className="h-3.5 w-3.5 text-muted-foreground" />
                         <span className="font-semibold">{staff._count?.assignedCases || 0}</span>
-                        <span className="text-[11px] text-muted-foreground">active cases</span>
+                        <span className="text-[11px] text-muted-foreground">assigned cases</span>
                       </div>
                     </TableCell>
 

@@ -30,34 +30,43 @@ export async function createVolunteer(data: VolunteerFormInput) {
     }
 
     const year = new Date().getFullYear();
-    const count = await prisma.volunteer.count();
-    const volunteerCode = `VOL-${year}-${String(count + 1).padStart(4, "0")}`;
+    const volunteer = await prisma.$transaction(async (tx) => {
+      const [sequence] = await tx.$queryRaw<Array<{ nextValue: number }>>`
+        INSERT INTO "volunteer_code_sequence" ("year", "nextValue")
+        VALUES (${year}, 1)
+        ON CONFLICT ("year") DO UPDATE
+        SET "nextValue" = "volunteer_code_sequence"."nextValue" + 1
+        RETURNING "nextValue"
+      `;
+      const volunteerCode = `VOL-${year}-${String(Number(sequence.nextValue)).padStart(4, "0")}`;
+      const createdVolunteer = await tx.volunteer.create({
+        data: {
+          volunteerCode,
+          name: validated.name,
+          cnic: validated.cnic || null,
+          email: validated.email,
+          phone: validated.phone,
+          status: validated.status as VolunteerStatus,
+          skills: validated.skills,
+          availability: validated.availability as VolunteerAvailability,
+          city: validated.city || null,
+          district: validated.district || null,
+          area: validated.area || null,
+          address: validated.address || null,
+          notes: validated.notes || null,
+        },
+      });
 
-    const volunteer = await prisma.volunteer.create({
-      data: {
-        volunteerCode,
-        name: validated.name,
-        cnic: validated.cnic || null,
-        email: validated.email,
-        phone: validated.phone,
-        status: validated.status as VolunteerStatus,
-        skills: validated.skills,
-        availability: validated.availability as VolunteerAvailability,
-        city: validated.city || null,
-        district: validated.district || null,
-        area: validated.area || null,
-        address: validated.address || null,
-        notes: validated.notes || null,
-      },
-    });
+      await tx.volunteerActivity.create({
+        data: {
+          volunteerId: createdVolunteer.id,
+          title: "Registered as Volunteer",
+          description: `Application registered with status ${createdVolunteer.status}`,
+          hours: 0,
+        },
+      });
 
-    await prisma.volunteerActivity.create({
-      data: {
-        volunteerId: volunteer.id,
-        title: "Registered as Volunteer",
-        description: `Application registered with status ${volunteer.status}`,
-        hours: 0,
-      },
+      return createdVolunteer;
     });
 
     revalidatePath("/dashboard/volunteers");
@@ -276,25 +285,29 @@ export async function assignVolunteerToCampaign(volunteerId: string, data: Campa
     await requireServerSession();
     const validated = campaignAssignmentSchema.parse(data);
 
-    const assignment = await prisma.volunteerCampaignAssignment.create({
-      data: {
-        volunteerId,
-        campaignId: validated.campaignId,
-        role: validated.role || "Volunteer",
-        hoursLogged: validated.hoursLogged || 0,
-        status: validated.status || "ASSIGNED",
-      },
-      include: { campaign: true },
-    });
+    const assignment = await prisma.$transaction(async (tx) => {
+      const createdAssignment = await tx.volunteerCampaignAssignment.create({
+        data: {
+          volunteerId,
+          campaignId: validated.campaignId,
+          role: validated.role || "Volunteer",
+          hoursLogged: validated.hoursLogged || 0,
+          status: validated.status || "ASSIGNED",
+        },
+        include: { campaign: true },
+      });
 
-    await prisma.volunteerActivity.create({
-      data: {
-        volunteerId,
-        title: `Assigned to Campaign: ${assignment.campaign.title}`,
-        description: `Assigned role: ${validated.role || "Volunteer"}`,
-        hours: 0,
-        location: assignment.campaign.location || null,
-      },
+      await tx.volunteerActivity.create({
+        data: {
+          volunteerId,
+          title: `Assigned to Campaign: ${createdAssignment.campaign.title}`,
+          description: `Assigned role: ${validated.role || "Volunteer"}`,
+          hours: 0,
+          location: createdAssignment.campaign.location || null,
+        },
+      });
+
+      return createdAssignment;
     });
 
     revalidatePath(`/dashboard/volunteers/${volunteerId}`);
@@ -310,24 +323,27 @@ export async function logVolunteerActivity(volunteerId: string, data: VolunteerA
     await requireServerSession();
     const validated = volunteerActivitySchema.parse(data);
 
-    const activity = await prisma.volunteerActivity.create({
-      data: {
-        volunteerId,
-        title: validated.title,
-        description: validated.description || null,
-        hours: validated.hours,
-        activityDate: validated.activityDate ? new Date(validated.activityDate) : new Date(),
-        location: validated.location || null,
-        feedback: validated.feedback || null,
-      },
-    });
+    const activity = await prisma.$transaction(async (tx) => {
+      const createdActivity = await tx.volunteerActivity.create({
+        data: {
+          volunteerId,
+          title: validated.title,
+          description: validated.description || null,
+          hours: validated.hours,
+          activityDate: validated.activityDate ? new Date(validated.activityDate) : new Date(),
+          location: validated.location || null,
+          feedback: validated.feedback || null,
+        },
+      });
 
-    // Update total hours logged on Volunteer model
-    await prisma.volunteer.update({
-      where: { id: volunteerId },
-      data: {
-        totalHoursLogged: { increment: validated.hours },
-      },
+      await tx.volunteer.update({
+        where: { id: volunteerId },
+        data: {
+          totalHoursLogged: { increment: validated.hours },
+        },
+      });
+
+      return createdActivity;
     });
 
     revalidatePath(`/dashboard/volunteers/${volunteerId}`);
@@ -346,20 +362,28 @@ export async function createCampaign(data: CampaignFormInput) {
     const validated = campaignFormSchema.parse(data);
 
     const year = new Date().getFullYear();
-    const count = await prisma.welfareCampaign.count();
-    const code = `CMP-${year}-${String(count + 1).padStart(4, "0")}`;
+    const campaign = await prisma.$transaction(async (tx) => {
+      const [sequence] = await tx.$queryRaw<Array<{ nextValue: number }>>`
+        INSERT INTO "campaign_code_sequence" ("year", "nextValue")
+        VALUES (${year}, 1)
+        ON CONFLICT ("year") DO UPDATE
+        SET "nextValue" = "campaign_code_sequence"."nextValue" + 1
+        RETURNING "nextValue"
+      `;
+      const code = `CMP-${year}-${String(Number(sequence.nextValue)).padStart(4, "0")}`;
 
-    const campaign = await prisma.welfareCampaign.create({
-      data: {
-        code,
-        title: validated.title,
-        description: validated.description || null,
-        location: validated.location || null,
-        startDate: new Date(validated.startDate),
-        endDate: validated.endDate ? new Date(validated.endDate) : null,
-        targetBeneficiaries: validated.targetBeneficiaries || null,
-        status: validated.status,
-      },
+      return tx.welfareCampaign.create({
+        data: {
+          code,
+          title: validated.title,
+          description: validated.description || null,
+          location: validated.location || null,
+          startDate: new Date(validated.startDate),
+          endDate: validated.endDate ? new Date(validated.endDate) : null,
+          targetBeneficiaries: validated.targetBeneficiaries || null,
+          status: validated.status,
+        },
+      });
     });
 
     revalidatePath("/dashboard/volunteers/campaigns");

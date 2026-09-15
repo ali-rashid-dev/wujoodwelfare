@@ -161,7 +161,7 @@ export function HouseholdForm({ initialBeneficiaries = [], initialTotalPages = 1
       return;
     }
 
-    const invalidMember = members.find((m) => !m.fullName.trim());
+    const invalidMember = members.find((m) => m.fullName.trim().length < 2);
     if (invalidMember) {
       setErrorMsg("All family members must have a full name");
       setActiveTab("members");

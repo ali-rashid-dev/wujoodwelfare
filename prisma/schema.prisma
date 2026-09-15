@@ -216,11 +216,11 @@ model BeneficiaryDocument {
 }
 
 model BeneficiaryCase {
-  id            String      @id @default(cuid())
+  id            String           @id @default(cuid())
   beneficiaryId String
   title         String
   description   String?
-  openedAt      DateTime    @default(now())
+  openedAt      DateTime         @default(now())
   closedAt      DateTime?
   isOpen        Boolean          @default(true)
   beneficiary   Beneficiary      @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
@@ -462,17 +462,17 @@ model VolunteerCodeSequence {
 }
 
 model WelfareCampaign {
-  id                  String                        @id @default(cuid())
-  code                String                        @unique
+  id                  String    @id @default(cuid())
+  code                String    @unique
   title               String
   description         String?
   location            String?
   startDate           DateTime
   endDate             DateTime?
-  status              String                        @default("PLANNING")
+  status              String    @default("PLANNING")
   targetBeneficiaries Int?
-  createdAt           DateTime                      @default(now())
-  updatedAt           DateTime                      @updatedAt
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   volunteerAssignments VolunteerCampaignAssignment[]
 
@@ -514,4 +514,3 @@ model VolunteerActivity {
 
   @@map("volunteer_activity")
 }
-

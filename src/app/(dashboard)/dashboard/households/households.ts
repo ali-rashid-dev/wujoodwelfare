@@ -271,6 +271,7 @@ export async function getHouseholds(params?: {
 
     const formattedItems = items.map((h) => ({
       ...h,
+      fixedMonthlyIncome: h.fixedMonthlyIncome === null ? null : Number(h.fixedMonthlyIncome),
       monthlyIncome: h.monthlyIncome ? Number(h.monthlyIncome) : 0,
       createdAt: h.createdAt.toISOString(),
       updatedAt: h.updatedAt.toISOString(),
@@ -352,6 +353,7 @@ export async function getHouseholdById(id: string) {
 
     return {
       ...household,
+      fixedMonthlyIncome: household.fixedMonthlyIncome === null ? null : Number(household.fixedMonthlyIncome),
       monthlyIncome,
       createdAt: household.createdAt.toISOString(),
       updatedAt: household.updatedAt.toISOString(),

@@ -295,6 +295,7 @@ export function StaffForm({ initialData, isEditing = false }: StaffFormProps) {
                 >
                   <Checkbox
                     checked={checked}
+                    onClick={(event) => event.stopPropagation()}
                     onCheckedChange={() => handlePermissionToggle(perm.id)}
                     className="mt-0.5"
                   />

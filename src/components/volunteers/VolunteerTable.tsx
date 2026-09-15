@@ -112,7 +112,9 @@ export function VolunteerTable({
         params.delete(key);
       }
     });
-    params.set("page", "1");
+    if (!Object.prototype.hasOwnProperty.call(newParams, "page")) {
+      params.set("page", "1");
+    }
     startTransition(() => {
       router.push(`/dashboard/volunteers?${params.toString()}`);
     });

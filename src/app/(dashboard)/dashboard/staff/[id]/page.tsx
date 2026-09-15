@@ -20,5 +20,5 @@ export default async function StaffDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  return <StaffProfile staff={staff} availableCases={availableCases} />;
+  return <StaffProfile staff={staff} availableCases={availableCases.items} availableCasesTotalPages={availableCases.totalPages} />;
 }

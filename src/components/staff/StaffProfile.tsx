@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -34,7 +34,7 @@ import {
   CheckCircle2,
   Lock,
 } from "lucide-react";
-import { assignCaseToStaff, logStaffActivity } from "@/app/(dashboard)/dashboard/staff/staff-actions";
+import { assignCaseToStaff, getAvailableCasesForStaff, logStaffActivity } from "@/app/(dashboard)/dashboard/staff/staff-actions";
 import { StaffForm } from "./StaffForm";
 
 interface AssignedCase {
@@ -85,10 +85,12 @@ interface StaffProfileProps {
     activities: ActivityLog[];
   };
   availableCases: { id: string; title: string; beneficiaryName: string; beneficiaryCnic?: string | null }[];
+  availableCasesTotalPages: number;
 }
 
-export function StaffProfile({ staff, availableCases }: StaffProfileProps) {
+export function StaffProfile({ staff, availableCases: initialAvailableCases, availableCasesTotalPages: initialAvailableCasesTotalPages }: StaffProfileProps) {
   const router = useRouter();
+  const [, startCaseTransition] = useTransition();
   const [activeTab, setActiveTab] = useState("cases");
 
   // Assign Case Modal State
@@ -97,6 +99,10 @@ export function StaffProfile({ staff, availableCases }: StaffProfileProps) {
   const [roleInCase, setRoleInCase] = useState("Primary Officer");
   const [assignNotes, setAssignNotes] = useState("");
   const [submittingCase, setSubmittingCase] = useState(false);
+  const [availableCases, setAvailableCases] = useState(initialAvailableCases);
+  const [caseSearch, setCaseSearch] = useState("");
+  const [casePage, setCasePage] = useState(1);
+  const [caseTotalPages, setCaseTotalPages] = useState(initialAvailableCasesTotalPages);
 
   // Log Activity Modal State
   const [activityDialogOpen, setActivityDialogOpen] = useState(false);
@@ -106,6 +112,15 @@ export function StaffProfile({ staff, availableCases }: StaffProfileProps) {
 
   // Edit Mode State
   const [isEditing, setIsEditing] = useState(false);
+
+  const loadAvailableCases = (search: string, page: number) => {
+    startCaseTransition(async () => {
+      const result = await getAvailableCasesForStaff({ search, page, limit: 25 });
+      setAvailableCases(result.items);
+      setCasePage(result.page);
+      setCaseTotalPages(result.totalPages);
+    });
+  };
 
   const handleAssignCaseSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -432,6 +447,22 @@ export function StaffProfile({ staff, availableCases }: StaffProfileProps) {
             <div className="space-y-4 py-4">
               <div>
                 <label className="text-xs font-medium block mb-1">Select Case</label>
+                <div className="flex gap-2 mb-2">
+                  <Input
+                    value={caseSearch}
+                    onChange={(e) => setCaseSearch(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        loadAvailableCases(caseSearch, 1);
+                      }
+                    }}
+                    placeholder="Search case or beneficiary"
+                  />
+                  <Button type="button" variant="outline" size="sm" onClick={() => loadAvailableCases(caseSearch, 1)}>
+                    Search
+                  </Button>
+                </div>
                 <NativeSelect
                   value={selectedCaseId}
                   onChange={(e) => setSelectedCaseId(e.target.value)}
@@ -444,6 +475,15 @@ export function StaffProfile({ staff, availableCases }: StaffProfileProps) {
                     </NativeSelectOption>
                   ))}
                 </NativeSelect>
+                <div className="flex items-center justify-between mt-2 text-[11px] text-muted-foreground">
+                  <Button type="button" variant="ghost" size="sm" disabled={casePage <= 1} onClick={() => loadAvailableCases(caseSearch, casePage - 1)}>
+                    Previous
+                  </Button>
+                  <span>Page {casePage} of {caseTotalPages}</span>
+                  <Button type="button" variant="ghost" size="sm" disabled={casePage >= caseTotalPages} onClick={() => loadAvailableCases(caseSearch, casePage + 1)}>
+                    Next
+                  </Button>
+                </div>
               </div>
 
               <div>

@@ -36,7 +36,10 @@ export const householdMemberSchema = z.object({
 export const householdDocumentSchema = z.object({
   title: z.string().min(2, "Document title is required"),
   type: z.enum(DocumentType).default("OTHER"),
-  fileUrl: z.string().url("Must be a valid document URL"),
+  fileUrl: z.string().url("Must be a valid document URL").refine((value) => {
+    const protocol = new URL(value).protocol;
+    return protocol === "http:" || protocol === "https:";
+  }, "Must be a valid document URL"),
 });
 
 export const householdFormSchema = z.object({
