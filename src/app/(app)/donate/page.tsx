@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { PaymentCard } from "../../../components/donate/PaymentCard";
 
 export const metadata: Metadata = {
-  title: "Wujood Welfare — Donate",
+  title: "Donate",
   description:
     "Donate via bank transfer or Easypaisa. Support food, healthcare, education and emergency relief in Pakistan.",
   openGraph: {

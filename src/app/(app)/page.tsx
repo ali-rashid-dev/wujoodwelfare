@@ -11,7 +11,9 @@ import type { Metadata } from "next";
 
 
 export const metadata: Metadata = {
-  title: "Wujood Welfare — Zindagi Ko Wujood Do | Faisalabad NGO",
+  title: {
+    absolute: "Wujood Welfare — Zindagi Ko Wujood Do | Faisalabad NGO",
+  },
   description: "Wujood Welfare is a Faisalabad-based NGO supporting families with food, healthcare, education, clothing and emergency relief. Donate or volunteer today.",
   openGraph: {
     title: "Wujood Welfare — Zindagi Ko Wujood Do",

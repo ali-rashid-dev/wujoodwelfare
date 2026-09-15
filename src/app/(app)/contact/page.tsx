@@ -76,12 +76,9 @@ export default function ContactPage() {
               title: "Location",
               value: "Taj colony sargodha Road Near MTM Faisalabad, Pakistan",
             },
-          ].map((c) => (
-            <a
-              key={c.title}
-              href={c.href ?? "#"}
-              className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5 card-lift"
-            >
+          ].map((c) => {
+            const content = (
+              <>
               <div className="grid h-12 w-12 place-items-center rounded-xl gradient-blue text-primary-foreground">
                 <c.icon className="h-5 w-5" />
               </div>
@@ -92,8 +89,26 @@ export default function ContactPage() {
                 </p>
                 <p className="mt-0.5 font-semibold">{c.value}</p>
               </div>
-            </a>
-          ))}
+              </>
+            );
+
+            return c.href ? (
+              <a
+                key={c.title}
+                href={c.href}
+                className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5 card-lift"
+              >
+                {content}
+              </a>
+            ) : (
+              <div
+                key={c.title}
+                className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5 card-lift"
+              >
+                {content}
+              </div>
+            );
+          })}
 
           <div className="rounded-2xl overflow-hidden border border-border bg-card">
             <iframe
@@ -120,7 +135,6 @@ export default function ContactPage() {
               value="New contact message — Wujood Welfare"
             />
             <input type="hidden" name="_template" value="table" />
-            <input type="hidden" name="_captcha" value="false" />
             <input
               type="text"
               name="_honey"
@@ -138,8 +152,9 @@ export default function ContactPage() {
               <Field label="Subject" name="subject" required className="md:col-span-2" error={fieldErrors.subject} />
 
               <div className="md:col-span-2">
-                <label className="text-sm font-medium">Message</label>
+                <label htmlFor="message" className="text-sm font-medium">Message</label>
                 <textarea
+                  id="message"
                   name="message"
                   required
                   rows={5}
@@ -176,10 +191,11 @@ function Field({
 } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div className={className}>
-      <label className="text-sm font-medium">{label}</label>
+      <label htmlFor={rest.name} className="text-sm font-medium">{label}</label>
 
       <input
         {...rest}
+        id={rest.name}
         className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
       />
       {error && <p className="mt-1 text-xs text-destructive">{error}</p>}

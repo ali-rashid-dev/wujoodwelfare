@@ -105,9 +105,9 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
 
-  const [search, setSearch] = useState(() => searchParams.get("search") ?? "");
-  const [statusFilter, setStatusFilter] = useState(() => searchParams.get("status") ?? "ALL");
-  const [genderFilter, setGenderFilter] = useState(() => searchParams.get("gender") ?? "ALL");
+  const search = searchParams.get("search") ?? "";
+  const statusFilter = searchParams.get("status") ?? "ALL";
+  const genderFilter = searchParams.get("gender") ?? "ALL";
 
   // AlertDialog State
   const [deleteCandidate, setDeleteCandidate] = useState<{ id: string; name: string } | null>(null);
@@ -130,14 +130,10 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearch(value);
     updateFilters({ search: value });
   };
 
   const clearFilters = () => {
-    setSearch("");
-    setStatusFilter("ALL");
-    setGenderFilter("ALL");
     updateFilters({ search: "", status: "ALL", gender: "ALL" });
   };
 
@@ -206,7 +202,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
               />
               {search && (
                 <button
-                  onClick={() => { setSearch(""); updateFilters({ search: "" }); }}
+                  onClick={() => updateFilters({ search: "" })}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-4 h-4" />
@@ -217,7 +213,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
             {/* Dropdown Filters & Actions */}
             <div className="flex items-center gap-2 flex-wrap">
               {/* Status Filter */}
-              <Select value={statusFilter} onValueChange={(val) => { const value = val || "ALL"; setStatusFilter(value); updateFilters({ status: value }); }}>
+              <Select value={statusFilter} onValueChange={(val) => { const value = val || "ALL"; updateFilters({ status: value }); }}>
                 <SelectTrigger className="w-[140px] text-xs h-9">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
@@ -231,7 +227,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
               </Select>
 
               {/* Gender Filter */}
-              <Select value={genderFilter} onValueChange={(val) => { const value = val || "ALL"; setGenderFilter(value); updateFilters({ gender: value }); }}>
+              <Select value={genderFilter} onValueChange={(val) => { const value = val || "ALL"; updateFilters({ gender: value }); }}>
                 <SelectTrigger className="w-[130px] text-xs h-9">
                   <SelectValue placeholder="Gender" />
                 </SelectTrigger>
@@ -273,7 +269,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
                 key={chip.id}
                 variant={statusFilter === chip.id ? "default" : "outline"}
                 size="sm"
-                onClick={() => { setStatusFilter(chip.id); updateFilters({ status: chip.id }); }}
+                onClick={() => updateFilters({ status: chip.id })}
                 className="h-7 text-[11px] px-2.5 rounded-full shrink-0 font-normal"
               >
                 {chip.label}

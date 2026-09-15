@@ -6,7 +6,7 @@ import { TeamHierarchy } from "@/components/sections/TeamHierarchy";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Wujood Welfare — About Us",
+  title: "About Us",
   description:
     "Our mission, vision and values. Learn how Wujood Welfare serves Faisalabad's most vulnerable families.",
   openGraph: {
