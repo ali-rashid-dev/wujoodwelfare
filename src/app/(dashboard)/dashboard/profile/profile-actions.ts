@@ -6,12 +6,13 @@ import { requireServerSession } from "@/lib/auth-server";
 import { z } from "zod";
 
 const updateProfileSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
+  name: z.string().trim().min(2, "Name must be at least 2 characters"),
 });
 
 export async function updateUserProfile(data: { name: string }) {
+  const session = await requireServerSession();
+
   try {
-    const session = await requireServerSession();
     const validated = updateProfileSchema.parse(data);
 
     await prisma.user.update({
