@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -107,12 +107,23 @@ export function BeneficiaryTable({ initialData, initialSearch }: BeneficiaryTabl
   const [, startTransition] = useTransition();
 
   const [search, setSearch] = useState(initialSearch);
+  const searchQueue = useRef(Promise.resolve());
+  const latestSearchVersion = useRef(0);
   const statusFilter = searchParams.get("status") ?? "ALL";
   const genderFilter = searchParams.get("gender") ?? "ALL";
 
   useEffect(() => {
+    const version = ++latestSearchVersion.current;
     const timeout = window.setTimeout(() => {
-      void setBeneficiarySearch(search).then(() => router.refresh());
+      searchQueue.current = searchQueue.current
+        .catch(() => undefined)
+        .then(() => setBeneficiarySearch(search))
+        .then(() => {
+          if (version === latestSearchVersion.current) {
+            router.refresh();
+          }
+        })
+        .catch(() => undefined);
     }, 400);
 
     return () => window.clearTimeout(timeout);

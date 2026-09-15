@@ -41,7 +41,10 @@ export async function setBeneficiarySearch(value: string) {
       secure: process.env.NODE_ENV === "production",
     });
   } else {
-    cookieStore.delete(BENEFICIARY_SEARCH_COOKIE);
+    cookieStore.delete({
+      name: BENEFICIARY_SEARCH_COOKIE,
+      path: "/dashboard/beneficiaries",
+    });
   }
 }
 
