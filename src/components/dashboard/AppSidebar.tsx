@@ -58,6 +58,12 @@ export function AppSidebar() {
       exact: false,
     },
     {
+      title: "Households",
+      url: "/dashboard/households",
+      icon: Home,
+      exact: false,
+    },
+    {
       title: "Register Beneficiary",
       url: "/dashboard/beneficiaries/new",
       icon: UserPlus,
