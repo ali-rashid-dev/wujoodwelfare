@@ -29,6 +29,8 @@ import {
   LayoutDashboard,
   Users,
   UserPlus,
+  UserCheck,
+  HeartHandshake,
   User,
   Home,
   LogOut,
@@ -61,6 +63,18 @@ export function AppSidebar() {
       title: "Households",
       url: "/dashboard/households",
       icon: Home,
+      exact: false,
+    },
+    {
+      title: "Staff & Team",
+      url: "/dashboard/staff",
+      icon: UserCheck,
+      exact: false,
+    },
+    {
+      title: "Volunteers",
+      url: "/dashboard/volunteers",
+      icon: HeartHandshake,
       exact: false,
     },
     {

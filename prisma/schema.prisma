@@ -16,6 +16,7 @@ model User {
   updatedAt     DateTime
   accounts      Account[]
   sessions      Session[]
+  staff         Staff?
 
   @@map("user")
 }
@@ -221,8 +222,9 @@ model BeneficiaryCase {
   description   String?
   openedAt      DateTime    @default(now())
   closedAt      DateTime?
-  isOpen        Boolean     @default(true)
-  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  isOpen        Boolean          @default(true)
+  beneficiary   Beneficiary      @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  assignments   CaseAssignment[]
 
   @@map("beneficiary_case")
 }
@@ -317,3 +319,199 @@ model HouseholdDocument {
 
   @@map("household_document")
 }
+
+// ─── Staff & Volunteer Enums ──────────────────────────────────────────────────
+
+enum StaffRole {
+  ADMIN
+  FIELD_OFFICER
+  CASE_MANAGER
+  VOLUNTEER_COORDINATOR
+  FINANCE_OFFICER
+}
+
+enum StaffDepartment {
+  FIELD_OPERATIONS
+  CASE_MANAGEMENT
+  HEALTH_SERVICES
+  EDUCATION
+  LOGISTICS_RELIEF
+  FINANCE_ADMIN
+}
+
+enum StaffStatus {
+  ACTIVE
+  ON_LEAVE
+  SUSPENDED
+  TERMINATED
+}
+
+enum VolunteerStatus {
+  APPLIED
+  INTERVIEWED
+  ACTIVE
+  INACTIVE
+  REJECTED
+}
+
+enum VolunteerAvailability {
+  WEEKDAYS
+  WEEKENDS
+  EVENINGS
+  FULL_TIME
+  ON_CALL
+}
+
+// ─── Staff Models ─────────────────────────────────────────────────────────────
+
+model Staff {
+  id               String          @id @default(cuid())
+  employeeId       String          @unique
+  userId           String?         @unique
+  user             User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name             String
+  email            String          @unique
+  phone            String?
+  designation      String
+  role             StaffRole       @default(FIELD_OFFICER)
+  department       StaffDepartment @default(FIELD_OPERATIONS)
+  status           StaffStatus     @default(ACTIVE)
+  permissions      String[]
+  joinedAt         DateTime        @default(now())
+  emergencyContact String?
+  notes            String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignedCases CaseAssignment[]
+  activities    StaffActivity[]
+
+  @@map("staff")
+}
+
+model StaffCodeSequence {
+  year      Int @id
+  nextValue Int @default(0)
+
+  @@map("staff_code_sequence")
+}
+
+model CaseAssignment {
+  id         String          @id @default(cuid())
+  staffId    String
+  staff      Staff           @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  caseId     String
+  caseItem   BeneficiaryCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  roleInCase String          @default("Primary Officer")
+  assignedAt DateTime        @default(now())
+  status     String          @default("ACTIVE")
+  notes      String?
+
+  @@map("case_assignment")
+}
+
+model StaffActivity {
+  id          String   @id @default(cuid())
+  staffId     String
+  staff       Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  action      String
+  description String?
+  targetType  String?
+  targetId    String?
+  performedAt DateTime @default(now())
+
+  @@map("staff_activity")
+}
+
+// ─── Volunteer Models ─────────────────────────────────────────────────────────
+
+model Volunteer {
+  id               String                @id @default(cuid())
+  volunteerCode    String                @unique
+  cnic             String?               @unique
+  name             String
+  email            String
+  phone            String
+  status           VolunteerStatus       @default(APPLIED)
+  skills           String[]
+  availability     VolunteerAvailability @default(WEEKENDS)
+  city             String?
+  district         String?
+  area             String?
+  address          String?
+  totalHoursLogged Int                   @default(0)
+  rating           Decimal?              @db.Decimal(3, 2)
+  joinedAt         DateTime              @default(now())
+  notes            String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campaignAssignments VolunteerCampaignAssignment[]
+  activities          VolunteerActivity[]
+
+  @@map("volunteer")
+}
+
+model VolunteerCodeSequence {
+  year      Int @id
+  nextValue Int @default(0)
+
+  @@map("volunteer_code_sequence")
+}
+
+model WelfareCampaign {
+  id                  String                        @id @default(cuid())
+  code                String                        @unique
+  title               String
+  description         String?
+  location            String?
+  startDate           DateTime
+  endDate             DateTime?
+  status              String                        @default("PLANNING")
+  targetBeneficiaries Int?
+  createdAt           DateTime                      @default(now())
+  updatedAt           DateTime                      @updatedAt
+
+  volunteerAssignments VolunteerCampaignAssignment[]
+
+  @@map("welfare_campaign")
+}
+
+model CampaignCodeSequence {
+  year      Int @id
+  nextValue Int @default(0)
+
+  @@map("campaign_code_sequence")
+}
+
+model VolunteerCampaignAssignment {
+  id          String          @id @default(cuid())
+  volunteerId String
+  volunteer   Volunteer       @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  campaignId  String
+  campaign    WelfareCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  role        String?
+  assignedAt  DateTime        @default(now())
+  hoursLogged Int             @default(0)
+  status      String          @default("ASSIGNED")
+
+  @@map("volunteer_campaign_assignment")
+}
+
+model VolunteerActivity {
+  id           String    @id @default(cuid())
+  volunteerId  String
+  volunteer    Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?
+  hours        Int       @default(0)
+  activityDate DateTime  @default(now())
+  location     String?
+  feedback     String?
+  createdAt    DateTime  @default(now())
+
+  @@map("volunteer_activity")
+}
+

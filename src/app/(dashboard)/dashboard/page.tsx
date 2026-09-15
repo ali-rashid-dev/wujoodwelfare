@@ -130,7 +130,7 @@ export default function DashboardPage() {
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Welfare Management Modules</CardTitle>
           <CardDescription className="text-xs">
-            Access core welfare registry, aid tracking, and beneficiary database.
+            Access core welfare registry, aid tracking, staff operations, and volunteer management.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -151,6 +151,46 @@ export default function DashboardPage() {
                 </p>
               </div>
               <Button size="sm" variant="ghost" className="text-xs text-primary gap-1 font-semibold group-hover:translate-x-0.5 transition-transform">
+                Open <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+
+            <div
+              onClick={() => router.push("/dashboard/staff")}
+              className="flex items-center justify-between p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 transition-colors cursor-pointer group"
+            >
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-blue-600" />
+                  <h4 className="font-bold text-sm text-foreground group-hover:text-blue-600 transition-colors">
+                    Staff & Team Management
+                  </h4>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Manage staff profiles, role permissions, assigned cases, and field activity logs.
+                </p>
+              </div>
+              <Button size="sm" variant="ghost" className="text-xs text-blue-600 gap-1 font-semibold group-hover:translate-x-0.5 transition-transform">
+                Open <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+
+            <div
+              onClick={() => router.push("/dashboard/volunteers")}
+              className="flex items-center justify-between p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors cursor-pointer group"
+            >
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-emerald-600" />
+                  <h4 className="font-bold text-sm text-foreground group-hover:text-emerald-600 transition-colors">
+                    Volunteer & Campaign Management
+                  </h4>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Register volunteers, track skills & availability, deploy campaigns, and log service hours.
+                </p>
+              </div>
+              <Button size="sm" variant="ghost" className="text-xs text-emerald-600 gap-1 font-semibold group-hover:translate-x-0.5 transition-transform">
                 Open <ArrowRight className="w-3.5 h-3.5" />
               </Button>
             </div>
