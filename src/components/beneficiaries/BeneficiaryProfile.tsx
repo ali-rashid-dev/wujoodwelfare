@@ -145,16 +145,20 @@ export function BeneficiaryProfile({ beneficiary }: BeneficiaryProfileProps) {
   const [caseTitle, setCaseTitle] = useState("");
   const [caseDesc, setCaseDesc] = useState("");
 
-  const copyToClipboard = (text: string, type: "cnic" | "phone") => {
-    navigator.clipboard.writeText(text);
-    if (type === "cnic") {
-      setCopiedCnic(true);
-      toast.success("CNIC copied to clipboard");
-      setTimeout(() => setCopiedCnic(false), 2000);
-    } else {
-      setCopiedPhone(true);
-      toast.success("Phone number copied to clipboard");
-      setTimeout(() => setCopiedPhone(false), 2000);
+  const copyToClipboard = async (text: string, type: "cnic" | "phone") => {
+    try {
+      await navigator.clipboard.writeText(text);
+      if (type === "cnic") {
+        setCopiedCnic(true);
+        toast.success("CNIC copied to clipboard");
+        setTimeout(() => setCopiedCnic(false), 2000);
+      } else {
+        setCopiedPhone(true);
+        toast.success("Phone number copied to clipboard");
+        setTimeout(() => setCopiedPhone(false), 2000);
+      }
+    } catch {
+      toast.error("Could not copy to clipboard");
     }
   };
 
@@ -312,12 +316,12 @@ export function BeneficiaryProfile({ beneficiary }: BeneficiaryProfileProps) {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="FINANCIAL">Financial Assistance</SelectItem>
-                        <SelectItem value="FOOD_RATION">Food Ration Pack</SelectItem>
+                        <SelectItem value="FOOD">Food Assistance</SelectItem>
                         <SelectItem value="MEDICAL">Medical Treatment / Medicine</SelectItem>
                         <SelectItem value="EDUCATION">Educational Fee / School Kit</SelectItem>
-                        <SelectItem value="SHELTER">Shelter / Housing Repair</SelectItem>
-                        <SelectItem value="EMERGENCY_RELIEF">Emergency Disaster Relief</SelectItem>
-                        <SelectItem value="JOB_PLACEMENT">Job / Small Business Micro-grant</SelectItem>
+                        <SelectItem value="HOUSING">Shelter / Housing Repair</SelectItem>
+                        <SelectItem value="FINANCIAL">Emergency Financial Relief</SelectItem>
+                        <SelectItem value="OTHER">Job / Small Business Support</SelectItem>
                         <SelectItem value="OTHER">Other Support</SelectItem>
                       </SelectContent>
                     </Select>
@@ -409,10 +413,9 @@ export function BeneficiaryProfile({ beneficiary }: BeneficiaryProfileProps) {
                       <SelectContent>
                         <SelectItem value="CNIC">CNIC Copy</SelectItem>
                         <SelectItem value="B_FORM">B-Form (Children)</SelectItem>
-                        <SelectItem value="UTILITY_BILL">Utility Bill (Electricity/Gas)</SelectItem>
-                        <SelectItem value="INCOME_CERTIFICATE">Income Certificate</SelectItem>
+                        <SelectItem value="PROOF_OF_RESIDENCE">Utility Bill (Electricity/Gas)</SelectItem>
+                        <SelectItem value="PROOF_OF_INCOME">Income Certificate</SelectItem>
                         <SelectItem value="MEDICAL_REPORT">Medical Report</SelectItem>
-                        <SelectItem value="DEATH_CERTIFICATE">Death Certificate</SelectItem>
                         <SelectItem value="OTHER">Other Document</SelectItem>
                       </SelectContent>
                     </Select>
@@ -818,7 +821,7 @@ export function BeneficiaryProfile({ beneficiary }: BeneficiaryProfileProps) {
                   <FolderOpen className="w-10 h-10 text-muted-foreground mx-auto mb-2 opacity-50" />
                   <p className="text-sm font-medium text-foreground">No documents attached yet</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Click "Attach Document" to add CNIC copies, bills, or medical reports.
+                    Click &quot;Attach Document&quot; to add CNIC copies, bills, or medical reports.
                   </p>
                 </div>
               ) : (
@@ -903,7 +906,7 @@ export function BeneficiaryProfile({ beneficiary }: BeneficiaryProfileProps) {
                   <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-2 opacity-50" />
                   <p className="text-sm font-medium text-foreground">No active cases or appeals logged</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Click "Open New Case" to log an urgent medical appeal or emergency aid request.
+                    Click &quot;Open New Case&quot; to log an urgent medical appeal or emergency aid request.
                   </p>
                 </div>
               ) : (

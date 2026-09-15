@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, XCircle, AlertTriangle, ShieldCheck, Archive } from "lucide-react";
+import { CheckCircle2, Clock, XCircle, ShieldCheck } from "lucide-react";
 import { BeneficiaryStatus } from "@prisma/client";
 
 interface StatusBadgeProps {
@@ -52,18 +52,6 @@ export function StatusBadge({ status, isVerified, showVerifiedOnly }: StatusBadg
           label: "Inactive",
           className: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20",
           icon: XCircle,
-        };
-      case "SUSPENDED":
-        return {
-          label: "Suspended",
-          className: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
-          icon: AlertTriangle,
-        };
-      case "ARCHIVED":
-        return {
-          label: "Archived",
-          className: "bg-neutral-500/10 text-neutral-500 border-neutral-500/20",
-          icon: Archive,
         };
       default:
         return {

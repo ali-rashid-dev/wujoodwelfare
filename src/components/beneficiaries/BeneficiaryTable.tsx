@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import {
   Table,
@@ -54,7 +54,6 @@ import {
   Users,
   ShieldCheck,
   CheckCircle2,
-  AlertTriangle,
   ChevronLeft,
   ChevronRight,
   X,
@@ -103,41 +102,44 @@ interface BeneficiaryTableProps {
 
 export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams();
+  const [, startTransition] = useTransition();
 
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
-  const [genderFilter, setGenderFilter] = useState("ALL");
+  const [search, setSearch] = useState(() => searchParams.get("search") ?? "");
+  const [statusFilter, setStatusFilter] = useState(() => searchParams.get("status") ?? "ALL");
+  const [genderFilter, setGenderFilter] = useState(() => searchParams.get("gender") ?? "ALL");
 
   // AlertDialog State
   const [deleteCandidate, setDeleteCandidate] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const updateFilters = (next: { search?: string; status?: string; gender?: string }) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("page");
+    const values = {
+      search: next.search ?? search,
+      status: next.status ?? statusFilter,
+      gender: next.gender ?? genderFilter,
+    };
+    for (const [key, value] of Object.entries(values)) {
+      if (!value || value === "ALL") params.delete(key);
+      else params.set(key, value);
+    }
+    router.push(`/dashboard/beneficiaries?${params.toString()}`);
+  };
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
+    const value = e.target.value;
+    setSearch(value);
+    updateFilters({ search: value });
   };
 
   const clearFilters = () => {
     setSearch("");
     setStatusFilter("ALL");
     setGenderFilter("ALL");
+    updateFilters({ search: "", status: "ALL", gender: "ALL" });
   };
-
-  const filteredItems = initialData.items.filter((item) => {
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      const matchName = item.name.toLowerCase().includes(q);
-      const matchCnic = item.cnic?.toLowerCase().includes(q) ?? false;
-      const matchPhone = item.contact?.phone?.toLowerCase().includes(q) ?? false;
-      const matchCity = item.address?.city?.toLowerCase().includes(q) ?? false;
-      if (!matchName && !matchCnic && !matchPhone && !matchCity) return false;
-    }
-
-    if (statusFilter !== "ALL" && item.status !== statusFilter) return false;
-    if (genderFilter !== "ALL" && item.gender !== genderFilter) return false;
-
-    return true;
-  });
 
   const confirmDelete = async () => {
     if (!deleteCandidate) return;
@@ -204,7 +206,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
               />
               {search && (
                 <button
-                  onClick={() => setSearch("")}
+                  onClick={() => { setSearch(""); updateFilters({ search: "" }); }}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-4 h-4" />
@@ -215,7 +217,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
             {/* Dropdown Filters & Actions */}
             <div className="flex items-center gap-2 flex-wrap">
               {/* Status Filter */}
-              <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val || "ALL")}>
+              <Select value={statusFilter} onValueChange={(val) => { const value = val || "ALL"; setStatusFilter(value); updateFilters({ status: value }); }}>
                 <SelectTrigger className="w-[140px] text-xs h-9">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
@@ -225,13 +227,11 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
                   <SelectItem value="ACTIVE">Active</SelectItem>
                   <SelectItem value="VERIFIED">Verified</SelectItem>
                   <SelectItem value="INACTIVE">Inactive</SelectItem>
-                  <SelectItem value="SUSPENDED">Suspended</SelectItem>
-                  <SelectItem value="ARCHIVED">Archived</SelectItem>
                 </SelectContent>
               </Select>
 
               {/* Gender Filter */}
-              <Select value={genderFilter} onValueChange={(val) => setGenderFilter(val || "ALL")}>
+              <Select value={genderFilter} onValueChange={(val) => { const value = val || "ALL"; setGenderFilter(value); updateFilters({ gender: value }); }}>
                 <SelectTrigger className="w-[130px] text-xs h-9">
                   <SelectValue placeholder="Gender" />
                 </SelectTrigger>
@@ -262,18 +262,18 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
           {/* Status Quick Filter Chips */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 text-xs">
             <span className="text-muted-foreground font-medium text-[11px] shrink-0 mr-1">Quick Filter:</span>
-            {[
+              {[
               { id: "ALL", label: "All" },
               { id: "ACTIVE", label: "Active" },
               { id: "VERIFIED", label: "Verified" },
               { id: "PENDING", label: "Pending" },
-              { id: "SUSPENDED", label: "Suspended" },
+              { id: "INACTIVE", label: "Inactive" },
             ].map((chip) => (
               <Button
                 key={chip.id}
                 variant={statusFilter === chip.id ? "default" : "outline"}
                 size="sm"
-                onClick={() => setStatusFilter(chip.id)}
+                onClick={() => { setStatusFilter(chip.id); updateFilters({ status: chip.id }); }}
                 className="h-7 text-[11px] px-2.5 rounded-full shrink-0 font-normal"
               >
                 {chip.label}
@@ -298,7 +298,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredItems.length === 0 ? (
+              {initialData.items.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-12">
                     <Users className="w-10 h-10 text-muted-foreground mx-auto mb-2 opacity-40" />
@@ -317,7 +317,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredItems.map((item) => (
+                initialData.items.map((item) => (
                   <TableRow key={item.id} className="hover:bg-muted/30 transition-colors">
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -407,10 +407,10 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
                             <ShieldCheck className="w-3.5 h-3.5 text-blue-500" /> Verify Beneficiary
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => handleStatusUpdate(item.id, item.name, "SUSPENDED" as BeneficiaryStatus)}
+                            onClick={() => handleStatusUpdate(item.id, item.name, BeneficiaryStatus.INACTIVE)}
                             className="gap-2 text-xs cursor-pointer"
                           >
-                            <AlertTriangle className="w-3.5 h-3.5 text-rose-500" /> Suspend
+                            <X className="w-3.5 h-3.5 text-rose-500" /> Mark Inactive
                           </DropdownMenuItem>
 
                           <DropdownMenuSeparator />
@@ -432,7 +432,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
 
         {/* MOBILE CARD GRID VIEW (< md) */}
         <div className="block md:hidden divide-y divide-border">
-          {filteredItems.length === 0 ? (
+          {initialData.items.length === 0 ? (
             <div className="text-center py-10 px-4">
               <Users className="w-10 h-10 text-muted-foreground mx-auto mb-2 opacity-40" />
               <p className="text-sm font-semibold text-foreground">No beneficiaries found</p>
@@ -441,7 +441,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
               </p>
             </div>
           ) : (
-            filteredItems.map((item) => (
+            initialData.items.map((item) => (
               <div key={item.id} className="p-4 space-y-3 hover:bg-muted/20 transition-colors">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -534,7 +534,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
         {/* Footer / Pagination */}
         <div className="flex items-center justify-between p-4 border-t border-border text-xs text-muted-foreground bg-muted/20">
           <div>
-            Showing <span className="font-semibold text-foreground">{filteredItems.length}</span> of{" "}
+            Showing <span className="font-semibold text-foreground">{initialData.items.length}</span> of{" "}
             <span className="font-semibold text-foreground">{initialData.total}</span> beneficiaries
           </div>
           <div className="flex items-center gap-1">
@@ -542,7 +542,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
               variant="outline"
               size="sm"
               disabled={initialData.page <= 1}
-              onClick={() => router.push(`/dashboard/beneficiaries?page=${initialData.page - 1}`)}
+              onClick={() => { const params = new URLSearchParams(searchParams.toString()); params.set("page", String(initialData.page - 1)); router.push(`/dashboard/beneficiaries?${params.toString()}`); }}
               className="h-8 w-8 p-0"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -554,7 +554,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
               variant="outline"
               size="sm"
               disabled={initialData.page >= initialData.totalPages}
-              onClick={() => router.push(`/dashboard/beneficiaries?page=${initialData.page + 1}`)}
+              onClick={() => { const params = new URLSearchParams(searchParams.toString()); params.set("page", String(initialData.page + 1)); router.push(`/dashboard/beneficiaries?${params.toString()}`); }}
               className="h-8 w-8 p-0"
             >
               <ChevronRight className="w-4 h-4" />

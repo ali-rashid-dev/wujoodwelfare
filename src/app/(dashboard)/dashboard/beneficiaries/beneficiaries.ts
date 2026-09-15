@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
+import { requireServerSession } from "@/lib/auth-server";
 import {
   beneficiaryFormSchema,
   BeneficiaryFormInput,
@@ -13,6 +14,7 @@ import {
   BeneficiaryCaseInput,
 } from "@/validation/beneficiary";
 import {
+  Prisma,
   BeneficiaryStatus,
   Gender,
   MaritalStatus,
@@ -24,6 +26,7 @@ import {
 
 export async function createBeneficiary(data: BeneficiaryFormInput) {
   try {
+    await requireServerSession();
     const validated = beneficiaryFormSchema.parse(data);
 
     if (validated.cnic) {
@@ -99,7 +102,9 @@ export async function createBeneficiary(data: BeneficiaryFormInput) {
 
 export async function updateBeneficiary(id: string, data: BeneficiaryFormInput) {
   try {
+    await requireServerSession();
     const validated = beneficiaryFormSchema.parse(data);
+    const current = await prisma.beneficiary.findUnique({ where: { id }, select: { verifiedAt: true } });
 
     if (validated.cnic) {
       const existingCnic = await prisma.beneficiary.findFirst({
@@ -127,7 +132,7 @@ export async function updateBeneficiary(id: string, data: BeneficiaryFormInput) 
         gender: validated.gender as Gender,
         status: validated.status as BeneficiaryStatus,
         notes: validated.notes || null,
-        verifiedAt: validated.isVerified ? new Date() : null,
+        verifiedAt: validated.isVerified ? (current?.verifiedAt ?? new Date()) : null,
 
         contact: validated.contact ? {
           upsert: {
@@ -212,6 +217,7 @@ export async function updateBeneficiary(id: string, data: BeneficiaryFormInput) 
 
 export async function deleteBeneficiary(id: string) {
   try {
+    await requireServerSession();
     await prisma.beneficiary.delete({ where: { id } });
     revalidatePath("/dashboard/beneficiaries");
     return { success: true };
@@ -227,12 +233,16 @@ export async function updateBeneficiaryStatus(
   isVerified?: boolean
 ) {
   try {
+    await requireServerSession();
+    const current = isVerified
+      ? await prisma.beneficiary.findUnique({ where: { id }, select: { verifiedAt: true } })
+      : null;
     await prisma.beneficiary.update({
       where: { id },
       data: {
         status,
         ...(isVerified !== undefined
-          ? { verifiedAt: isVerified ? new Date() : null }
+          ? { verifiedAt: isVerified ? (current?.verifiedAt ?? new Date()) : null }
           : {}),
       },
     });
@@ -247,13 +257,14 @@ export async function updateBeneficiaryStatus(
 
 export async function addAssistanceRecord(beneficiaryId: string, data: AssistanceRecordInput) {
   try {
+    await requireServerSession();
     const validated = assistanceRecordSchema.parse(data);
 
     const record = await prisma.assistanceRecord.create({
       data: {
         beneficiaryId,
         type: validated.type as AssistanceType,
-        amount: validated.amount || null,
+        amount: validated.amount ?? null,
         description: validated.description,
         givenAt: new Date(validated.givenAt),
         givenBy: validated.givenBy || null,
@@ -270,6 +281,7 @@ export async function addAssistanceRecord(beneficiaryId: string, data: Assistanc
 
 export async function addBeneficiaryDocument(beneficiaryId: string, data: BeneficiaryDocumentInput) {
   try {
+    await requireServerSession();
     const validated = beneficiaryDocumentSchema.parse(data);
 
     const document = await prisma.beneficiaryDocument.create({
@@ -291,7 +303,13 @@ export async function addBeneficiaryDocument(beneficiaryId: string, data: Benefi
 
 export async function deleteBeneficiaryDocument(documentId: string, beneficiaryId: string) {
   try {
-    await prisma.beneficiaryDocument.delete({ where: { id: documentId } });
+    await requireServerSession();
+    const result = await prisma.beneficiaryDocument.deleteMany({
+      where: { id: documentId, beneficiaryId },
+    });
+    if (result.count === 0) {
+      return { success: false, error: "Document not found for this beneficiary" };
+    }
     revalidatePath(`/dashboard/beneficiaries/${beneficiaryId}`);
     return { success: true };
   } catch (err: unknown) {
@@ -302,6 +320,7 @@ export async function deleteBeneficiaryDocument(documentId: string, beneficiaryI
 
 export async function addBeneficiaryCase(beneficiaryId: string, data: BeneficiaryCaseInput) {
   try {
+    await requireServerSession();
     const validated = beneficiaryCaseSchema.parse(data);
 
     const newCase = await prisma.beneficiaryCase.create({
@@ -323,6 +342,7 @@ export async function addBeneficiaryCase(beneficiaryId: string, data: Beneficiar
 
 export async function getBeneficiary(id: string) {
   try {
+    await requireServerSession();
     const beneficiary = await prisma.beneficiary.findUnique({
       where: { id },
       include: {
@@ -342,7 +362,17 @@ export async function getBeneficiary(id: string) {
       },
     });
 
-    return beneficiary;
+    if (!beneficiary) return null;
+    return {
+      ...beneficiary,
+      economic: beneficiary.economic
+        ? { ...beneficiary.economic, monthlyIncome: beneficiary.economic.monthlyIncome === null ? null : Number(beneficiary.economic.monthlyIncome) }
+        : null,
+      assistanceHistory: beneficiary.assistanceHistory.map((record) => ({
+        ...record,
+        amount: record.amount === null ? null : Number(record.amount),
+      })),
+    };
   } catch {
     return null;
   }
@@ -356,18 +386,23 @@ export async function getBeneficiaries(params?: {
   limit?: number;
 }) {
   try {
-    const page = params?.page || 1;
-    const limit = params?.limit || 10;
+    await requireServerSession();
+    const requestedPage = params?.page;
+    const requestedLimit = params?.limit;
+    const page = typeof requestedPage === "number" && Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+    const limit = typeof requestedLimit === "number" && Number.isInteger(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 100) : 10;
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.BeneficiaryWhereInput = {};
 
     if (params?.status && params.status !== "ALL") {
-      where.status = params.status;
+      const status = Object.values(BeneficiaryStatus).find((value) => value === params.status);
+      if (status) where.status = status;
     }
 
     if (params?.gender && params.gender !== "ALL") {
-      where.gender = params.gender;
+      const gender = Object.values(Gender).find((value) => value === params.gender);
+      if (gender) where.gender = gender;
     }
 
     if (params?.search && params.search.trim() !== "") {
@@ -408,7 +443,16 @@ export async function getBeneficiaries(params?: {
     ]);
 
     return {
-      items,
+      items: items.map((item) => ({
+        ...item,
+        economic: item.economic
+          ? { ...item.economic, monthlyIncome: item.economic.monthlyIncome === null ? null : Number(item.economic.monthlyIncome) }
+          : null,
+        assistanceHistory: item.assistanceHistory.map((record) => ({
+          ...record,
+          amount: record.amount === null ? null : Number(record.amount),
+        })),
+      })),
       total,
       page,
       totalPages: Math.ceil(total / limit),
@@ -420,6 +464,7 @@ export async function getBeneficiaries(params?: {
 
 export async function getBeneficiaryStats() {
   try {
+    await requireServerSession();
     const [total, verified, pending, active, totalAssistance] = await Promise.all([
       prisma.beneficiary.count(),
       prisma.beneficiary.count({ where: { verifiedAt: { not: null } } }),
@@ -435,7 +480,7 @@ export async function getBeneficiaryStats() {
       verified,
       pending,
       active,
-      totalAssistanceAmount: totalAssistance._sum.amount || 0,
+      totalAssistanceAmount: totalAssistance._sum.amount === null ? 0 : Number(totalAssistance._sum.amount),
     };
   } catch {
     return { total: 0, verified: 0, pending: 0, active: 0, totalAssistanceAmount: 0 };

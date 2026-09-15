@@ -23,7 +23,8 @@ interface PageProps {
 
 export default async function BeneficiariesPage({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
-  const page = resolvedParams.page ? parseInt(resolvedParams.page, 10) : 1;
+  const parsedPage = resolvedParams.page ? Number.parseInt(resolvedParams.page, 10) : 1;
+  const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
   const [data, stats] = await Promise.all([
     getBeneficiaries({

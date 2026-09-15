@@ -1,13 +1,12 @@
 import { z } from "zod";
+import {
+  AssistanceType,
+  BeneficiaryStatus,
+  DocumentType,
+  EmploymentStatus,
+} from "@prisma/client";
 
-export const BeneficiaryStatusEnum = z.enum([
-  "PENDING",
-  "ACTIVE",
-  "INACTIVE",
-  "VERIFIED",
-  "SUSPENDED",
-  "ARCHIVED",
-]);
+export const BeneficiaryStatusEnum = z.enum(BeneficiaryStatus);
 
 export const GenderEnum = z.enum(["MALE", "FEMALE", "OTHER"]);
 
@@ -18,14 +17,7 @@ export const MaritalStatusEnum = z.enum([
   "DIVORCED",
 ]);
 
-export const EmploymentStatusEnum = z.enum([
-  "EMPLOYED",
-  "UNEMPLOYED",
-  "SELF_EMPLOYED",
-  "DAILY_WAGER",
-  "DISABLED",
-  "STUDENT",
-]);
+export const EmploymentStatusEnum = z.enum(EmploymentStatus);
 
 export const HousingTypeEnum = z.enum([
   "OWNED",
@@ -34,26 +26,14 @@ export const HousingTypeEnum = z.enum([
   "HOMELESS",
 ]);
 
-export const AssistanceTypeEnum = z.enum([
-  "FINANCIAL",
-  "FOOD_RATION",
-  "MEDICAL",
-  "EDUCATION",
-  "SHELTER",
-  "EMERGENCY_RELIEF",
-  "JOB_PLACEMENT",
-  "OTHER",
-]);
+export const AssistanceTypeEnum = z.enum(AssistanceType);
 
-export const DocumentTypeEnum = z.enum([
-  "CNIC",
-  "B_FORM",
-  "UTILITY_BILL",
-  "INCOME_CERTIFICATE",
-  "MEDICAL_REPORT",
-  "DEATH_CERTIFICATE",
-  "OTHER",
-]);
+export const DocumentTypeEnum = z.enum(DocumentType);
+
+const optionalDate = z.string().refine(
+  (value) => value === "" || (/^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(`${value}T00:00:00Z`).getTime())),
+  "Invalid date"
+).optional();
 
 // Personal Info schema
 export const beneficiaryPersonalSchema = z.object({
@@ -63,7 +43,7 @@ export const beneficiaryPersonalSchema = z.object({
     .min(13, "CNIC must be at least 13 characters (e.g. 42101-1234567-1)")
     .max(15, "CNIC cannot exceed 15 characters"),
   fatherName: z.string().optional(),
-  dateOfBirth: z.string().optional().or(z.literal("")),
+  dateOfBirth: optionalDate,
   gender: GenderEnum.default("MALE"),
   status: BeneficiaryStatusEnum.default("PENDING"),
   isVerified: z.boolean().default(false),
@@ -122,7 +102,10 @@ export const assistanceRecordSchema = z.object({
   type: AssistanceTypeEnum,
   amount: z.coerce.number().min(0).optional(),
   description: z.string().min(3, "Description is required"),
-  givenAt: z.string().min(1, "Date is required"),
+  givenAt: z.string().min(1, "Date is required").refine(
+    (value) => /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(`${value}T00:00:00Z`).getTime()),
+    "Invalid date"
+  ),
   givenBy: z.string().optional(),
 });
 

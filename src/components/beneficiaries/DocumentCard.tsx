@@ -46,18 +46,18 @@ export function DocumentCard({
       case "CNIC":
       case "B_FORM":
         return Shield;
-      case "INCOME_CERTIFICATE":
+      case "PROOF_OF_INCOME":
         return Award;
       case "MEDICAL_REPORT":
         return Stethoscope;
-      case "UTILITY_BILL":
+      case "PROOF_OF_RESIDENCE":
         return FileCheck;
       default:
         return FileText;
     }
   };
 
-  const Icon = getDocIcon();
+  const icon = getDocIcon();
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -89,7 +89,7 @@ export function DocumentCard({
         <CardContent className="p-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3.5 min-w-0">
             <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <Icon className="w-5 h-5" />
+              {React.createElement(icon, { className: "w-5 h-5" })}
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
@@ -118,6 +118,7 @@ export function DocumentCard({
               size="sm"
               disabled={isDeleting}
               onClick={() => setShowConfirm(true)}
+              aria-label="Delete document"
               className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
             >
               <Trash2 className="w-4 h-4" />

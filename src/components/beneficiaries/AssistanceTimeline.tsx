@@ -3,7 +3,7 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { DollarSign, Utensils, Stethoscope, GraduationCap, Home, AlertCircle, Briefcase, HelpCircle, Calendar } from "lucide-react";
+import { DollarSign, Utensils, Stethoscope, GraduationCap, Home, HelpCircle, Calendar } from "lucide-react";
 import { AssistanceType } from "@prisma/client";
 
 export interface AssistanceItem {
@@ -26,7 +26,7 @@ export function AssistanceTimeline({ items }: AssistanceTimelineProps) {
         <HelpCircle className="w-10 h-10 text-muted-foreground mx-auto mb-2 opacity-50" />
         <p className="text-sm font-medium text-foreground">No assistance history recorded yet</p>
         <p className="text-xs text-muted-foreground mt-1">
-          Click "Record Aid" to log financial, medical, or ration support.
+          Click &quot;Record Aid&quot; to log financial, medical, or ration support.
         </p>
       </div>
     );
@@ -36,18 +36,14 @@ export function AssistanceTimeline({ items }: AssistanceTimelineProps) {
     switch (type) {
       case "FINANCIAL":
         return DollarSign;
-      case "FOOD_RATION":
+      case "FOOD":
         return Utensils;
       case "MEDICAL":
         return Stethoscope;
       case "EDUCATION":
         return GraduationCap;
-      case "SHELTER":
+      case "HOUSING":
         return Home;
-      case "EMERGENCY_RELIEF":
-        return AlertCircle;
-      case "JOB_PLACEMENT":
-        return Briefcase;
       default:
         return HelpCircle;
     }

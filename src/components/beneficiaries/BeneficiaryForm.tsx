@@ -83,7 +83,12 @@ export function BeneficiaryForm({ initialData, isEdit = false }: BeneficiaryForm
   const [cnic, setCnic] = useState(initialData?.cnic || "");
   const [fatherName, setFatherName] = useState(initialData?.fatherName || "");
   const [dateOfBirth, setDateOfBirth] = useState(
-    initialData?.dateOfBirth ? new Date(initialData.dateOfBirth).toISOString().split("T")[0] : ""
+    initialData?.dateOfBirth
+      ? (() => {
+          const date = new Date(initialData.dateOfBirth);
+          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+        })()
+      : ""
   );
   const [gender, setGender] = useState(initialData?.gender || "MALE");
   const [status, setStatus] = useState(initialData?.status || "PENDING");
@@ -348,7 +353,6 @@ export function BeneficiaryForm({ initialData, isEdit = false }: BeneficiaryForm
                       <SelectItem value="ACTIVE">Active Beneficiary</SelectItem>
                       <SelectItem value="VERIFIED">Verified & Active</SelectItem>
                       <SelectItem value="INACTIVE">Inactive</SelectItem>
-                      <SelectItem value="SUSPENDED">Suspended</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
