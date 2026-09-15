@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -62,7 +62,7 @@ import {
   FilterX,
 } from "lucide-react";
 import { StatusBadge } from "./StatusBadge";
-import { deleteBeneficiary, updateBeneficiaryStatus } from "@/app/(dashboard)/dashboard/beneficiaries/beneficiaries";
+import { deleteBeneficiary, setBeneficiarySearch, updateBeneficiaryStatus } from "@/app/(dashboard)/dashboard/beneficiaries/beneficiaries";
 import { BeneficiaryStatus } from "@prisma/client";
 
 export interface BeneficiaryItem {
@@ -92,6 +92,7 @@ export interface BeneficiaryItem {
 }
 
 interface BeneficiaryTableProps {
+  initialSearch: string;
   initialData: {
     items: BeneficiaryItem[];
     total: number;
@@ -100,24 +101,32 @@ interface BeneficiaryTableProps {
   };
 }
 
-export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
+export function BeneficiaryTable({ initialData, initialSearch }: BeneficiaryTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
 
-  const search = searchParams.get("search") ?? "";
+  const [search, setSearch] = useState(initialSearch);
   const statusFilter = searchParams.get("status") ?? "ALL";
   const genderFilter = searchParams.get("gender") ?? "ALL";
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      void setBeneficiarySearch(search).then(() => router.refresh());
+    }, 400);
+
+    return () => window.clearTimeout(timeout);
+  }, [search, router]);
 
   // AlertDialog State
   const [deleteCandidate, setDeleteCandidate] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const updateFilters = (next: { search?: string; status?: string; gender?: string }) => {
+  const updateFilters = (next: { status?: string; gender?: string }) => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("page");
+    params.delete("search");
     const values = {
-      search: next.search ?? search,
       status: next.status ?? statusFilter,
       gender: next.gender ?? genderFilter,
     };
@@ -129,12 +138,12 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    updateFilters({ search: value });
+    setSearch(e.target.value);
   };
 
   const clearFilters = () => {
-    updateFilters({ search: "", status: "ALL", gender: "ALL" });
+    setSearch("");
+    updateFilters({ status: "ALL", gender: "ALL" });
   };
 
   const confirmDelete = async () => {
@@ -202,7 +211,7 @@ export function BeneficiaryTable({ initialData }: BeneficiaryTableProps) {
               />
               {search && (
                 <button
-                  onClick={() => updateFilters({ search: "" })}
+                  onClick={() => setSearch("")}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-4 h-4" />

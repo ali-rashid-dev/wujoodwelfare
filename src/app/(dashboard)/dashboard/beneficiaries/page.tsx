@@ -1,6 +1,7 @@
 import React from "react";
+import { cookies } from "next/headers";
 import Link from "next/link";
-import { getBeneficiaries, getBeneficiaryStats } from "@/app/(dashboard)/dashboard/beneficiaries/beneficiaries";
+import { BENEFICIARY_SEARCH_COOKIE, getBeneficiaries, getBeneficiaryStats } from "@/app/(dashboard)/dashboard/beneficiaries/beneficiaries";
 import { BeneficiaryTable } from "@/components/beneficiaries/BeneficiaryTable";
 import { Card, CardContent } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
@@ -14,7 +15,6 @@ export const metadata = {
 
 interface PageProps {
   searchParams: Promise<{
-    search?: string;
     status?: string;
     gender?: string;
     page?: string;
@@ -23,12 +23,13 @@ interface PageProps {
 
 export default async function BeneficiariesPage({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
+  const search = (await cookies()).get(BENEFICIARY_SEARCH_COOKIE)?.value;
   const parsedPage = resolvedParams.page ? Number.parseInt(resolvedParams.page, 10) : 1;
   const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
   const [data, stats] = await Promise.all([
     getBeneficiaries({
-      search: resolvedParams.search,
+      search,
       status: resolvedParams.status,
       gender: resolvedParams.gender,
       page,
@@ -130,7 +131,7 @@ export default async function BeneficiariesPage({ searchParams }: PageProps) {
       </div>
 
       {/* Main Beneficiary Table */}
-      <BeneficiaryTable initialData={data} />
+      <BeneficiaryTable initialData={data} initialSearch={search ?? ""} />
     </div>
   );
 }

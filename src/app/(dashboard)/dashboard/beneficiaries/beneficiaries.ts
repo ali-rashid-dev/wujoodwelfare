@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
 import { requireServerSession } from "@/lib/auth-server";
 import {
@@ -23,6 +24,26 @@ import {
   AssistanceType,
   DocumentType,
 } from "@prisma/client";
+
+export const BENEFICIARY_SEARCH_COOKIE = "beneficiary-search";
+
+export async function setBeneficiarySearch(value: string) {
+  await requireServerSession();
+  const cookieStore = await cookies();
+  const search = value.trim();
+
+  if (search) {
+    cookieStore.set(BENEFICIARY_SEARCH_COOKIE, search, {
+      httpOnly: true,
+      maxAge: 300,
+      path: "/dashboard/beneficiaries",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+  } else {
+    cookieStore.delete(BENEFICIARY_SEARCH_COOKIE);
+  }
+}
 
 export async function createBeneficiary(data: BeneficiaryFormInput) {
   try {

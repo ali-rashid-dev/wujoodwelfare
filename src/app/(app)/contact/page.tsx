@@ -4,8 +4,16 @@ import { useState } from "react";
 import { Reveal } from "@/components/site/Reveal";
 import { PageHero } from "@/components/site/SiteLayout";
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 import { contactFormSchema } from "@/validation";
+
+type ContactCard = {
+  icon: LucideIcon;
+  title: string;
+  value: string;
+  href?: string;
+};
 
 export default function ContactPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -52,7 +60,7 @@ export default function ContactPage() {
 
       <section className="section-y container-x grid lg:grid-cols-5 gap-10">
         <Reveal className="lg:col-span-2 space-y-4">
-          {[
+          {([
             {
               icon: Phone,
               title: "Phone",
@@ -76,7 +84,7 @@ export default function ContactPage() {
               title: "Location",
               value: "Taj colony sargodha Road Near MTM Faisalabad, Pakistan",
             },
-          ].map((c) => {
+          ] satisfies ContactCard[]).map((c) => {
             const content = (
               <>
               <div className="grid h-12 w-12 place-items-center rounded-xl gradient-blue text-primary-foreground">
