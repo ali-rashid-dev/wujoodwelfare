@@ -1,6 +1,6 @@
 import React from "react";
-import prisma from "@/lib/prisma";
 import { requireServerSession } from "@/lib/auth-server";
+import { getBeneficiaryOptions } from "@/app/(dashboard)/dashboard/households/households";
 import { HouseholdForm } from "@/components/households/HouseholdForm";
 
 export const metadata = {
@@ -11,16 +11,7 @@ export const metadata = {
 export default async function NewHouseholdPage() {
   await requireServerSession();
 
-  // Fetch list of beneficiaries for head selection dropdown
-  const beneficiaries = await prisma.beneficiary.findMany({
-    select: {
-      id: true,
-      name: true,
-      cnic: true,
-    },
-    orderBy: { name: "asc" },
-    take: 200,
-  });
+  const beneficiaries = await getBeneficiaryOptions({ page: 1, limit: 25 });
 
-  return <HouseholdForm beneficiaries={beneficiaries} />;
+  return <HouseholdForm initialBeneficiaries={beneficiaries.items} initialTotalPages={beneficiaries.totalPages} />;
 }

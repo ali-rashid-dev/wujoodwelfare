@@ -21,6 +21,16 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Home,
   Users,
   UserCheck,
@@ -102,11 +112,12 @@ interface HouseholdProfileProps {
 
 export function HouseholdProfile({ household }: HouseholdProfileProps) {
   const router = useRouter();
-  const [, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
 
   // Dialog State
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
   const [docDialogOpen, setDocDialogOpen] = useState(false);
+  const [deleteCandidate, setDeleteCandidate] = useState<{ id: string; name: string } | null>(null);
 
   // New Member Form State
   const [fullName, setFullName] = useState("");
@@ -152,6 +163,13 @@ export function HouseholdProfile({ household }: HouseholdProfileProps) {
         setMemberDialogOpen(false);
         setFullName("");
         setCnic("");
+        setAge("");
+        setGender("MALE");
+        setEmploymentStatus("UNEMPLOYED");
+        setMemberIncome("0");
+        setIsDisable(false);
+        setIsElderly(false);
+        setIsDependent(true);
         router.refresh();
       } else {
         toast.error(res.error || "Failed to add family member");
@@ -515,7 +533,7 @@ export function HouseholdProfile({ household }: HouseholdProfileProps) {
                     <Button type="button" variant="outline" onClick={() => setMemberDialogOpen(false)}>
                       Cancel
                     </Button>
-                    <Button type="submit">Save Member</Button>
+                    <Button type="submit" disabled={isPending}>Save Member</Button>
                   </div>
                 </form>
               </DialogContent>
@@ -537,7 +555,7 @@ export function HouseholdProfile({ household }: HouseholdProfileProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDeleteMember(member.id)}
+                      onClick={() => setDeleteCandidate({ id: member.id, name: member.fullName })}
                       className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
                       title="Remove Member"
                     >
@@ -549,7 +567,7 @@ export function HouseholdProfile({ household }: HouseholdProfileProps) {
                     {member.cnic && (
                       <span className="block font-mono text-[11px]">CNIC: {member.cnic}</span>
                     )}
-                    {member.age && <span className="block">Age: {member.age} years</span>}
+                    {member.age !== null && member.age !== undefined && <span className="block">Age: {member.age} years</span>}
                     <span className="block">Income: {formatPKR(member.monthlyIncome)} / mo</span>
                   </div>
 
@@ -683,7 +701,7 @@ export function HouseholdProfile({ household }: HouseholdProfileProps) {
                     <Button type="button" variant="outline" onClick={() => setDocDialogOpen(false)}>
                       Cancel
                     </Button>
-                    <Button type="submit">Upload Document</Button>
+                    <Button type="submit" disabled={isPending}>Upload Document</Button>
                   </div>
                 </form>
               </DialogContent>
@@ -724,6 +742,29 @@ export function HouseholdProfile({ household }: HouseholdProfileProps) {
           </div>
         </TabsContent>
       </Tabs>
+
+      <AlertDialog open={Boolean(deleteCandidate)} onOpenChange={(open) => !open && setDeleteCandidate(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Family Member?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove <strong>{deleteCandidate?.name}</strong> from this household?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isPending}
+              onClick={() => {
+                if (deleteCandidate) handleDeleteMember(deleteCandidate.id);
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Remove Member
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

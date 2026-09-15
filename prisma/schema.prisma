@@ -126,29 +126,29 @@ enum HousingType {
 // ─── Beneficiary Models ────────────────────────────────────────────────────────
 
 model Beneficiary {
-  id              String            @id @default(cuid())
-  cnic            String?           @unique
-  name            String
-  fatherName      String?
-  dateOfBirth     DateTime?
-  gender          Gender?
-  religion        String?
-  education       String?
-  status          BeneficiaryStatus @default(PENDING)
-  notes           String?
-  verifiedAt      DateTime?
-  registeredAt    DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id           String            @id @default(cuid())
+  cnic         String?           @unique
+  name         String
+  fatherName   String?
+  dateOfBirth  DateTime?
+  gender       Gender?
+  religion     String?
+  education    String?
+  status       BeneficiaryStatus @default(PENDING)
+  notes        String?
+  verifiedAt   DateTime?
+  registeredAt DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
-  phone           String?
-  whatsapp        String?
-  email           String?
+  phone    String?
+  whatsapp String?
+  email    String?
 
-  address         BeneficiaryAddress?
-  family          BeneficiaryFamily?
-  economic        BeneficiaryEconomic?
-  documents       BeneficiaryDocument[]
-  cases           BeneficiaryCase[]
+  address           BeneficiaryAddress?
+  family            BeneficiaryFamily?
+  economic          BeneficiaryEconomic?
+  documents         BeneficiaryDocument[]
+  cases             BeneficiaryCase[]
   assistanceHistory AssistanceRecord[]
 
   householdId          String?
@@ -174,30 +174,30 @@ model BeneficiaryAddress {
 }
 
 model BeneficiaryFamily {
-  id              String        @id @default(cuid())
-  beneficiaryId   String        @unique
+  id              String         @id @default(cuid())
+  beneficiaryId   String         @unique
   maritalStatus   MaritalStatus?
   spouseName      String?
-  totalChildren   Int           @default(0)
-  maleChildren    Int           @default(0)
-  femaleChildren  Int           @default(0)
-  dependents      Int           @default(0)
-  disabledMembers Int           @default(0)
-  beneficiary     Beneficiary   @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  totalChildren   Int            @default(0)
+  maleChildren    Int            @default(0)
+  femaleChildren  Int            @default(0)
+  dependents      Int            @default(0)
+  disabledMembers Int            @default(0)
+  beneficiary     Beneficiary    @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
 
   @@map("beneficiary_family")
 }
 
 model BeneficiaryEconomic {
-  id               String           @id @default(cuid())
-  beneficiaryId    String           @unique
+  id               String            @id @default(cuid())
+  beneficiaryId    String            @unique
   employmentStatus EmploymentStatus?
   occupation       String?
-  monthlyIncome    Decimal?         @db.Decimal(12, 2)
+  monthlyIncome    Decimal?          @db.Decimal(12, 2)
   housingType      HousingType?
-  ownLand          Boolean          @default(false)
-  bankAccount      Boolean          @default(false)
-  beneficiary      Beneficiary      @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  ownLand          Boolean           @default(false)
+  bankAccount      Boolean           @default(false)
+  beneficiary      Beneficiary       @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
 
   @@map("beneficiary_economic")
 }
@@ -244,69 +244,75 @@ model AssistanceRecord {
 // ─── Household Models ─────────────────────────────────────────────────────────
 
 model Household {
-  id                    String            @id @default(cuid())
-  householdCode         String            @unique
-  name                  String
-  headBeneficiaryId     String?
-  headBeneficiary       Beneficiary?      @relation("HouseholdHead", fields: [headBeneficiaryId], references: [id], onDelete: SetNull)
-  
-  monthlyIncome         Decimal?          @db.Decimal(12, 2)
-  totalMembers          Int               @default(1)
-  dependents            Int               @default(0)
-  elderlyCount          Int               @default(0)
-  disabledCount         Int               @default(0)
-  childrenCount         Int               @default(0)
-  
+  id                String       @id @default(cuid())
+  householdCode     String       @unique
+  name              String
+  headBeneficiaryId String?
+  headBeneficiary   Beneficiary? @relation("HouseholdHead", fields: [headBeneficiaryId], references: [id], onDelete: SetNull)
+
+  monthlyIncome Decimal? @db.Decimal(12, 2)
+  totalMembers  Int      @default(1)
+  dependents    Int      @default(0)
+  elderlyCount  Int      @default(0)
+  disabledCount Int      @default(0)
+  childrenCount Int      @default(0)
+
   housingType           HousingType?
   housingCondition      String?
-  vulnerabilityScore    Int               @default(0)
-  vulnerabilityCategory String            @default("MODERATE")
+  vulnerabilityScore    Int          @default(0)
+  vulnerabilityCategory String       @default("MODERATE")
   notes                 String?
 
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  beneficiaries         Beneficiary[]     @relation("HouseholdMembers")
-  members               HouseholdMember[]
-  documents             HouseholdDocument[]
+  beneficiaries Beneficiary[]       @relation("HouseholdMembers")
+  members       HouseholdMember[]
+  documents     HouseholdDocument[]
 
   @@map("household")
 }
 
+model HouseholdCodeSequence {
+  year      Int @id
+  nextValue Int @default(0)
+
+  @@map("household_code_sequence")
+}
+
 model HouseholdMember {
-  id                String            @id @default(cuid())
-  householdId       String
-  household         Household         @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  beneficiaryId     String?
-  beneficiary       Beneficiary?      @relation(fields: [beneficiaryId], references: [id], onDelete: SetNull)
+  id            String       @id @default(cuid())
+  householdId   String
+  household     Household    @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  beneficiaryId String?
+  beneficiary   Beneficiary? @relation(fields: [beneficiaryId], references: [id], onDelete: SetNull)
 
-  fullName          String
-  cnic              String?
-  relationToHead    String
-  age               Int?
-  gender            Gender?
-  employmentStatus  EmploymentStatus?
-  monthlyIncome     Decimal?          @db.Decimal(12, 2)
-  isDisable         Boolean           @default(false)
-  isElderly         Boolean           @default(false)
-  isDependent       Boolean           @default(true)
-  healthCondition   String?
+  fullName         String
+  cnic             String?
+  relationToHead   String
+  age              Int?
+  gender           Gender?
+  employmentStatus EmploymentStatus?
+  monthlyIncome    Decimal?          @db.Decimal(12, 2)
+  isDisable        Boolean           @default(false)
+  isElderly        Boolean           @default(false)
+  isDependent      Boolean           @default(true)
+  healthCondition  String?
 
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("household_member")
 }
 
 model HouseholdDocument {
-  id            String       @id @default(cuid())
-  householdId   String
-  household     Household    @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  title         String
-  type          DocumentType
-  fileUrl       String
-  uploadedAt    DateTime     @default(now())
+  id          String       @id @default(cuid())
+  householdId String
+  household   Household    @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  title       String
+  type        DocumentType
+  fileUrl     String
+  uploadedAt  DateTime     @default(now())
 
   @@map("household_document")
 }
-

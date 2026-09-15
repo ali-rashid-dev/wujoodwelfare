@@ -132,8 +132,8 @@ export async function createHousehold(data: HouseholdFormInput) {
     const totalMembers = validated.members.length;
     const dependents = validated.members.filter((m) => m.isDependent).length;
     const disabledCount = validated.members.filter((m) => m.isDisable).length;
-    const elderlyCount = validated.members.filter((m) => m.isElderly || (m.age && m.age >= 60)).length;
-    const childrenCount = validated.members.filter((m) => m.relationToHead === "SON" || m.relationToHead === "DAUGHTER" || (m.age && m.age < 18)).length;
+    const elderlyCount = validated.members.filter((m) => m.isElderly || (m.age ?? 0) >= 60).length;
+    const childrenCount = validated.members.filter((m) => m.relationToHead === "SON" || m.relationToHead === "DAUGHTER" || (m.age ?? 120) < 18).length;
 
     const totalIncome = validated.monthlyIncome || validated.members.reduce((sum, m) => sum + (m.monthlyIncome || 0), 0);
 
@@ -149,54 +149,63 @@ export async function createHousehold(data: HouseholdFormInput) {
     });
 
     const year = new Date().getFullYear();
-    const count = await prisma.household.count();
-    const householdCode = `HH-${year}-${String(count + 1).padStart(4, "0")}`;
+    const household = await prisma.$transaction(async (tx) => {
+      const [sequence] = await tx.$queryRaw<Array<{ nextValue: number }>>`
+        INSERT INTO "household_code_sequence" ("year", "nextValue")
+        VALUES (${year}, 1)
+        ON CONFLICT ("year") DO UPDATE
+        SET "nextValue" = "household_code_sequence"."nextValue" + 1
+        RETURNING "nextValue"
+      `;
+      const householdCode = `HH-${year}-${String(Number(sequence.nextValue)).padStart(4, "0")}`;
 
-    const household = await prisma.household.create({
-      data: {
-        householdCode,
-        name: validated.name,
-        headBeneficiaryId: validated.headBeneficiaryId || null,
-        monthlyIncome: totalIncome,
-        totalMembers,
-        dependents,
-        elderlyCount,
-        disabledCount,
-        childrenCount,
-        housingType: validated.housingType,
-        housingCondition: validated.housingCondition,
-        vulnerabilityScore: assessment.score,
-        vulnerabilityCategory: assessment.category,
-        notes: validated.notes,
-        members: {
-          create: validated.members.map((m) => ({
-            fullName: m.fullName,
-            cnic: m.cnic || null,
-            relationToHead: m.relationToHead,
-            age: m.age || null,
-            gender: m.gender || null,
-            employmentStatus: m.employmentStatus || null,
-            monthlyIncome: m.monthlyIncome || 0,
-            isDisable: m.isDisable,
-            isElderly: m.isElderly,
-            isDependent: m.isDependent,
-            healthCondition: m.healthCondition || null,
-            beneficiaryId: m.beneficiaryId || null,
-          })),
+      const createdHousehold = await tx.household.create({
+        data: {
+          householdCode,
+          name: validated.name,
+          headBeneficiaryId: validated.headBeneficiaryId || null,
+          monthlyIncome: totalIncome,
+          totalMembers,
+          dependents,
+          elderlyCount,
+          disabledCount,
+          childrenCount,
+          housingType: validated.housingType,
+          housingCondition: validated.housingCondition,
+          vulnerabilityScore: assessment.score,
+          vulnerabilityCategory: assessment.category,
+          notes: validated.notes,
+          members: {
+            create: validated.members.map((m) => ({
+              fullName: m.fullName,
+              cnic: m.cnic || null,
+              relationToHead: m.relationToHead,
+              age: m.age ?? null,
+              gender: m.gender || null,
+              employmentStatus: m.employmentStatus || null,
+              monthlyIncome: m.monthlyIncome || 0,
+              isDisable: m.isDisable,
+              isElderly: m.isElderly,
+              isDependent: m.isDependent,
+              healthCondition: m.healthCondition || null,
+              beneficiaryId: m.beneficiaryId || null,
+            })),
+          },
         },
-      },
-      include: {
-        members: true,
-      },
-    });
+        include: {
+          members: true,
+        },
+      });
 
-    // If head beneficiary selected, link householdId to that beneficiary
-    if (validated.headBeneficiaryId) {
-      await prisma.beneficiary.update({
-        where: { id: validated.headBeneficiaryId },
-        data: { householdId: household.id },
-      }).catch(() => undefined);
-    }
+      if (validated.headBeneficiaryId) {
+        await tx.beneficiary.update({
+          where: { id: validated.headBeneficiaryId },
+          data: { householdId: createdHousehold.id },
+        });
+      }
+
+      return createdHousehold;
+    });
 
     revalidatePath("/dashboard/households");
     return { success: true, id: household.id };
@@ -273,6 +282,34 @@ export async function getHouseholds(params?: {
   } catch {
     return { items: [], total: 0, page: 1, totalPages: 1 };
   }
+}
+
+export async function getBeneficiaryOptions(params?: { search?: string; page?: number; limit?: number }) {
+  await requireServerSession();
+  const page = Math.max(params?.page || 1, 1);
+  const limit = Math.min(params?.limit || 25, 100);
+  const search = params?.search?.trim();
+  const where = search
+    ? {
+        OR: [
+          { name: { contains: search, mode: "insensitive" as const } },
+          { cnic: { contains: search, mode: "insensitive" as const } },
+        ],
+      }
+    : undefined;
+
+  const [items, total] = await Promise.all([
+    prisma.beneficiary.findMany({
+      where,
+      select: { id: true, name: true, cnic: true },
+      orderBy: { name: "asc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.beneficiary.count({ where }),
+  ]);
+
+  return { items, page, totalPages: Math.max(Math.ceil(total / limit), 1) };
 }
 
 export async function getHouseholdById(id: string) {
@@ -379,7 +416,7 @@ export async function addHouseholdMember(householdId: string, data: HouseholdMem
         fullName: validated.fullName,
         cnic: validated.cnic || null,
         relationToHead: validated.relationToHead,
-        age: validated.age || null,
+        age: validated.age ?? null,
         gender: validated.gender || null,
         employmentStatus: validated.employmentStatus || null,
         monthlyIncome: validated.monthlyIncome || 0,
@@ -405,9 +442,18 @@ export async function addHouseholdMember(householdId: string, data: HouseholdMem
 export async function deleteHouseholdMember(memberId: string, householdId: string) {
   try {
     await requireServerSession();
+    const member = await prisma.householdMember.findUnique({
+      where: { id: memberId },
+      select: { householdId: true },
+    });
+
+    if (!member || member.householdId !== householdId) {
+      return { success: false, error: "Member does not belong to this household" };
+    }
+
     await prisma.householdMember.delete({ where: { id: memberId } });
 
-    await syncHouseholdMetrics(householdId);
+    await syncHouseholdMetrics(member.householdId);
 
     revalidatePath(`/dashboard/households/${householdId}`);
     return { success: true };
@@ -463,7 +509,7 @@ async function syncHouseholdMetrics(householdId: string) {
   const childrenCount = members.filter((m) => m.relationToHead === "SON" || m.relationToHead === "DAUGHTER" || (m.age && m.age < 18)).length;
 
   const memberIncome = members.reduce((sum, m) => sum + (m.monthlyIncome ? Number(m.monthlyIncome) : 0), 0);
-  const totalIncome = Math.max(Number(household.monthlyIncome || 0), memberIncome);
+  const totalIncome = memberIncome;
 
   const assessment = await calculateWelfareAssessment({
     monthlyIncome: totalIncome,
@@ -479,6 +525,7 @@ async function syncHouseholdMetrics(householdId: string) {
   await prisma.household.update({
     where: { id: householdId },
     data: {
+      monthlyIncome: totalIncome,
       totalMembers,
       dependents,
       disabledCount,

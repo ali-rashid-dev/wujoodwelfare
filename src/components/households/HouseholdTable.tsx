@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -96,6 +96,10 @@ export function HouseholdTable({ initialData }: HouseholdTableProps) {
 
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const categoryFilter = searchParams.get("category") || "ALL";
+
+  useEffect(() => {
+    setSearch(searchParams.get("search") || "");
+  }, [searchParams]);
 
   const [deleteCandidate, setDeleteCandidate] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -197,6 +201,8 @@ export function HouseholdTable({ initialData }: HouseholdTableProps) {
               />
               {search && (
                 <button
+                  type="button"
+                  aria-label="Clear household search"
                   onClick={() => {
                     setSearch("");
                     updateFilters({ search: "" });
@@ -333,7 +339,7 @@ export function HouseholdTable({ initialData }: HouseholdTableProps) {
 
                   <TableCell className="text-right">
                     <DropdownMenu>
-                      <DropdownMenuTrigger className="h-8 w-8 p-0 inline-flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground hover:text-foreground">
+                      <DropdownMenuTrigger aria-label={`Actions for ${item.name}`} className="h-8 w-8 p-0 inline-flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground hover:text-foreground">
                         <MoreVertical className="w-4 h-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
@@ -376,6 +382,7 @@ export function HouseholdTable({ initialData }: HouseholdTableProps) {
                 params.set("page", String(initialData.page - 1));
                 router.push(`/dashboard/households?${params.toString()}`);
               }}
+              aria-label="Previous household page"
               className="h-8 w-8 p-0"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -392,6 +399,7 @@ export function HouseholdTable({ initialData }: HouseholdTableProps) {
                 params.set("page", String(initialData.page + 1));
                 router.push(`/dashboard/households?${params.toString()}`);
               }}
+              aria-label="Next household page"
               className="h-8 w-8 p-0"
             >
               <ChevronRight className="w-4 h-4" />

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -26,7 +26,7 @@ import {
   ShieldAlert,
   UserCheck,
 } from "lucide-react";
-import { createHousehold } from "@/app/(dashboard)/dashboard/households/households";
+import { createHousehold, getBeneficiaryOptions } from "@/app/(dashboard)/dashboard/households/households";
 import { HouseholdFormInput, HouseholdMemberInput } from "@/validation/household";
 
 interface BeneficiaryOption {
@@ -36,11 +36,13 @@ interface BeneficiaryOption {
 }
 
 interface HouseholdFormProps {
-  beneficiaries?: BeneficiaryOption[];
+  initialBeneficiaries?: BeneficiaryOption[];
+  initialTotalPages?: number;
 }
 
-export function HouseholdForm({ beneficiaries = [] }: HouseholdFormProps) {
+export function HouseholdForm({ initialBeneficiaries = [], initialTotalPages = 1 }: HouseholdFormProps) {
   const [isPending, startTransition] = useTransition();
+  const [isBeneficiaryPending, startBeneficiaryTransition] = useTransition();
   const [errorMsg, setErrorMsg] = useState("");
   const [activeTab, setActiveTab] = useState("basic");
 
@@ -51,6 +53,12 @@ export function HouseholdForm({ beneficiaries = [] }: HouseholdFormProps) {
   const [housingType, setHousingType] = useState("RENTED");
   const [housingCondition, setHousingCondition] = useState("");
   const [notes, setNotes] = useState("");
+  const [beneficiarySearch, setBeneficiarySearch] = useState("");
+  const [beneficiaryPage, setBeneficiaryPage] = useState(1);
+  const [beneficiaryTotalPages, setBeneficiaryTotalPages] = useState(initialTotalPages);
+  const [beneficiaryOptions, setBeneficiaryOptions] = useState(initialBeneficiaries);
+  const [selectedBeneficiary, setSelectedBeneficiary] = useState<BeneficiaryOption | null>(null);
+  const autoFilledHeadRef = useRef<{ fullName?: string; cnic?: string } | null>(null);
 
   // Family Members State
   const [members, setMembers] = useState<HouseholdMemberInput[]>([
@@ -85,10 +93,25 @@ export function HouseholdForm({ beneficiaries = [] }: HouseholdFormProps) {
   };
 
   const updateMember = (index: number, field: keyof HouseholdMemberInput, value: any) => {
+    if (index === 0 && (field === "fullName" || field === "cnic")) {
+      autoFilledHeadRef.current = {
+        ...autoFilledHeadRef.current,
+        [field]: undefined,
+      };
+    }
     setMembers((prev) => {
       const copy = [...prev];
       copy[index] = { ...copy[index], [field]: value };
       return copy;
+    });
+  };
+
+  const loadBeneficiaries = (search: string, page: number) => {
+    startBeneficiaryTransition(async () => {
+      const result = await getBeneficiaryOptions({ search, page, limit: 25 });
+      setBeneficiaryOptions(result.items);
+      setBeneficiaryPage(result.page);
+      setBeneficiaryTotalPages(result.totalPages);
     });
   };
 
@@ -102,14 +125,30 @@ export function HouseholdForm({ beneficiaries = [] }: HouseholdFormProps) {
 
   const handleHeadChange = (id: string) => {
     setHeadBeneficiaryId(id);
-    const found = beneficiaries.find((b) => b.id === id);
+    const found = beneficiaryOptions.find((b) => b.id === id) || (selectedBeneficiary?.id === id ? selectedBeneficiary : null);
     if (found && !name) {
       setName(`${found.name} Family Household`);
     }
-    if (found && members.length > 0 && !members[0].fullName) {
-      updateMember(0, "fullName", found.name);
-      if (found.cnic) updateMember(0, "cnic", found.cnic);
+    if (members.length > 0) {
+      const currentHead = members[0];
+      const previousAutoFill = autoFilledHeadRef.current;
+      const canReplaceName = !currentHead.fullName || currentHead.fullName === previousAutoFill?.fullName;
+      const canReplaceCnic = !currentHead.cnic || currentHead.cnic === previousAutoFill?.cnic;
+
+      if (canReplaceName || canReplaceCnic) {
+        setMembers((prev) => {
+          const copy = [...prev];
+          copy[0] = {
+            ...copy[0],
+            ...(canReplaceName ? { fullName: found?.name || "" } : {}),
+            ...(canReplaceCnic ? { cnic: found?.cnic || "" } : {}),
+          };
+          return copy;
+        });
+        autoFilledHeadRef.current = found ? { fullName: found.name, cnic: found.cnic || undefined } : null;
+      }
     }
+    setSelectedBeneficiary(found || null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -224,6 +263,18 @@ export function HouseholdForm({ beneficiaries = [] }: HouseholdFormProps) {
                   <Label htmlFor="headSelect" className="text-xs font-semibold">
                     Select Household Head (Registered Beneficiary)
                   </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={beneficiarySearch}
+                      onChange={(e) => setBeneficiarySearch(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && loadBeneficiaries(beneficiarySearch, 1)}
+                      placeholder="Search name or CNIC"
+                      className="text-xs"
+                    />
+                    <Button type="button" variant="outline" size="sm" onClick={() => loadBeneficiaries(beneficiarySearch, 1)} disabled={isBeneficiaryPending}>
+                      Search
+                    </Button>
+                  </div>
                   <NativeSelect
                     id="headSelect"
                     value={headBeneficiaryId}
@@ -231,12 +282,24 @@ export function HouseholdForm({ beneficiaries = [] }: HouseholdFormProps) {
                     className="w-full"
                   >
                     <NativeSelectOption value="">-- Optional: Select Head Beneficiary --</NativeSelectOption>
-                    {beneficiaries.map((b) => (
+                    {(selectedBeneficiary && !beneficiaryOptions.some((b) => b.id === selectedBeneficiary.id)
+                      ? [selectedBeneficiary, ...beneficiaryOptions]
+                      : beneficiaryOptions
+                    ).map((b) => (
                       <NativeSelectOption key={b.id} value={b.id}>
                         {b.name} {b.cnic ? `(CNIC: ${b.cnic})` : ""}
                       </NativeSelectOption>
                     ))}
                   </NativeSelect>
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                    <Button type="button" variant="ghost" size="sm" disabled={isBeneficiaryPending || beneficiaryPage <= 1} onClick={() => loadBeneficiaries(beneficiarySearch, beneficiaryPage - 1)}>
+                      Previous
+                    </Button>
+                    <span>Page {beneficiaryPage} of {beneficiaryTotalPages}</span>
+                    <Button type="button" variant="ghost" size="sm" disabled={isBeneficiaryPending || beneficiaryPage >= beneficiaryTotalPages} onClick={() => loadBeneficiaries(beneficiarySearch, beneficiaryPage + 1)}>
+                      Next
+                    </Button>
+                  </div>
                   <p className="text-[11px] text-muted-foreground">
                     Assigning a head links this family directly to an existing beneficiary profile.
                   </p>
