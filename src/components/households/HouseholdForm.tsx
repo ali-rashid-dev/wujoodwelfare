@@ -267,7 +267,12 @@ export function HouseholdForm({ initialBeneficiaries = [], initialTotalPages = 1
                     <Input
                       value={beneficiarySearch}
                       onChange={(e) => setBeneficiarySearch(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && loadBeneficiaries(beneficiarySearch, 1)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          loadBeneficiaries(beneficiarySearch, 1);
+                        }
+                      }}
                       placeholder="Search name or CNIC"
                       className="text-xs"
                     />

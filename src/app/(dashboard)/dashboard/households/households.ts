@@ -135,7 +135,9 @@ export async function createHousehold(data: HouseholdFormInput) {
     const elderlyCount = validated.members.filter((m) => m.isElderly || (m.age ?? 0) >= 60).length;
     const childrenCount = validated.members.filter((m) => m.relationToHead === "SON" || m.relationToHead === "DAUGHTER" || (m.age ?? 120) < 18).length;
 
-    const totalIncome = validated.monthlyIncome || validated.members.reduce((sum, m) => sum + (m.monthlyIncome || 0), 0);
+    const fixedMonthlyIncome = validated.monthlyIncome || 0;
+    const memberIncome = validated.members.reduce((sum, m) => sum + (m.monthlyIncome || 0), 0);
+    const totalIncome = fixedMonthlyIncome + memberIncome;
 
     const assessment = await calculateWelfareAssessment({
       monthlyIncome: totalIncome,
@@ -164,6 +166,7 @@ export async function createHousehold(data: HouseholdFormInput) {
           householdCode,
           name: validated.name,
           headBeneficiaryId: validated.headBeneficiaryId || null,
+          fixedMonthlyIncome,
           monthlyIncome: totalIncome,
           totalMembers,
           dependents,
@@ -302,7 +305,7 @@ export async function getBeneficiaryOptions(params?: { search?: string; page?: n
     prisma.beneficiary.findMany({
       where,
       select: { id: true, name: true, cnic: true },
-      orderBy: { name: "asc" },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
       skip: (page - 1) * limit,
       take: limit,
     }),
@@ -508,8 +511,9 @@ async function syncHouseholdMetrics(householdId: string) {
   const elderlyCount = members.filter((m) => m.isElderly || (m.age && m.age >= 60)).length;
   const childrenCount = members.filter((m) => m.relationToHead === "SON" || m.relationToHead === "DAUGHTER" || (m.age && m.age < 18)).length;
 
+  const fixedMonthlyIncome = household.fixedMonthlyIncome ? Number(household.fixedMonthlyIncome) : 0;
   const memberIncome = members.reduce((sum, m) => sum + (m.monthlyIncome ? Number(m.monthlyIncome) : 0), 0);
-  const totalIncome = memberIncome;
+  const totalIncome = fixedMonthlyIncome + memberIncome;
 
   const assessment = await calculateWelfareAssessment({
     monthlyIncome: totalIncome,
