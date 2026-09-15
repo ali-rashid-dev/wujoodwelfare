@@ -1,6 +1,7 @@
 import { SiteLayout } from "@/components/site/SiteLayout";
 import type { Metadata } from "next";
 import { Noto_Nastaliq_Urdu, Poppins } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -32,6 +33,7 @@ export default function RootLayout({
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col">
         <SiteLayout>{children}</SiteLayout>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

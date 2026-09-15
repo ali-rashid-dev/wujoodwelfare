@@ -63,3 +63,185 @@ model Verification {
 
   @@map("verification")
 }
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum BeneficiaryStatus {
+  PENDING
+  VERIFIED
+  ACTIVE
+  INACTIVE
+  REJECTED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+}
+
+enum AssistanceType {
+  FOOD
+  MEDICAL
+  EDUCATION
+  FINANCIAL
+  HOUSING
+  CLOTHING
+  OTHER
+}
+
+enum DocumentType {
+  CNIC
+  B_FORM
+  PROOF_OF_INCOME
+  PROOF_OF_RESIDENCE
+  MEDICAL_REPORT
+  OTHER
+}
+
+enum EmploymentStatus {
+  EMPLOYED
+  UNEMPLOYED
+  SELF_EMPLOYED
+  DAILY_WAGE
+  RETIRED
+  DISABLED
+  STUDENT
+}
+
+enum HousingType {
+  OWNED
+  RENTED
+  SHARED
+  HOMELESS
+}
+
+// ─── Beneficiary Models ────────────────────────────────────────────────────────
+
+model Beneficiary {
+  id              String            @id @default(cuid())
+  cnic            String?           @unique
+  name            String
+  fatherName      String?
+  dateOfBirth     DateTime?
+  gender          Gender?
+  religion        String?
+  education       String?
+  status          BeneficiaryStatus @default(PENDING)
+  notes           String?
+  verifiedAt      DateTime?
+  registeredAt    DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  contact         BeneficiaryContact?
+  address         BeneficiaryAddress?
+  family          BeneficiaryFamily?
+  economic        BeneficiaryEconomic?
+  documents       BeneficiaryDocument[]
+  cases           BeneficiaryCase[]
+  assistanceHistory AssistanceRecord[]
+
+  @@map("beneficiary")
+}
+
+model BeneficiaryContact {
+  id            String      @id @default(cuid())
+  beneficiaryId String      @unique
+  phone         String?
+  phone2        String?
+  whatsapp      String?
+  email         String?
+  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+
+  @@map("beneficiary_contact")
+}
+
+model BeneficiaryAddress {
+  id            String      @id @default(cuid())
+  beneficiaryId String      @unique
+  street        String?
+  area          String?
+  city          String?
+  district      String?
+  province      String?
+  postalCode    String?
+  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+
+  @@map("beneficiary_address")
+}
+
+model BeneficiaryFamily {
+  id              String        @id @default(cuid())
+  beneficiaryId   String        @unique
+  maritalStatus   MaritalStatus?
+  spouseName      String?
+  totalChildren   Int           @default(0)
+  maleChildren    Int           @default(0)
+  femaleChildren  Int           @default(0)
+  dependents      Int           @default(0)
+  disabledMembers Int           @default(0)
+  beneficiary     Beneficiary   @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+
+  @@map("beneficiary_family")
+}
+
+model BeneficiaryEconomic {
+  id               String           @id @default(cuid())
+  beneficiaryId    String           @unique
+  employmentStatus EmploymentStatus?
+  occupation       String?
+  monthlyIncome    Float?
+  housingType      HousingType?
+  ownLand          Boolean          @default(false)
+  bankAccount      Boolean          @default(false)
+  beneficiary      Beneficiary      @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+
+  @@map("beneficiary_economic")
+}
+
+model BeneficiaryDocument {
+  id            String       @id @default(cuid())
+  beneficiaryId String
+  type          DocumentType
+  label         String?
+  fileUrl       String
+  uploadedAt    DateTime     @default(now())
+  beneficiary   Beneficiary  @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+
+  @@map("beneficiary_document")
+}
+
+model BeneficiaryCase {
+  id            String      @id @default(cuid())
+  beneficiaryId String
+  title         String
+  description   String?
+  openedAt      DateTime    @default(now())
+  closedAt      DateTime?
+  isOpen        Boolean     @default(true)
+  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+
+  @@map("beneficiary_case")
+}
+
+model AssistanceRecord {
+  id            String         @id @default(cuid())
+  beneficiaryId String
+  type          AssistanceType
+  description   String?
+  amount        Float?
+  quantity      String?
+  givenAt       DateTime       @default(now())
+  givenBy       String?
+  beneficiary   Beneficiary    @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+
+  @@map("assistance_record")
+}
+
