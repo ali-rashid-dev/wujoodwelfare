@@ -25,7 +25,7 @@ import {
   DocumentType,
 } from "@prisma/client";
 
-export const BENEFICIARY_SEARCH_COOKIE = "beneficiary-search";
+import { BENEFICIARY_SEARCH_COOKIE } from "./constants";
 
 export async function setBeneficiarySearch(value: string) {
   await requireServerSession();
@@ -77,14 +77,9 @@ export async function createBeneficiary(data: BeneficiaryFormInput) {
         notes: validated.notes || null,
         verifiedAt: validated.isVerified ? new Date() : null,
 
-        contact: validated.contact && (validated.contact.phone || validated.contact.email) ? {
-          create: {
-            phone: validated.contact.phone || null,
-            phone2: validated.contact.phone2 || null,
-            whatsapp: validated.contact.whatsapp || null,
-            email: validated.contact.email || null,
-          },
-        } : undefined,
+        phone: validated.phone || null,
+        whatsapp: validated.whatsapp || null,
+        email: validated.email || null,
 
         address: validated.address && validated.address.city ? {
           create: {
@@ -158,22 +153,9 @@ export async function updateBeneficiary(id: string, data: BeneficiaryFormInput) 
         notes: validated.notes || null,
         verifiedAt: validated.isVerified ? (current?.verifiedAt ?? new Date()) : null,
 
-        contact: validated.contact ? {
-          upsert: {
-            create: {
-              phone: validated.contact.phone || null,
-              phone2: validated.contact.phone2 || null,
-              whatsapp: validated.contact.whatsapp || null,
-              email: validated.contact.email || null,
-            },
-            update: {
-              phone: validated.contact.phone || null,
-              phone2: validated.contact.phone2 || null,
-              whatsapp: validated.contact.whatsapp || null,
-              email: validated.contact.email || null,
-            },
-          },
-        } : undefined,
+        phone: validated.phone || null,
+        whatsapp: validated.whatsapp || null,
+        email: validated.email || null,
 
         address: validated.address ? {
           upsert: {
@@ -370,7 +352,6 @@ export async function getBeneficiary(id: string) {
     const beneficiary = await prisma.beneficiary.findUnique({
       where: { id },
       include: {
-        contact: true,
         address: true,
         family: true,
         economic: true,
@@ -434,7 +415,9 @@ export async function getBeneficiaries(params?: {
       where.OR = [
         { name: { contains: q, mode: "insensitive" } },
         { cnic: { contains: q, mode: "insensitive" } },
-        { contact: { phone: { contains: q, mode: "insensitive" } } },
+        { phone: { contains: q, mode: "insensitive" } },
+        { whatsapp: { contains: q, mode: "insensitive" } },
+        { email: { contains: q, mode: "insensitive" } },
         { address: { city: { contains: q, mode: "insensitive" } } },
       ];
     }
@@ -443,7 +426,6 @@ export async function getBeneficiaries(params?: {
       prisma.beneficiary.findMany({
         where,
         include: {
-          contact: true,
           address: true,
           family: true,
           economic: true,

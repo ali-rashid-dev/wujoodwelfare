@@ -48,12 +48,7 @@ export const beneficiaryPersonalSchema = z.object({
   status: BeneficiaryStatusEnum.default("PENDING"),
   isVerified: z.boolean().default(false),
   notes: z.string().optional(),
-});
-
-// Contact Info schema
-export const beneficiaryContactSchema = z.object({
-  phone: z.string().min(10, "Phone number is required"),
-  phone2: z.string().optional(),
+  phone: z.string().min(10, "Phone number is required").optional().or(z.literal("")),
   whatsapp: z.string().optional(),
   email: z.string().email("Invalid email").optional().or(z.literal("")),
 });
@@ -111,7 +106,6 @@ export const assistanceRecordSchema = z.object({
 
 // Full Beneficiary Form Schema
 export const beneficiaryFormSchema = beneficiaryPersonalSchema.extend({
-  contact: beneficiaryContactSchema.optional(),
   address: beneficiaryAddressSchema.optional(),
   family: beneficiaryFamilySchema.optional(),
   economic: beneficiaryEconomicSchema.optional(),
@@ -119,7 +113,6 @@ export const beneficiaryFormSchema = beneficiaryPersonalSchema.extend({
 
 export type BeneficiaryFormInput = z.infer<typeof beneficiaryFormSchema>;
 export type BeneficiaryPersonalInput = z.infer<typeof beneficiaryPersonalSchema>;
-export type BeneficiaryContactInput = z.infer<typeof beneficiaryContactSchema>;
 export type BeneficiaryAddressInput = z.infer<typeof beneficiaryAddressSchema>;
 export type BeneficiaryFamilyInput = z.infer<typeof beneficiaryFamilySchema>;
 export type BeneficiaryEconomicInput = z.infer<typeof beneficiaryEconomicSchema>;

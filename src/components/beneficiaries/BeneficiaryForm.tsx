@@ -42,12 +42,9 @@ interface BeneficiaryFormProps {
     status: string;
     verifiedAt?: string | Date | null;
     notes?: string | null;
-    contact?: {
-      phone?: string | null;
-      phone2?: string | null;
-      whatsapp?: string | null;
-      email?: string | null;
-    } | null;
+    phone?: string | null;
+    whatsapp?: string | null;
+    email?: string | null;
     address?: {
       street?: string | null;
       city?: string | null;
@@ -85,9 +82,9 @@ export function BeneficiaryForm({ initialData, isEdit = false }: BeneficiaryForm
   const [dateOfBirth, setDateOfBirth] = useState(
     initialData?.dateOfBirth
       ? (() => {
-          const date = new Date(initialData.dateOfBirth);
-          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-        })()
+        const date = new Date(initialData.dateOfBirth);
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      })()
       : ""
   );
   const [gender, setGender] = useState(initialData?.gender || "MALE");
@@ -96,10 +93,12 @@ export function BeneficiaryForm({ initialData, isEdit = false }: BeneficiaryForm
   const [notes, setNotes] = useState(initialData?.notes || "");
 
   // Contact State
-  const [phone, setPhone] = useState(initialData?.contact?.phone || "");
-  const [phone2, setPhone2] = useState(initialData?.contact?.phone2 || "");
-  const [whatsapp, setWhatsapp] = useState(initialData?.contact?.whatsapp || "");
-  const [email, setEmail] = useState(initialData?.contact?.email || "");
+  const [phone, setPhone] = useState(initialData?.phone || "");
+  const [whatsapp, setWhatsapp] = useState(initialData?.whatsapp || "");
+  const [email, setEmail] = useState(initialData?.email || "");
+  const [sameAsPhone, setSameAsPhone] = useState(
+    Boolean(initialData?.phone && initialData?.whatsapp && initialData.phone === initialData.whatsapp)
+  );
 
   // Address State
   const [street, setStreet] = useState(initialData?.address?.street || "");
@@ -133,12 +132,9 @@ export function BeneficiaryForm({ initialData, isEdit = false }: BeneficiaryForm
       status: status as any,
       isVerified,
       notes,
-      contact: {
-        phone,
-        phone2,
-        whatsapp,
-        email,
-      },
+      phone,
+      whatsapp: sameAsPhone ? phone : whatsapp,
+      email,
       address: {
         street,
         city,
@@ -253,20 +249,20 @@ export function BeneficiaryForm({ initialData, isEdit = false }: BeneficiaryForm
       <Card className="border-border shadow-xs">
         <CardContent className="p-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full bg-muted/60 p-1 rounded-xl h-auto">
-              <TabsTrigger value="personal" className="gap-1.5 text-xs py-2">
+            <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full bg-muted/60 p-1 rounded-xl">
+              <TabsTrigger value="personal" className="gap-1.5 text-xs">
                 <User className="w-3.5 h-3.5" /> Personal
               </TabsTrigger>
-              <TabsTrigger value="contact" className="gap-1.5 text-xs py-2">
+              <TabsTrigger value="contact" className="gap-1.5 text-xs">
                 <Phone className="w-3.5 h-3.5" /> Contact
               </TabsTrigger>
-              <TabsTrigger value="address" className="gap-1.5 text-xs py-2">
+              <TabsTrigger value="address" className="gap-1.5 text-xs">
                 <MapPin className="w-3.5 h-3.5" /> Address
               </TabsTrigger>
-              <TabsTrigger value="family" className="gap-1.5 text-xs py-2">
+              <TabsTrigger value="family" className="gap-1.5 text-xs">
                 <Users className="w-3.5 h-3.5" /> Family
               </TabsTrigger>
-              <TabsTrigger value="economic" className="gap-1.5 text-xs py-2">
+              <TabsTrigger value="economic" className="gap-1.5 text-xs">
                 <BadgeDollarSign className="w-3.5 h-3.5" /> Economic
               </TabsTrigger>
             </TabsList>
@@ -388,42 +384,47 @@ export function BeneficiaryForm({ initialData, isEdit = false }: BeneficiaryForm
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-xs font-semibold">
-                    Primary Mobile Phone <span className="text-destructive">*</span>
+                    Primary Mobile Phone
                   </Label>
                   <Input
                     id="phone"
-                    required
                     placeholder="0300-1234567"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setPhone(val);
+                      if (sameAsPhone) setWhatsapp(val);
+                    }}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone2" className="text-xs font-semibold">
-                    Alternate Phone
-                  </Label>
-                  <Input
-                    id="phone2"
-                    placeholder="0321-9876543"
-                    value={phone2}
-                    onChange={(e) => setPhone2(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="whatsapp" className="text-xs font-semibold">
-                    WhatsApp Number
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="whatsapp" className="text-xs font-semibold">
+                      WhatsApp Number
+                    </Label>
+                    <label className="flex items-center gap-1.5 cursor-pointer text-xs text-muted-foreground hover:text-foreground">
+                      <Checkbox
+                        checked={sameAsPhone}
+                        onCheckedChange={(checked) => {
+                          const isChecked = Boolean(checked);
+                          setSameAsPhone(isChecked);
+                          if (isChecked) setWhatsapp(phone);
+                        }}
+                      />
+                      <span>Same as Phone</span>
+                    </label>
+                  </div>
                   <Input
                     id="whatsapp"
                     placeholder="0300-1234567"
-                    value={whatsapp}
+                    disabled={sameAsPhone}
+                    value={sameAsPhone ? phone : whatsapp}
                     onChange={(e) => setWhatsapp(e.target.value)}
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="email" className="text-xs font-semibold">
                     Email Address (Optional)
                   </Label>

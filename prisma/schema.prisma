@@ -140,7 +140,10 @@ model Beneficiary {
   registeredAt    DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
-  contact         BeneficiaryContact?
+  phone           String?
+  whatsapp        String?
+  email           String?
+
   address         BeneficiaryAddress?
   family          BeneficiaryFamily?
   economic        BeneficiaryEconomic?
@@ -149,18 +152,6 @@ model Beneficiary {
   assistanceHistory AssistanceRecord[]
 
   @@map("beneficiary")
-}
-
-model BeneficiaryContact {
-  id            String      @id @default(cuid())
-  beneficiaryId String      @unique
-  phone         String?
-  phone2        String?
-  whatsapp      String?
-  email         String?
-  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
-
-  @@map("beneficiary_contact")
 }
 
 model BeneficiaryAddress {

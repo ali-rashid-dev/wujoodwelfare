@@ -26,12 +26,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  NativeSelect,
+  NativeSelectOption,
+} from "@/components/ui/native-select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -73,12 +70,9 @@ export interface BeneficiaryItem {
   status: BeneficiaryStatus | string;
   verifiedAt?: string | Date | null;
   registeredAt: string | Date;
-  contact?: {
-    phone?: string | null;
-    phone2?: string | null;
-    whatsapp?: string | null;
-    email?: string | null;
-  } | null;
+  phone?: string | null;
+  whatsapp?: string | null;
+  email?: string | null;
   address?: {
     city?: string | null;
     province?: string | null;
@@ -233,31 +227,29 @@ export function BeneficiaryTable({ initialData, initialSearch }: BeneficiaryTabl
             {/* Dropdown Filters & Actions */}
             <div className="flex items-center gap-2 flex-wrap">
               {/* Status Filter */}
-              <Select value={statusFilter} onValueChange={(val) => { const value = val || "ALL"; updateFilters({ status: value }); }}>
-                <SelectTrigger className="w-[140px] text-xs h-9">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">All Statuses</SelectItem>
-                  <SelectItem value="PENDING">Pending</SelectItem>
-                  <SelectItem value="ACTIVE">Active</SelectItem>
-                  <SelectItem value="VERIFIED">Verified</SelectItem>
-                  <SelectItem value="INACTIVE">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
+              <NativeSelect
+                value={statusFilter}
+                onChange={(e) => updateFilters({ status: e.target.value })}
+                className="w-[140px]"
+              >
+                <NativeSelectOption value="ALL">All Statuses</NativeSelectOption>
+                <NativeSelectOption value="PENDING">Pending</NativeSelectOption>
+                <NativeSelectOption value="ACTIVE">Active</NativeSelectOption>
+                <NativeSelectOption value="VERIFIED">Verified</NativeSelectOption>
+                <NativeSelectOption value="INACTIVE">Inactive</NativeSelectOption>
+              </NativeSelect>
 
               {/* Gender Filter */}
-              <Select value={genderFilter} onValueChange={(val) => { const value = val || "ALL"; updateFilters({ gender: value }); }}>
-                <SelectTrigger className="w-[130px] text-xs h-9">
-                  <SelectValue placeholder="Gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">All Genders</SelectItem>
-                  <SelectItem value="MALE">Male</SelectItem>
-                  <SelectItem value="FEMALE">Female</SelectItem>
-                  <SelectItem value="OTHER">Other</SelectItem>
-                </SelectContent>
-              </Select>
+              <NativeSelect
+                value={genderFilter}
+                onChange={(e) => updateFilters({ gender: e.target.value })}
+                className="w-[130px]"
+              >
+                <NativeSelectOption value="ALL">All Genders</NativeSelectOption>
+                <NativeSelectOption value="MALE">Male</NativeSelectOption>
+                <NativeSelectOption value="FEMALE">Female</NativeSelectOption>
+                <NativeSelectOption value="OTHER">Other</NativeSelectOption>
+              </NativeSelect>
 
               {hasActiveFilters && (
                 <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9 px-2 text-xs text-muted-foreground hover:text-foreground gap-1">
@@ -360,10 +352,10 @@ export function BeneficiaryTable({ initialData, initialSearch }: BeneficiaryTabl
 
                     <TableCell>
                       <div className="space-y-0.5 text-xs">
-                        {item.contact?.phone && (
+                        {item.phone && (
                           <div className="flex items-center gap-1.5 text-foreground">
                             <Phone className="w-3 h-3 text-muted-foreground shrink-0" />
-                            <span>{item.contact.phone}</span>
+                            <span>{item.phone}</span>
                           </div>
                         )}
                         {item.address?.city && (
@@ -507,18 +499,18 @@ export function BeneficiaryTable({ initialData, initialSearch }: BeneficiaryTabl
                   <StatusBadge status={item.status} isVerified={Boolean(item.verifiedAt)} />
 
                   <div className="flex items-center gap-2">
-                    {item.contact?.phone && (
+                    {item.phone && (
                       <a
-                        href={`tel:${item.contact.phone}`}
+                        href={`tel:${item.phone}`}
                         className={buttonVariants({ variant: "outline", size: "sm", className: "h-7 w-7 p-0 rounded-full" })}
                         title="Call Beneficiary"
                       >
                         <Phone className="w-3.5 h-3.5 text-primary" />
                       </a>
                     )}
-                    {item.contact?.whatsapp && (
+                    {item.whatsapp && (
                       <a
-                        href={`https://wa.me/${item.contact.whatsapp.replace(/[^0-9]/g, "")}`}
+                        href={`https://wa.me/${item.whatsapp.replace(/[^0-9]/g, "")}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={buttonVariants({ variant: "outline", size: "sm", className: "h-7 w-7 p-0 rounded-full border-emerald-500/30 text-emerald-600" })}

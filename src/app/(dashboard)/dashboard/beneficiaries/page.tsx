@@ -1,7 +1,8 @@
 import React from "react";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { BENEFICIARY_SEARCH_COOKIE, getBeneficiaries, getBeneficiaryStats } from "@/app/(dashboard)/dashboard/beneficiaries/beneficiaries";
+import { BENEFICIARY_SEARCH_COOKIE } from "@/app/(dashboard)/dashboard/beneficiaries/constants";
+import { getBeneficiaries, getBeneficiaryStats } from "@/app/(dashboard)/dashboard/beneficiaries/beneficiaries";
 import { BeneficiaryTable } from "@/components/beneficiaries/BeneficiaryTable";
 import { Card, CardContent } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";

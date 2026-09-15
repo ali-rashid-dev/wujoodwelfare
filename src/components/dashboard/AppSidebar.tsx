@@ -29,6 +29,7 @@ import {
   LayoutDashboard,
   Users,
   UserPlus,
+  User,
   Home,
   LogOut,
   Heart,
@@ -196,6 +197,14 @@ export function AppSidebar() {
                     </div>
                   </div>
                 </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => router.push("/dashboard/profile")}
+                  className="gap-2 text-xs cursor-pointer"
+                >
+                  <User className="h-4 w-4 text-primary" />
+                  My Profile
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={async () => {

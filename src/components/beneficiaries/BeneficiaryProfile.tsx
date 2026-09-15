@@ -73,12 +73,9 @@ interface BeneficiaryProfileProps {
     verifiedAt?: string | Date | null;
     notes?: string | null;
     registeredAt: string | Date;
-    contact?: {
-      phone?: string | null;
-      phone2?: string | null;
-      whatsapp?: string | null;
-      email?: string | null;
-    } | null;
+    phone?: string | null;
+    whatsapp?: string | null;
+    email?: string | null;
     address?: {
       street?: string | null;
       city?: string | null;
@@ -285,11 +282,10 @@ export function BeneficiaryProfile({ beneficiary }: BeneficiaryProfileProps) {
             size="sm"
             onClick={handleToggleVerified}
             disabled={isPending}
-            className={`gap-1.5 text-xs h-9 font-medium ${
-              isVerified
+            className={`gap-1.5 text-xs h-9 font-medium ${isVerified
                 ? "border-amber-500/30 text-amber-600 hover:bg-amber-500/10"
                 : "border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10"
-            }`}
+              }`}
           >
             <ShieldCheck className="w-4 h-4" />
             {isVerified ? "Revoke Verification" : "Verify Beneficiary"}
@@ -484,14 +480,14 @@ export function BeneficiaryProfile({ beneficiary }: BeneficiaryProfileProps) {
                       {copiedCnic ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3 text-muted-foreground" />}
                     </button>
                   )}
-                  {beneficiary.contact?.phone && (
+                  {beneficiary.phone && (
                     <button
-                      onClick={() => copyToClipboard(beneficiary.contact!.phone!, "phone")}
+                      onClick={() => copyToClipboard(beneficiary.phone!, "phone")}
                       className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
                       title="Click to copy phone"
                     >
                       <Phone className="w-3.5 h-3.5 text-primary" />
-                      {beneficiary.contact.phone}
+                      {beneficiary.phone}
                       {copiedPhone ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3 text-muted-foreground" />}
                     </button>
                   )}
@@ -528,23 +524,23 @@ export function BeneficiaryProfile({ beneficiary }: BeneficiaryProfileProps) {
 
       {/* Main Tabs */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full bg-card p-1 rounded-xl border border-border h-auto">
-          <TabsTrigger value="overview" className="gap-1.5 text-xs py-2">
+        <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full bg-card p-1 rounded-xl border border-border">
+          <TabsTrigger value="overview" className="gap-1.5 text-xs">
             <User className="w-3.5 h-3.5" /> Overview
           </TabsTrigger>
-          <TabsTrigger value="contact" className="gap-1.5 text-xs py-2">
+          <TabsTrigger value="contact" className="gap-1.5 text-xs">
             <Phone className="w-3.5 h-3.5" /> Contact
           </TabsTrigger>
-          <TabsTrigger value="family" className="gap-1.5 text-xs py-2">
+          <TabsTrigger value="family" className="gap-1.5 text-xs">
             <Users className="w-3.5 h-3.5" /> Family & Eco
           </TabsTrigger>
-          <TabsTrigger value="aid" className="gap-1.5 text-xs py-2">
+          <TabsTrigger value="aid" className="gap-1.5 text-xs">
             <History className="w-3.5 h-3.5" /> Aid ({beneficiary.assistanceHistory.length})
           </TabsTrigger>
-          <TabsTrigger value="documents" className="gap-1.5 text-xs py-2">
+          <TabsTrigger value="documents" className="gap-1.5 text-xs">
             <FolderOpen className="w-3.5 h-3.5" /> Docs ({beneficiary.documents.length})
           </TabsTrigger>
-          <TabsTrigger value="cases" className="gap-1.5 text-xs py-2">
+          <TabsTrigger value="cases" className="gap-1.5 text-xs">
             <FileText className="w-3.5 h-3.5" /> Cases ({beneficiary.cases.length})
           </TabsTrigger>
         </TabsList>
@@ -645,20 +641,16 @@ export function BeneficiaryProfile({ beneficiary }: BeneficiaryProfileProps) {
                   </h4>
                   <div className="space-y-2 bg-muted/30 p-4 rounded-xl border border-border/50">
                     <div className="flex justify-between items-center py-1">
-                      <span className="text-muted-foreground">Primary Mobile:</span>
-                      <span className="font-semibold text-foreground">{beneficiary.contact?.phone || "N/A"}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-1 border-t border-border/40">
-                      <span className="text-muted-foreground">Alternate Phone:</span>
-                      <span className="font-semibold text-foreground">{beneficiary.contact?.phone2 || "N/A"}</span>
+                      <span className="text-muted-foreground">Primary Phone:</span>
+                      <span className="font-semibold text-foreground">{beneficiary.phone || "N/A"}</span>
                     </div>
                     <div className="flex justify-between items-center py-1 border-t border-border/40">
                       <span className="text-muted-foreground">WhatsApp:</span>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-foreground">{beneficiary.contact?.whatsapp || "N/A"}</span>
-                        {beneficiary.contact?.whatsapp && (
+                        <span className="font-semibold text-foreground">{beneficiary.whatsapp || "N/A"}</span>
+                        {beneficiary.whatsapp && (
                           <a
-                            href={`https://wa.me/${beneficiary.contact.whatsapp.replace(/[^0-9]/g, "")}`}
+                            href={`https://wa.me/${beneficiary.whatsapp.replace(/[^0-9]/g, "")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={buttonVariants({ variant: "outline", size: "sm", className: "h-6 text-[10px] px-2 border-emerald-500/30 text-emerald-600 gap-1" })}
@@ -670,7 +662,7 @@ export function BeneficiaryProfile({ beneficiary }: BeneficiaryProfileProps) {
                     </div>
                     <div className="flex justify-between items-center py-1 border-t border-border/40">
                       <span className="text-muted-foreground">Email Address:</span>
-                      <span className="font-semibold text-foreground">{beneficiary.contact?.email || "N/A"}</span>
+                      <span className="font-semibold text-foreground">{beneficiary.email || "N/A"}</span>
                     </div>
                   </div>
                 </div>
