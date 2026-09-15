@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
-import { PageHero } from "@/components/site/SiteLayout";
+
 import { Lock, Mail, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { signInSchema } from "@/validation";
@@ -76,14 +76,7 @@ export default function SignInPage() {
   }
 
   return (
-    <>
-      <PageHero
-        eyebrow="Account Access"
-        title="Sign In"
-        subtitle="Access your Wujood Welfare member account and dashboard"
-      />
-      <section className="section-y container-x flex justify-center">
-        <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 shadow-xl">
+    <div className="w-full bg-card border border-border rounded-2xl p-8 shadow-xl">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-foreground">Welcome Back</h2>
             <p className="text-sm text-muted-foreground mt-1">
@@ -191,8 +184,6 @@ export default function SignInPage() {
               Create an account
             </Link>
           </p>
-        </div>
-      </section>
-    </>
+    </div>
   );
 }

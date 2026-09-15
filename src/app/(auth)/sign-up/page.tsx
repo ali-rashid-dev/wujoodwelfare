@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn, signUp } from "@/lib/auth-client";
-import { PageHero } from "@/components/site/SiteLayout";
+
 import { User, Lock, Mail, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { signUpSchema } from "@/validation";
@@ -77,14 +77,7 @@ export default function SignUpPage() {
   }
 
   return (
-    <>
-      <PageHero
-        eyebrow="Join Wujood Welfare"
-        title="Create Account"
-        subtitle="Sign up to track your donations, volunteer, and get involved"
-      />
-      <section className="section-y container-x flex justify-center">
-        <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 shadow-xl">
+    <div className="w-full bg-card border border-border rounded-2xl p-8 shadow-xl">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-foreground">Get Started</h2>
             <p className="text-sm text-muted-foreground mt-1">
@@ -204,8 +197,6 @@ export default function SignUpPage() {
               Sign In
             </Link>
           </p>
-        </div>
-      </section>
-    </>
+    </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { requestPasswordReset } from "@/lib/auth-client";
-import { PageHero } from "@/components/site/SiteLayout";
+
 import { Mail, ArrowRight, Loader2, AlertCircle, CheckCircle2, ArrowLeft } from "lucide-react";
 import { forgotPasswordSchema } from "@/validation";
 
@@ -46,14 +46,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <>
-      <PageHero
-        eyebrow="Account Recovery"
-        title="Forgot Password"
-        subtitle="Enter your email to receive password reset instructions"
-      />
-      <section className="section-y container-x flex justify-center">
-        <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 shadow-xl">
+    <div className="w-full bg-card border border-border rounded-2xl p-8 shadow-xl">
           {submitted ? (
             <div className="text-center py-4 space-y-5">
               <div className="mx-auto w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
@@ -146,8 +139,6 @@ export default function ForgotPasswordPage() {
               </p>
             </>
           )}
-        </div>
-      </section>
-    </>
+    </div>
   );
 }

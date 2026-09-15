@@ -1,7 +1,7 @@
 import { Reveal } from "@/components/site/Reveal";
 import { Heart } from "lucide-react";
 import type { Metadata } from "next";
-import { PaymentCard } from "../../components/donate/PaymentCard";
+import { PaymentCard } from "../../../components/donate/PaymentCard";
 
 export const metadata: Metadata = {
   title: "Wujood Welfare — Donate",

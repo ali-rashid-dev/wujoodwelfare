@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { verifyEmail, sendVerificationEmail } from "@/lib/auth-client";
-import { PageHero } from "@/components/site/SiteLayout";
+
 import { Mail, ArrowRight, Loader2, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react";
 import { verifyEmailSchema } from "@/validation";
 
@@ -203,23 +203,16 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
   return (
-    <>
-      <PageHero
-        eyebrow="Account Verification"
-        title="Email Verification"
-        subtitle="Confirm your email address to access all features"
-      />
-      <section className="section-y container-x flex justify-center">
-        <Suspense
-          fallback={
-            <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 shadow-xl flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          }
-        >
-          <VerifyEmailContent />
-        </Suspense>
-      </section>
-    </>
+    <section className="flex justify-center">
+      <Suspense
+        fallback={
+          <div className="w-full bg-card border border-border rounded-2xl p-8 shadow-xl flex items-center justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        }
+      >
+        <VerifyEmailContent />
+      </Suspense>
+    </section>
   );
 }

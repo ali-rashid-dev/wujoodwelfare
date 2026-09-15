@@ -4,7 +4,7 @@ import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { resetPassword } from "@/lib/auth-client";
-import { PageHero } from "@/components/site/SiteLayout";
+
 import { Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { resetPasswordSchema } from "@/validation";
 
@@ -180,21 +180,14 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <>
-      <PageHero
-        eyebrow="Account Security"
-        title="Reset Password"
-        subtitle="Enter and confirm your new password below"
-      />
-      <section className="section-y container-x flex justify-center">
-        <Suspense fallback={
-          <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 shadow-xl flex items-center justify-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        }>
-          <ResetPasswordForm />
-        </Suspense>
-      </section>
-    </>
+    <section className="flex justify-center">
+      <Suspense fallback={
+        <div className="w-full bg-card border border-border rounded-2xl p-8 shadow-xl flex items-center justify-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      }>
+        <ResetPasswordForm />
+      </Suspense>
+    </section>
   );
 }
