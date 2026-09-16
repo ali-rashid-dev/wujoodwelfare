@@ -147,7 +147,12 @@ export function ApplicationProfile({ application, staffList }: ApplicationProfil
   };
 
   const getStepIndex = (statusStr: string) => {
-    if (statusStr === "REJECTED") return 4;
+    if (statusStr === "REJECTED") {
+      if (application.assessedAt) return 3;
+      if (application.verifiedAt) return 2;
+      if (application.reviewedAt) return 1;
+      return 0;
+    }
     return WORKFLOW_STEPS.findIndex((s) => s.status === statusStr);
   };
 
@@ -284,7 +289,7 @@ export function ApplicationProfile({ application, staffList }: ApplicationProfil
             <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
               {WORKFLOW_STEPS.map((step, idx) => {
                 const StepIcon = step.icon;
-                const isCompleted = idx < currentStepIndex || application.status === "APPROVED";
+                const isCompleted = idx < currentStepIndex || (application.status === "APPROVED" && idx < WORKFLOW_STEPS.length - 1);
                 const isCurrent = idx === currentStepIndex && application.status !== "REJECTED";
                 const isRejected = application.status === "REJECTED" && idx === 4;
 

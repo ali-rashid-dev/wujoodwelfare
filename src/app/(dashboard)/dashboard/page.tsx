@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Mail, LogOut, Loader2, ShieldCheck, Users, ArrowRight, Heart, BookOpen, FileText } from "lucide-react";
+import { Mail, LogOut, Loader2, ShieldCheck, Users, ArrowRight, Heart, BookOpen, FileText, Briefcase } from "lucide-react";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -230,6 +230,26 @@ export default function DashboardPage() {
                 </p>
               </div>
               <Button size="sm" variant="ghost" className="text-xs text-emerald-600 gap-1 font-semibold group-hover:translate-x-0.5 transition-transform">
+                Open <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+
+            <div
+              onClick={() => router.push("/dashboard/cases")}
+              className="flex items-center justify-between p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 transition-colors cursor-pointer group"
+            >
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Briefcase className="w-4 h-4 text-amber-600" />
+                  <h4 className="font-bold text-sm text-foreground group-hover:text-amber-600 transition-colors">
+                    Case Management
+                  </h4>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Open cases, assign officers, record assessments, field visits, notes, and track case lifecycle.
+                </p>
+              </div>
+              <Button size="sm" variant="ghost" className="text-xs text-amber-600 gap-1 font-semibold group-hover:translate-x-0.5 transition-transform">
                 Open <ArrowRight className="w-3.5 h-3.5" />
               </Button>
             </div>

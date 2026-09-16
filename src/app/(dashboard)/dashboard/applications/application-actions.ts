@@ -108,36 +108,47 @@ export async function updateApplicationStatus(id: string, data: ApplicationStatu
   try {
     const session = await requireServerSession();
     const validated = applicationStatusUpdateSchema.parse(data);
-
-    const existing = await prisma.welfareApplication.findUnique({
-      where: { id },
-      include: { beneficiary: true, program: true },
-    });
-
-    if (!existing) {
-      return { success: false, error: "Application not found" };
-    }
-
-    const now = new Date();
-    const statusData: Prisma.WelfareApplicationUpdateInput = {
-      status: validated.targetStatus as ApplicationStatus,
-      reviewNotes: validated.notes || existing.reviewNotes,
-    };
-
-    if (validated.targetStatus === "INITIAL_REVIEW" && !existing.reviewedAt) {
-      statusData.reviewedAt = now;
-    } else if (validated.targetStatus === "VERIFICATION" && !existing.verifiedAt) {
-      statusData.verifiedAt = now;
-    } else if (validated.targetStatus === "ELIGIBILITY_ASSESSMENT" && !existing.assessedAt) {
-      statusData.assessedAt = now;
-    } else if (validated.targetStatus === "APPROVED" || validated.targetStatus === "REJECTED") {
-      statusData.decidedAt = now;
-      if (validated.targetStatus === "REJECTED") {
-        statusData.rejectionReason = validated.rejectionReason || "Criteria requirements not met.";
-      }
-    }
-
     const result = await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT "id" FROM "welfare_application" WHERE "id" = ${id} FOR UPDATE`;
+      const existing = await tx.welfareApplication.findUnique({
+        where: { id },
+        include: { beneficiary: true, program: true },
+      });
+
+      if (!existing) throw new Error("Application not found");
+
+      const allowedTransitions: Record<ApplicationStatus, ApplicationStatus[]> = {
+        SUBMITTED: ["INITIAL_REVIEW", "REJECTED"],
+        INITIAL_REVIEW: ["VERIFICATION", "REJECTED"],
+        VERIFICATION: ["ELIGIBILITY_ASSESSMENT", "REJECTED"],
+        ELIGIBILITY_ASSESSMENT: ["APPROVED", "REJECTED"],
+        APPROVED: [],
+        REJECTED: [],
+      };
+      const targetStatus = validated.targetStatus as ApplicationStatus;
+      if (!allowedTransitions[existing.status].includes(targetStatus)) {
+        throw new Error(`Invalid application status transition from ${existing.status} to ${targetStatus}`);
+      }
+
+      const now = new Date();
+      const statusData: Prisma.WelfareApplicationUpdateInput = {
+        status: targetStatus,
+        reviewNotes: validated.notes || existing.reviewNotes,
+      };
+
+      if (targetStatus === "INITIAL_REVIEW" && !existing.reviewedAt) {
+        statusData.reviewedAt = now;
+      } else if (targetStatus === "VERIFICATION" && !existing.verifiedAt) {
+        statusData.verifiedAt = now;
+      } else if (targetStatus === "ELIGIBILITY_ASSESSMENT" && !existing.assessedAt) {
+        statusData.assessedAt = now;
+      } else if (targetStatus === "APPROVED" || targetStatus === "REJECTED") {
+        statusData.decidedAt = now;
+        if (targetStatus === "REJECTED") {
+          statusData.rejectionReason = validated.rejectionReason || "Criteria requirements not met.";
+        }
+      }
+
       const updatedApp = await tx.welfareApplication.update({
         where: { id },
         data: statusData,
@@ -147,14 +158,14 @@ export async function updateApplicationStatus(id: string, data: ApplicationStatu
         data: {
           applicationId: id,
           fromStatus: existing.status,
-          toStatus: validated.targetStatus as ApplicationStatus,
-          notes: validated.notes || (validated.targetStatus === "REJECTED" ? validated.rejectionReason : `Status updated to ${validated.targetStatus}`),
+          toStatus: targetStatus,
+          notes: validated.notes || (targetStatus === "REJECTED" ? validated.rejectionReason : `Status updated to ${targetStatus}`),
           performedBy: session.user?.name || "Staff Officer",
         },
       });
 
       // Auto-enroll beneficiary into program if APPROVED
-      if (validated.targetStatus === "APPROVED" && existing.programId) {
+      if (targetStatus === "APPROVED" && existing.programId) {
         await tx.programEnrollment.upsert({
           where: {
             programId_beneficiaryId: {
@@ -176,15 +187,15 @@ export async function updateApplicationStatus(id: string, data: ApplicationStatu
         });
       }
 
-      return updatedApp;
+      return { application: updatedApp, programId: existing.programId };
     });
 
     revalidatePath("/dashboard/applications");
     revalidatePath(`/dashboard/applications/${id}`);
-    if (existing.programId) {
-      revalidatePath(`/dashboard/programs/${existing.programId}`);
+    if (result.programId) {
+      revalidatePath(`/dashboard/programs/${result.programId}`);
     }
-    return { success: true, application: result };
+    return { success: true, application: result.application };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to update application status";
     return { success: false, error: message };

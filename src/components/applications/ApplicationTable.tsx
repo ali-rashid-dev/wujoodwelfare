@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
@@ -141,8 +141,9 @@ export function ApplicationTable({
   const status = searchParams.get("status") || "ALL";
   const priority = searchParams.get("priority") || "ALL";
   const programId = searchParams.get("programId") || "ALL";
+  const [searchValue, setSearchValue] = useState(search);
 
-  const updateFilters = (newParams: Record<string, string | undefined>) => {
+  const updateFilters = useCallback((newParams: Record<string, string | undefined>) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(newParams).forEach(([key, val]) => {
       if (val && val !== "ALL" && val !== "") {
@@ -151,9 +152,22 @@ export function ApplicationTable({
         params.delete(key);
       }
     });
-    params.set("page", "1");
+    if (!Object.prototype.hasOwnProperty.call(newParams, "page")) {
+      params.set("page", "1");
+    }
     router.push(`${pathname}?${params.toString()}`);
-  };
+  }, [pathname, router, searchParams]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setSearchValue(search), 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [search]);
+
+  useEffect(() => {
+    if (searchValue === search) return;
+    const timeoutId = window.setTimeout(() => updateFilters({ search: searchValue }), 300);
+    return () => window.clearTimeout(timeoutId);
+  }, [search, searchValue, updateFilters]);
 
   const handleDelete = async (id: string, code: string) => {
     if (!confirm(`Are you sure you want to delete application "${code}"?`)) return;
@@ -313,8 +327,8 @@ export function ApplicationTable({
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search by application code, beneficiary name, CNIC, or reason..."
-                value={search}
-                onChange={(e) => updateFilters({ search: e.target.value })}
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
                 className="pl-9 text-xs"
               />
             </div>

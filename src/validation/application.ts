@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { AssistanceType } from "@prisma/client";
 
 export const applicationStatusEnum = z.enum([
   "SUBMITTED",
@@ -19,7 +20,7 @@ export const applicationPriorityEnum = z.enum([
 export const applicationFormSchema = z.object({
   beneficiaryId: z.string().min(1, "Beneficiary selection is required"),
   programId: z.string().optional().or(z.literal("")),
-  assistanceType: z.string().default("FINANCIAL"),
+  assistanceType: z.enum(AssistanceType).default("FINANCIAL"),
   requestedAmount: z.coerce.number().min(0, "Requested amount must be non-negative").optional().or(z.literal("")),
   requestedItems: z.string().optional().or(z.literal("")),
   reason: z.string().min(10, "Please provide a detailed hardship narrative (at least 10 characters)"),

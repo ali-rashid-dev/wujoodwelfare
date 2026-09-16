@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Save, Loader2, FileText, User, BookOpen, AlertTriangle, Plus, Trash2, CheckCircle2 } from "lucide-react";
 import { createApplication, updateApplication } from "@/app/(dashboard)/dashboard/applications/application-actions";
 import { ApplicationFormInput } from "@/validation/application";
-import { ApplicationPriority } from "@prisma/client";
+import { ApplicationPriority, AssistanceType } from "@prisma/client";
 import { toast } from "sonner";
 
 interface ApplicationFormProps {
@@ -56,10 +56,10 @@ export function ApplicationForm({ beneficiaries, programs, initialData, isEditin
   const [docInput, setDocInput] = useState("");
 
   const [formData, setFormData] = useState<ApplicationFormInput>({
-    beneficiaryId: initialData?.beneficiaryId || (beneficiaries[0]?.id || ""),
+    beneficiaryId: initialData?.beneficiaryId ?? "",
     programId: initialData?.programId || "",
-    assistanceType: initialData?.assistanceType || "FINANCIAL",
-    requestedAmount: initialData?.requestedAmount || undefined,
+    assistanceType: (initialData?.assistanceType as AssistanceType) || "FINANCIAL",
+    requestedAmount: initialData?.requestedAmount ?? undefined,
     requestedItems: initialData?.requestedItems || "",
     reason: initialData?.reason || "",
     priority: (initialData?.priority as ApplicationPriority) || "MEDIUM",
@@ -73,7 +73,7 @@ export function ApplicationForm({ beneficiaries, programs, initialData, isEditin
     setFormData((prev) => ({
       ...prev,
       programId,
-      assistanceType: prog ? prog.assistanceType : prev.assistanceType,
+      assistanceType: prog ? (prog.assistanceType as AssistanceType) : prev.assistanceType,
     }));
   };
 
@@ -262,8 +262,8 @@ export function ApplicationForm({ beneficiaries, programs, initialData, isEditin
                     type="number"
                     min="0"
                     placeholder="e.g. 25000"
-                    value={formData.requestedAmount || ""}
-                    onChange={(e) => setFormData({ ...formData, requestedAmount: e.target.value ? Number(e.target.value) : undefined })}
+                    value={formData.requestedAmount ?? ""}
+                    onChange={(e) => setFormData({ ...formData, requestedAmount: e.target.value === "" ? undefined : Number(e.target.value) })}
                     className="text-xs"
                   />
                 </div>
@@ -355,6 +355,7 @@ export function ApplicationForm({ beneficiaries, programs, initialData, isEditin
                           type="button"
                           variant="ghost"
                           size="icon"
+                          aria-label={`Remove document ${doc}`}
                           onClick={() => handleRemoveDocument(idx)}
                           className="h-6 w-6 text-destructive hover:bg-destructive/10 shrink-0"
                         >

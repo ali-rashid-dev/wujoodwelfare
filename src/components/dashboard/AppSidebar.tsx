@@ -39,6 +39,7 @@ import {
   ExternalLink,
   BookOpen,
   FileText,
+  Briefcase,
 } from "lucide-react";
 
 export function AppSidebar() {
@@ -65,6 +66,12 @@ export function AppSidebar() {
       title: "Welfare Programs",
       url: "/dashboard/programs",
       icon: BookOpen,
+      exact: false,
+    },
+    {
+      title: "Case Management",
+      url: "/dashboard/cases",
+      icon: Briefcase,
       exact: false,
     },
     {

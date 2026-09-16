@@ -112,6 +112,24 @@ enum ApplicationPriority {
   URGENT
 }
 
+enum CaseStatus {
+  NEW
+  ASSIGNED
+  UNDER_ASSESSMENT
+  VERIFICATION
+  DECISION
+  ASSISTANCE
+  FOLLOW_UP
+  CLOSED
+}
+
+enum CasePriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
 enum AssistanceType {
   FOOD
   MEDICAL
@@ -253,17 +271,98 @@ model BeneficiaryDocument {
 }
 
 model BeneficiaryCase {
-  id            String           @id @default(cuid())
-  beneficiaryId String
-  title         String
-  description   String?
-  openedAt      DateTime         @default(now())
-  closedAt      DateTime?
-  isOpen        Boolean          @default(true)
-  beneficiary   Beneficiary      @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
-  assignments   CaseAssignment[]
+  id               String            @id @default(cuid())
+  caseNumber       String?
+  beneficiaryId    String
+  beneficiary      Beneficiary       @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  title            String
+  category         String            @default("GENERAL")
+  description      String?           @db.Text
+  status           CaseStatus        @default(NEW)
+  priority         CasePriority      @default(MEDIUM)
+  openedAt         DateTime          @default(now())
+  closedAt         DateTime?
+  closureReason    String?           @db.Text
+  isOpen           Boolean           @default(true)
+  nextFollowUpDate DateTime?
+  followUpPurpose  String?
+  documents        String[]
+
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  assignments      CaseAssignment[]
+  assessments      CaseAssessment[]
+  notes            CaseNote[]
+  visits           CaseVisit[]
+  logs             CaseActivityLog[]
 
   @@map("beneficiary_case")
+}
+
+model CaseCodeSequence {
+  year      Int @id
+  nextValue Int @default(0)
+
+  @@map("case_code_sequence")
+}
+
+model CaseAssessment {
+  id                 String          @id @default(cuid())
+  caseId             String
+  caseItem           BeneficiaryCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  assessorId         String?
+  assessorName       String?
+  vulnerabilityScore Int             @default(0)
+  financialNeedScore Int             @default(0)
+  recommendation     String          @db.Text
+  findings           String?         @db.Text
+  createdAt          DateTime        @default(now())
+
+  @@map("case_assessment")
+}
+
+model CaseNote {
+  id         String          @id @default(cuid())
+  caseId     String
+  caseItem   BeneficiaryCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  authorId   String?
+  authorName String
+  content    String          @db.Text
+  isInternal Boolean         @default(true)
+  createdAt  DateTime        @default(now())
+
+  @@map("case_note")
+}
+
+model CaseVisit {
+  id          String          @id @default(cuid())
+  caseId      String
+  caseItem    BeneficiaryCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  visitorId   String?
+  visitorName String
+  visitDate   DateTime        @default(now())
+  location    String?
+  purpose     String
+  findings    String          @db.Text
+  outcome     String?
+  createdAt   DateTime        @default(now())
+
+  @@map("case_visit")
+}
+
+model CaseActivityLog {
+  id          String          @id @default(cuid())
+  caseId      String
+  caseItem    BeneficiaryCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  fromStatus  CaseStatus?
+  toStatus    CaseStatus
+  action      String
+  details     String?
+  performedBy String?
+  timestamp   DateTime        @default(now())
+
+  @@map("case_activity_log")
 }
 
 model AssistanceRecord {
