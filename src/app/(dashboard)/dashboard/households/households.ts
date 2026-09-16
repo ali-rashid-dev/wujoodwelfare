@@ -165,7 +165,9 @@ export async function createHousehold(data: HouseholdFormInput) {
         data: {
           householdCode,
           name: validated.name,
-          headBeneficiaryId: validated.headBeneficiaryId || null,
+          headBeneficiary: validated.headBeneficiaryId
+            ? { connect: { id: validated.headBeneficiaryId } }
+            : undefined,
           fixedMonthlyIncome,
           monthlyIncome: totalIncome,
           totalMembers,

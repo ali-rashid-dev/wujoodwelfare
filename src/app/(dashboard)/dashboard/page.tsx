@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Mail, LogOut, Loader2, ShieldCheck, Users, ArrowRight, Heart } from "lucide-react";
+import { Mail, LogOut, Loader2, ShieldCheck, Users, ArrowRight, Heart, BookOpen } from "lucide-react";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -130,11 +130,31 @@ export default function DashboardPage() {
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Welfare Management Modules</CardTitle>
           <CardDescription className="text-xs">
-            Access core welfare registry, aid tracking, staff operations, and volunteer management.
+            Access central program configurations, aid tracking, staff operations, and volunteer management.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              onClick={() => router.push("/dashboard/programs")}
+              className="flex items-center justify-between p-4 rounded-xl border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 transition-colors cursor-pointer group"
+            >
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-purple-600" />
+                  <h4 className="font-bold text-sm text-foreground group-hover:text-purple-600 transition-colors">
+                    Welfare Programs
+                  </h4>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Central program configuration, budget tracking, eligibility rules, and aid distribution.
+                </p>
+              </div>
+              <Button size="sm" variant="ghost" className="text-xs text-purple-600 gap-1 font-semibold group-hover:translate-x-0.5 transition-transform">
+                Open <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+
             <div
               onClick={() => router.push("/dashboard/beneficiaries")}
               className="flex items-center justify-between p-4 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors cursor-pointer group"

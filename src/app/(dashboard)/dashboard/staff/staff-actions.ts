@@ -345,8 +345,14 @@ export async function logStaffActivity(staffId: string, data: StaffActivityInput
 export async function getAvailableCasesForStaff(params?: { search?: string; page?: number; limit?: number }) {
   try {
     await requireServerSession();
-    const page = Math.max(params?.page || 1, 1);
-    const limit = Math.min(params?.limit || 25, 100);
+    const requestedPage = Number(params?.page);
+    const requestedLimit = Number(params?.limit);
+    const page = Number.isFinite(requestedPage) && requestedPage > 0
+      ? Math.max(Math.floor(requestedPage), 1)
+      : 1;
+    const limit = Number.isFinite(requestedLimit) && requestedLimit > 0
+      ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
+      : 25;
     const search = params?.search?.trim();
     const where = {
       isOpen: true,

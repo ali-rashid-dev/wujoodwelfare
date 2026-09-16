@@ -88,6 +88,14 @@ enum MaritalStatus {
   WIDOWED
 }
 
+enum ProgramStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
 enum AssistanceType {
   FOOD
   MEDICAL
@@ -95,6 +103,12 @@ enum AssistanceType {
   FINANCIAL
   HOUSING
   CLOTHING
+  ORPHAN_SUPPORT
+  DISABILITY_SUPPORT
+  EMERGENCY_RELIEF
+  MARRIAGE_ASSISTANCE
+  EMPLOYMENT_SUPPORT
+  MONTHLY_FINANCIAL_AID
   OTHER
 }
 
@@ -104,6 +118,11 @@ enum DocumentType {
   PROOF_OF_INCOME
   PROOF_OF_RESIDENCE
   MEDICAL_REPORT
+  ORPHAN_CERTIFICATE
+  DISABILITY_CERTIFICATE
+  MARRIAGE_CERTIFICATE
+  JOB_APPLICATION
+  ACADEMIC_RECORD
   OTHER
 }
 
@@ -151,6 +170,7 @@ model Beneficiary {
   documents         BeneficiaryDocument[]
   cases             BeneficiaryCase[]
   assistanceHistory AssistanceRecord[]
+  programEnrollments ProgramEnrollment[]
 
   householdId          String?
   household            Household?        @relation("HouseholdMembers", fields: [householdId], references: [id], onDelete: SetNull)
@@ -230,15 +250,17 @@ model BeneficiaryCase {
 }
 
 model AssistanceRecord {
-  id            String         @id @default(cuid())
+  id            String          @id @default(cuid())
   beneficiaryId String
+  programId     String?
+  program       WelfareProgram? @relation(fields: [programId], references: [id], onDelete: SetNull)
   type          AssistanceType
   description   String?
-  amount        Decimal?       @db.Decimal(12, 2)
+  amount        Decimal?        @db.Decimal(12, 2)
   quantity      String?
-  givenAt       DateTime       @default(now())
+  givenAt       DateTime        @default(now())
   givenBy       String?
-  beneficiary   Beneficiary    @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  beneficiary   Beneficiary     @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
 
   @@map("assistance_record")
 }
@@ -514,3 +536,54 @@ model VolunteerActivity {
 
   @@map("volunteer_activity")
 }
+
+// ─── Welfare Program Models ────────────────────────────────────────────────────
+
+model WelfareProgram {
+  id                  String             @id @default(cuid())
+  code                String             @unique
+  name                String
+  slug                String             @unique
+  description         String?            @db.Text
+  eligibilityCriteria String?            @db.Text
+  budget              Decimal            @default(0) @db.Decimal(14, 2)
+  spentBudget         Decimal            @default(0) @db.Decimal(14, 2)
+  startDate           DateTime
+  endDate             DateTime?
+  status              ProgramStatus      @default(ACTIVE)
+  assistanceType      AssistanceType     @default(FINANCIAL)
+  requiredDocuments   DocumentType[]
+  targetBeneficiaries Int?
+  maxBeneficiaries    Int?
+
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  enrollments         ProgramEnrollment[]
+  disbursements       AssistanceRecord[]
+
+  @@map("welfare_program")
+}
+
+model ProgramCodeSequence {
+  year      Int @id
+  nextValue Int @default(0)
+
+  @@map("program_code_sequence")
+}
+
+model ProgramEnrollment {
+  id            String         @id @default(cuid())
+  programId     String
+  program       WelfareProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  beneficiaryId String
+  beneficiary   Beneficiary    @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  status        String         @default("ENROLLED")
+  enrolledAt    DateTime       @default(now())
+  approvedAt    DateTime?
+  notes         String?
+
+  @@unique([programId, beneficiaryId])
+  @@map("program_enrollment")
+}
+

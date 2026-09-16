@@ -37,6 +37,7 @@ import {
   Heart,
   ChevronsUpDown,
   ExternalLink,
+  BookOpen,
 } from "lucide-react";
 
 export function AppSidebar() {
@@ -52,6 +53,12 @@ export function AppSidebar() {
       url: "/dashboard",
       icon: LayoutDashboard,
       exact: true,
+    },
+    {
+      title: "Welfare Programs",
+      url: "/dashboard/programs",
+      icon: BookOpen,
+      exact: false,
     },
     {
       title: "Beneficiaries",
