@@ -87,7 +87,7 @@ export function AddAssessmentModal({
             <Slider
               value={[vulnerabilityScore]}
               onValueChange={(val) => setVulnerabilityScore(typeof val === "number" ? val : val[0] ?? 0)}
-              min={0}
+              min={1}
               max={100}
               step={1}
             />
@@ -105,7 +105,7 @@ export function AddAssessmentModal({
             <Slider
               value={[financialNeedScore]}
               onValueChange={(val) => setFinancialNeedScore(typeof val === "number" ? val : val[0] ?? 0)}
-              min={0}
+              min={1}
               max={100}
               step={1}
             />

@@ -272,7 +272,7 @@ model BeneficiaryDocument {
 
 model BeneficiaryCase {
   id               String            @id @default(cuid())
-  caseNumber       String?
+  caseNumber       String?           @unique
   beneficiaryId    String
   beneficiary      Beneficiary       @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
   title            String

@@ -109,6 +109,10 @@ export async function updateCase(id: string, data: CaseFormInput) {
           where: { caseId: id, staffId: validated.assignedStaffId },
         });
         if (!existingAssignment) {
+          await tx.caseAssignment.updateMany({
+            where: { caseId: id, roleInCase: "Primary Officer", status: "ACTIVE" },
+            data: { status: "INACTIVE" },
+          });
           await tx.caseAssignment.create({
             data: {
               caseId: id,
@@ -636,7 +640,7 @@ export async function getCaseStats() {
   }
 }
 
-export async function getCaseOptions() {
+export async function getCaseOptions(selectedBeneficiaryId?: string) {
   try {
     await requireServerSession();
     const [beneficiaries, staff] = await Promise.all([
@@ -651,6 +655,14 @@ export async function getCaseOptions() {
         select: { id: true, name: true, designation: true, department: true },
       }),
     ]);
+
+    if (selectedBeneficiaryId && !beneficiaries.some((beneficiary) => beneficiary.id === selectedBeneficiaryId)) {
+      const selectedBeneficiary = await prisma.beneficiary.findUnique({
+        where: { id: selectedBeneficiaryId },
+        select: { id: true, name: true, cnic: true, phone: true, status: true },
+      });
+      if (selectedBeneficiary) beneficiaries.push(selectedBeneficiary);
+    }
 
     return { beneficiaries, staff };
   } catch {

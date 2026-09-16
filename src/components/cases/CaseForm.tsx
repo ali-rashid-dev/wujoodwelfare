@@ -110,6 +110,10 @@ export function CaseForm({ beneficiaries, staffList, initialData, isEditing = fa
       toast.error("Case title is required.");
       return;
     }
+    if (formData.title.trim().length < 3) {
+      toast.error("Case title must be at least 3 characters.");
+      return;
+    }
 
     setSubmitting(true);
     try {

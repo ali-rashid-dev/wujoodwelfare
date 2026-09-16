@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
@@ -110,6 +110,7 @@ export function CaseTable({ initialItems, totalItems, currentPage, totalPages, s
   const [priority, setPriority] = useState(searchParams.get("priority") ?? "ALL");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [items, setItems] = useState(initialItems);
+  const hasMountedSearchRef = useRef(false);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => setItems(initialItems), 0);
@@ -117,15 +118,19 @@ export function CaseTable({ initialItems, totalItems, currentPage, totalPages, s
   }, [initialItems]);
 
   const updateSearch = useCallback(() => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(searchParams.toString());
     if (search) params.set("search", search);
     if (status && status !== "ALL") params.set("status", status);
     if (priority && priority !== "ALL") params.set("priority", priority);
     params.set("page", "1");
     router.push(`${pathname}?${params.toString()}`);
-  }, [search, status, priority, router, pathname]);
+  }, [search, status, priority, router, pathname, searchParams]);
 
   useEffect(() => {
+    if (!hasMountedSearchRef.current) {
+      hasMountedSearchRef.current = true;
+      return;
+    }
     const handler = setTimeout(() => {
       updateSearch();
     }, 400);

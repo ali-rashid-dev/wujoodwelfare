@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +25,20 @@ interface ScheduleFollowUpModalProps {
   currentFollowUpDate?: string | null;
 }
 
+const formatLocalDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const getFollowUpDate = (currentFollowUpDate?: string | null) => {
+  if (currentFollowUpDate) return formatLocalDate(new Date(currentFollowUpDate));
+  const defaultDate = new Date();
+  defaultDate.setDate(defaultDate.getDate() + 7);
+  return formatLocalDate(defaultDate);
+};
+
 export function ScheduleFollowUpModal({
   isOpen,
   onClose,
@@ -32,13 +46,17 @@ export function ScheduleFollowUpModal({
   caseTitle,
   currentFollowUpDate,
 }: ScheduleFollowUpModalProps) {
-  const [today] = useState(() => new Date().toISOString().split("T")[0]);
-  const [followUpDate, setFollowUpDate] = useState(() => currentFollowUpDate
-    ? new Date(currentFollowUpDate).toISOString().split("T")[0]
-    : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]);
+  const [today] = useState(() => formatLocalDate(new Date()));
+  const [followUpDate, setFollowUpDate] = useState(() => getFollowUpDate(currentFollowUpDate));
   const [followUpPurpose, setFollowUpPurpose] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const timeoutId = window.setTimeout(() => setFollowUpDate(getFollowUpDate(currentFollowUpDate)), 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [currentFollowUpDate, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

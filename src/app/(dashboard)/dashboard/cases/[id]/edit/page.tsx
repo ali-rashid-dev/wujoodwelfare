@@ -11,14 +11,13 @@ interface PageProps {
 
 export default async function EditCasePage({ params }: PageProps) {
   const { id } = await params;
-  const [caseItem, options] = await Promise.all([
-    getCaseById(id),
-    getCaseOptions(),
-  ]);
+  const caseItem = await getCaseById(id);
 
   if (!caseItem) {
     notFound();
   }
+
+  const options = await getCaseOptions(caseItem.beneficiaryId);
 
   return (
     <CaseForm

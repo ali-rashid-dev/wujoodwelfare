@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
@@ -142,6 +142,7 @@ export function ApplicationTable({
   const priority = searchParams.get("priority") || "ALL";
   const programId = searchParams.get("programId") || "ALL";
   const [searchValue, setSearchValue] = useState(search);
+  const lastSearchSentRef = useRef<string | null>(null);
 
   const updateFilters = useCallback((newParams: Record<string, string | undefined>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -155,10 +156,17 @@ export function ApplicationTable({
     if (!Object.prototype.hasOwnProperty.call(newParams, "page")) {
       params.set("page", "1");
     }
+    if (Object.prototype.hasOwnProperty.call(newParams, "search")) {
+      lastSearchSentRef.current = newParams.search ?? "";
+    }
     router.push(`${pathname}?${params.toString()}`);
   }, [pathname, router, searchParams]);
 
   useEffect(() => {
+    if (lastSearchSentRef.current === search) {
+      lastSearchSentRef.current = null;
+      return;
+    }
     const timeoutId = window.setTimeout(() => setSearchValue(search), 0);
     return () => window.clearTimeout(timeoutId);
   }, [search]);
