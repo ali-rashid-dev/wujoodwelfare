@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Save, Loader2, BookOpen, FileCheck, DollarSign, Calendar, Target } from "lucide-react";
 import { createProgram, updateProgram } from "@/app/(dashboard)/dashboard/programs/program-actions";
 import { ProgramFormInput } from "@/validation/program";
-import { ProgramStatus, AssistanceType, DocumentType } from "@prisma/client";
+import type { ProgramStatus, AssistanceType, DocumentType } from "@prisma/client";
 import { toast } from "sonner";
 
 interface ProgramFormProps {
@@ -358,7 +358,7 @@ export function ProgramForm({ initialData, isEditing = false }: ProgramFormProps
                   </Label>
                   <Textarea
                     id="prog-desc"
-                    placeholder="Describe the goals, items disbursemnt methodology, and objectives..."
+                    placeholder="Describe the goals, items disbursement methodology, and objectives..."
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="text-xs min-h-[90px]"

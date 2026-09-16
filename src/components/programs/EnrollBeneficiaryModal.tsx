@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -39,6 +40,7 @@ export function EnrollBeneficiaryModal({
   programId,
   programName,
 }: EnrollBeneficiaryModalProps) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [beneficiaries, setBeneficiaries] = useState<BeneficiaryItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -97,6 +99,7 @@ export function EnrollBeneficiaryModal({
 
     if (res.success) {
       toast.success("Beneficiary successfully enrolled in program!");
+      router.refresh();
       handleClose();
     } else {
       toast.error(res.error || "Failed to enroll beneficiary");

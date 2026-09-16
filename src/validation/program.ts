@@ -43,13 +43,32 @@ export const programFormSchema = z.object({
   description: z.string().optional().or(z.literal("")),
   eligibilityCriteria: z.string().optional().or(z.literal("")),
   budget: z.coerce.number().min(0, "Budget must be a non-negative number").default(0),
-  startDate: z.string().min(1, "Start date is required"),
-  endDate: z.string().optional().or(z.literal("")),
+  startDate: z.string()
+    .min(1, "Start date is required")
+    .refine((value) => !Number.isNaN(Date.parse(value)), "Start date must be a valid date"),
+  endDate: z.preprocess(
+    (value) => value === "" ? undefined : value,
+    z.string().refine((value) => !Number.isNaN(Date.parse(value)), "End date must be a valid date").optional(),
+  ),
   status: programStatusEnum.default("ACTIVE"),
   assistanceType: assistanceTypeEnum.default("FINANCIAL"),
   requiredDocuments: z.array(documentTypeEnum).default([]),
-  targetBeneficiaries: z.coerce.number().optional().or(z.literal("")),
-  maxBeneficiaries: z.coerce.number().optional().or(z.literal("")),
+  targetBeneficiaries: z.preprocess(
+    (value) => value === "" ? undefined : value,
+    z.coerce.number().int().nonnegative().optional(),
+  ),
+  maxBeneficiaries: z.preprocess(
+    (value) => value === "" ? undefined : value,
+    z.coerce.number().int().nonnegative().optional(),
+  ),
+}).superRefine((data, ctx) => {
+  if (data.endDate && Date.parse(data.endDate) < Date.parse(data.startDate)) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["endDate"],
+      message: "End date must be greater than or equal to start date",
+    });
+  }
 });
 
 export const programEnrollmentSchema = z.object({
@@ -61,7 +80,7 @@ export const programEnrollmentSchema = z.object({
 export const programAidDisbursementSchema = z.object({
   programId: z.string().min(1, "Program ID is required"),
   beneficiaryId: z.string().min(1, "Beneficiary selection is required"),
-  amount: z.coerce.number().min(0, "Amount must be a non-negative number"),
+  amount: z.coerce.number().gt(0, "Amount must be a positive number"),
   quantity: z.string().optional().or(z.literal("")),
   description: z.string().optional().or(z.literal("")),
 });

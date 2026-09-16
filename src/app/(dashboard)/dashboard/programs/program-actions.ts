@@ -10,6 +10,8 @@ import {
   ProgramEnrollmentInput,
   programAidDisbursementSchema,
   ProgramAidDisbursementInput,
+  programStatusEnum,
+  assistanceTypeEnum,
 } from "@/validation/program";
 import { ProgramStatus, AssistanceType, DocumentType, Prisma } from "@prisma/client";
 
@@ -143,17 +145,25 @@ export async function getProgramList(params?: {
 }) {
   try {
     await requireServerSession();
-    const page = Math.max(params?.page || 1, 1);
-    const limit = Math.min(params?.limit || 12, 100);
+    const requestedPage = Number(params?.page);
+    const requestedLimit = Number(params?.limit);
+    const page = Number.isFinite(requestedPage) && requestedPage > 0
+      ? Math.max(Math.floor(requestedPage), 1)
+      : 1;
+    const limit = Number.isFinite(requestedLimit) && requestedLimit > 0
+      ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
+      : 12;
     const skip = (page - 1) * limit;
 
     const where: Prisma.WelfareProgramWhereInput = {};
 
     if (params?.status && params.status !== "ALL") {
-      where.status = params.status as ProgramStatus;
+      const parsedStatus = programStatusEnum.safeParse(params.status);
+      if (parsedStatus.success) where.status = parsedStatus.data as ProgramStatus;
     }
     if (params?.assistanceType && params.assistanceType !== "ALL") {
-      where.assistanceType = params.assistanceType as AssistanceType;
+      const parsedAssistanceType = assistanceTypeEnum.safeParse(params.assistanceType);
+      if (parsedAssistanceType.success) where.assistanceType = parsedAssistanceType.data as AssistanceType;
     }
     if (params?.search && params.search.trim() !== "") {
       const q = params.search.trim();
@@ -302,11 +312,6 @@ export async function getProgramStats() {
 export async function seedDefaultPrograms() {
   try {
     await requireServerSession();
-    const existingCount = await prisma.welfareProgram.count();
-    if (existingCount > 0) {
-      return { success: false, error: "Programs already exist in database." };
-    }
-
     const defaultPrograms: Array<{
       name: string;
       description: string;
@@ -409,39 +414,44 @@ export async function seedDefaultPrograms() {
     ];
 
     const year = new Date().getFullYear();
-    let createdCount = 0;
+    const { createdCount } = await prisma.$transaction(async (tx) => {
+      const existingCount = await tx.welfareProgram.count();
+      if (existingCount > 0) throw new Error("Programs already exist in database.");
 
-    for (let i = 0; i < defaultPrograms.length; i++) {
-      const p = defaultPrograms[i];
-      const slug = generateSlug(p.name);
-      const code = `PROG-${year}-${String(i + 1).padStart(4, "0")}`;
+      let createdCount = 0;
+      for (let i = 0; i < defaultPrograms.length; i++) {
+        const p = defaultPrograms[i];
+        const slug = generateSlug(p.name);
+        const code = `PROG-${year}-${String(i + 1).padStart(4, "0")}`;
 
-      await prisma.welfareProgram.create({
-        data: {
-          code,
-          name: p.name,
-          slug,
-          description: p.description,
-          eligibilityCriteria: p.eligibilityCriteria,
-          budget: new Prisma.Decimal(p.budget),
-          spentBudget: new Prisma.Decimal(0),
-          startDate: new Date(),
-          status: "ACTIVE",
-          assistanceType: p.assistanceType,
-          requiredDocuments: p.requiredDocuments,
-          targetBeneficiaries: p.targetBeneficiaries,
-        },
-      });
-      createdCount++;
-    }
+        await tx.welfareProgram.create({
+          data: {
+            code,
+            name: p.name,
+            slug,
+            description: p.description,
+            eligibilityCriteria: p.eligibilityCriteria,
+            budget: new Prisma.Decimal(p.budget),
+            spentBudget: new Prisma.Decimal(0),
+            startDate: new Date(),
+            status: "ACTIVE",
+            assistanceType: p.assistanceType,
+            requiredDocuments: p.requiredDocuments,
+            targetBeneficiaries: p.targetBeneficiaries,
+          },
+        });
+        createdCount++;
+      }
 
-    // Ensure sequence table is initialized
-    await prisma.$executeRaw`
-      INSERT INTO "program_code_sequence" ("year", "nextValue")
-      VALUES (${year}, ${createdCount})
-      ON CONFLICT ("year") DO UPDATE
-      SET "nextValue" = EXCLUDED."nextValue"
-    `;
+      await tx.$executeRaw`
+        INSERT INTO "program_code_sequence" ("year", "nextValue")
+        VALUES (${year}, ${createdCount})
+        ON CONFLICT ("year") DO UPDATE
+        SET "nextValue" = EXCLUDED."nextValue"
+      `;
+
+      return { createdCount };
+    });
 
     revalidatePath("/dashboard/programs");
     return { success: true, count: createdCount };
@@ -456,26 +466,42 @@ export async function enrollBeneficiaryToProgram(data: ProgramEnrollmentInput) {
     await requireServerSession();
     const validated = programEnrollmentSchema.parse(data);
 
-    const existing = await prisma.programEnrollment.findUnique({
-      where: {
-        programId_beneficiaryId: {
+    const enrollment = await prisma.$transaction(async (tx) => {
+      const [program] = await tx.$queryRaw<Array<{ id: string; maxBeneficiaries: number | null }>>`
+        SELECT "id", "maxBeneficiaries"
+        FROM "welfare_program"
+        WHERE "id" = ${validated.programId}
+        FOR UPDATE
+      `;
+      if (!program) throw new Error("Program not found");
+
+      const existing = await tx.programEnrollment.findUnique({
+        where: {
+          programId_beneficiaryId: {
+            programId: validated.programId,
+            beneficiaryId: validated.beneficiaryId,
+          },
+        },
+      });
+      if (existing) throw new Error("Beneficiary is already enrolled in this program.");
+
+      if (program.maxBeneficiaries !== null) {
+        const enrollmentCount = await tx.programEnrollment.count({
+          where: { programId: validated.programId },
+        });
+        if (enrollmentCount >= program.maxBeneficiaries) {
+          throw new Error("This program has reached its maximum beneficiary capacity.");
+        }
+      }
+
+      return tx.programEnrollment.create({
+        data: {
           programId: validated.programId,
           beneficiaryId: validated.beneficiaryId,
+          notes: validated.notes || null,
+          approvedAt: new Date(),
         },
-      },
-    });
-
-    if (existing) {
-      return { success: false, error: "Beneficiary is already enrolled in this program." };
-    }
-
-    const enrollment = await prisma.programEnrollment.create({
-      data: {
-        programId: validated.programId,
-        beneficiaryId: validated.beneficiaryId,
-        notes: validated.notes || null,
-        approvedAt: new Date(),
-      },
+      });
     });
 
     revalidatePath(`/dashboard/programs/${validated.programId}`);
@@ -489,9 +515,12 @@ export async function enrollBeneficiaryToProgram(data: ProgramEnrollmentInput) {
 export async function removeBeneficiaryFromProgram(enrollmentId: string, programId: string) {
   try {
     await requireServerSession();
-    await prisma.programEnrollment.delete({
-      where: { id: enrollmentId },
+    const enrollment = await prisma.programEnrollment.findFirst({
+      where: { id: enrollmentId, programId },
     });
+    if (!enrollment) return { success: false, error: "Enrollment not found for this program" };
+
+    await prisma.programEnrollment.delete({ where: { id: enrollment.id } });
 
     revalidatePath(`/dashboard/programs/${programId}`);
     return { success: true };
@@ -515,6 +544,16 @@ export async function disburseProgramAid(data: ProgramAidDisbursementInput) {
     }
 
     const disbursement = await prisma.$transaction(async (tx) => {
+      const enrollment = await tx.programEnrollment.findUnique({
+        where: {
+          programId_beneficiaryId: {
+            programId: validated.programId,
+            beneficiaryId: validated.beneficiaryId,
+          },
+        },
+      });
+      if (!enrollment) throw new Error("Beneficiary is not enrolled in this program.");
+
       const record = await tx.assistanceRecord.create({
         data: {
           beneficiaryId: validated.beneficiaryId,

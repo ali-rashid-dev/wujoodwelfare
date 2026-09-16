@@ -13,7 +13,10 @@ interface PageProps {
 
 export default async function ProgramsPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const page = params.page ? parseInt(params.page, 10) : 1;
+  const requestedPage = Number(params.page);
+  const page = Number.isFinite(requestedPage) && requestedPage > 0
+    ? Math.max(Math.floor(requestedPage), 1)
+    : 1;
 
   const [programsData, stats] = await Promise.all([
     getProgramList({

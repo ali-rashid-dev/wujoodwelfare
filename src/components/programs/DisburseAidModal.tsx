@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +41,7 @@ export function DisburseAidModal({
   programName,
   enrolledBeneficiaries,
 }: DisburseAidModalProps) {
+  const router = useRouter();
   const [selectedBeneficiaryId, setSelectedBeneficiaryId] = useState("");
   const [amount, setAmount] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -69,6 +71,7 @@ export function DisburseAidModal({
       setQuantity("");
       setDescription("");
       setSelectedBeneficiaryId("");
+      router.refresh();
       onClose();
     } else {
       toast.error(res.error || "Failed to disburse aid");
