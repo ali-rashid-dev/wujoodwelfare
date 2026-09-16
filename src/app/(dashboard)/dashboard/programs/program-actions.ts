@@ -46,7 +46,7 @@ export async function createProgram(data: ProgramFormInput) {
       `;
       const code = `PROG-${year}-${String(Number(sequence.nextValue)).padStart(4, "0")}`;
 
-      const created = await tx.welfareProgram.create({
+      return tx.welfareProgram.create({
         data: {
           code,
           name: validated.name,
@@ -60,12 +60,10 @@ export async function createProgram(data: ProgramFormInput) {
           status: validated.status as ProgramStatus,
           assistanceType: validated.assistanceType as AssistanceType,
           requiredDocuments: validated.requiredDocuments as DocumentType[],
-          targetBeneficiaries: validated.targetBeneficiaries || null,
-          maxBeneficiaries: validated.maxBeneficiaries || null,
+          targetBeneficiaries: validated.targetBeneficiaries ?? null,
+          maxBeneficiaries: validated.maxBeneficiaries ?? null,
         },
       });
-
-      return created;
     });
 
     revalidatePath("/dashboard/programs");
@@ -110,8 +108,8 @@ export async function updateProgram(id: string, data: ProgramFormInput) {
         status: validated.status as ProgramStatus,
         assistanceType: validated.assistanceType as AssistanceType,
         requiredDocuments: validated.requiredDocuments as DocumentType[],
-        targetBeneficiaries: validated.targetBeneficiaries || null,
-        maxBeneficiaries: validated.maxBeneficiaries || null,
+        targetBeneficiaries: validated.targetBeneficiaries ?? null,
+        maxBeneficiaries: validated.maxBeneficiaries ?? null,
       },
     });
 
@@ -418,11 +416,19 @@ export async function seedDefaultPrograms() {
       const existingCount = await tx.welfareProgram.count();
       if (existingCount > 0) throw new Error("Programs already exist in database.");
 
+      const [sequence] = await tx.$queryRaw<Array<{ nextValue: number }>>`
+        INSERT INTO "program_code_sequence" ("year", "nextValue")
+        VALUES (${year}, ${defaultPrograms.length})
+        ON CONFLICT ("year") DO UPDATE
+        SET "nextValue" = "program_code_sequence"."nextValue" + ${defaultPrograms.length}
+        RETURNING "nextValue"
+      `;
+      const startingCode = Number(sequence.nextValue) - defaultPrograms.length + 1;
       let createdCount = 0;
       for (let i = 0; i < defaultPrograms.length; i++) {
         const p = defaultPrograms[i];
         const slug = generateSlug(p.name);
-        const code = `PROG-${year}-${String(i + 1).padStart(4, "0")}`;
+        const code = `PROG-${year}-${String(startingCode + i).padStart(4, "0")}`;
 
         await tx.welfareProgram.create({
           data: {
@@ -442,13 +448,6 @@ export async function seedDefaultPrograms() {
         });
         createdCount++;
       }
-
-      await tx.$executeRaw`
-        INSERT INTO "program_code_sequence" ("year", "nextValue")
-        VALUES (${year}, ${createdCount})
-        ON CONFLICT ("year") DO UPDATE
-        SET "nextValue" = EXCLUDED."nextValue"
-      `;
 
       return { createdCount };
     });
@@ -515,12 +514,19 @@ export async function enrollBeneficiaryToProgram(data: ProgramEnrollmentInput) {
 export async function removeBeneficiaryFromProgram(enrollmentId: string, programId: string) {
   try {
     await requireServerSession();
-    const enrollment = await prisma.programEnrollment.findFirst({
-      where: { id: enrollmentId, programId },
-    });
-    if (!enrollment) return { success: false, error: "Enrollment not found for this program" };
+    const removed = await prisma.$transaction(async (tx) => {
+      const [enrollment] = await tx.$queryRaw<Array<{ id: string }>>`
+        SELECT "id"
+        FROM "program_enrollment"
+        WHERE "id" = ${enrollmentId} AND "programId" = ${programId}
+        FOR UPDATE
+      `;
+      if (!enrollment) return false;
 
-    await prisma.programEnrollment.delete({ where: { id: enrollment.id } });
+      await tx.programEnrollment.delete({ where: { id: enrollment.id } });
+      return true;
+    });
+    if (!removed) return { success: false, error: "Enrollment not found for this program" };
 
     revalidatePath(`/dashboard/programs/${programId}`);
     return { success: true };
@@ -544,14 +550,13 @@ export async function disburseProgramAid(data: ProgramAidDisbursementInput) {
     }
 
     const disbursement = await prisma.$transaction(async (tx) => {
-      const enrollment = await tx.programEnrollment.findUnique({
-        where: {
-          programId_beneficiaryId: {
-            programId: validated.programId,
-            beneficiaryId: validated.beneficiaryId,
-          },
-        },
-      });
+      const [enrollment] = await tx.$queryRaw<Array<{ id: string }>>`
+        SELECT "id"
+        FROM "program_enrollment"
+        WHERE "programId" = ${validated.programId}
+          AND "beneficiaryId" = ${validated.beneficiaryId}
+        FOR UPDATE
+      `;
       if (!enrollment) throw new Error("Beneficiary is not enrolled in this program.");
 
       const record = await tx.assistanceRecord.create({

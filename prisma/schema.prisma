@@ -96,6 +96,22 @@ enum ProgramStatus {
   CANCELLED
 }
 
+enum ApplicationStatus {
+  SUBMITTED
+  INITIAL_REVIEW
+  VERIFICATION
+  ELIGIBILITY_ASSESSMENT
+  APPROVED
+  REJECTED
+}
+
+enum ApplicationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
 enum AssistanceType {
   FOOD
   MEDICAL
@@ -171,6 +187,7 @@ model Beneficiary {
   cases             BeneficiaryCase[]
   assistanceHistory AssistanceRecord[]
   programEnrollments ProgramEnrollment[]
+  applications      WelfareApplication[]
 
   householdId          String?
   household            Household?        @relation("HouseholdMembers", fields: [householdId], references: [id], onDelete: SetNull)
@@ -406,8 +423,9 @@ model Staff {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  assignedCases CaseAssignment[]
-  activities    StaffActivity[]
+  assignedCases        CaseAssignment[]
+  activities           StaffActivity[]
+  reviewedApplications WelfareApplication[]
 
   @@map("staff")
 }
@@ -561,6 +579,7 @@ model WelfareProgram {
 
   enrollments         ProgramEnrollment[]
   disbursements       AssistanceRecord[]
+  applications        WelfareApplication[]
 
   @@map("welfare_program")
 }
@@ -586,4 +605,63 @@ model ProgramEnrollment {
   @@unique([programId, beneficiaryId])
   @@map("program_enrollment")
 }
+
+// ─── Welfare Application Models ───────────────────────────────────────────────
+
+model WelfareApplication {
+  id              String              @id @default(cuid())
+  applicationCode String              @unique
+  beneficiaryId   String
+  beneficiary     Beneficiary         @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  programId       String?
+  program         WelfareProgram?     @relation(fields: [programId], references: [id], onDelete: SetNull)
+
+  assistanceType  AssistanceType      @default(FINANCIAL)
+  requestedAmount Decimal?            @db.Decimal(12, 2)
+  requestedItems  String?
+  reason          String              @db.Text
+
+  priority        ApplicationPriority @default(MEDIUM)
+  status          ApplicationStatus   @default(SUBMITTED)
+  documents       String[]
+
+  reviewerId      String?
+  reviewer        Staff?              @relation(fields: [reviewerId], references: [id], onDelete: SetNull)
+  reviewNotes     String?             @db.Text
+  rejectionReason String?             @db.Text
+
+  submittedAt     DateTime            @default(now())
+  reviewedAt      DateTime?
+  verifiedAt      DateTime?
+  assessedAt      DateTime?
+  decidedAt       DateTime?
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  logs            ApplicationLog[]
+
+  @@map("welfare_application")
+}
+
+model ApplicationCodeSequence {
+  year      Int @id
+  nextValue Int @default(0)
+
+  @@map("application_code_sequence")
+}
+
+model ApplicationLog {
+  id            String              @id @default(cuid())
+  applicationId String
+  application   WelfareApplication  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  fromStatus    ApplicationStatus?
+  toStatus      ApplicationStatus
+  notes         String?
+  performedBy   String?
+  timestamp     DateTime            @default(now())
+
+  @@map("application_log")
+}
+
 
