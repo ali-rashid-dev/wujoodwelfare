@@ -40,7 +40,10 @@ import {
   Loader2,
   MoreVertical,
   Activity,
+  ShieldCheck,
 } from "lucide-react";
+import { createVerificationRecord } from "@/app/(dashboard)/dashboard/verification/verification-actions";
+
 import {
   updateCaseStatus,
   addCaseNote,
@@ -283,6 +286,25 @@ export function CaseProfile({ caseItem, staffList }: CaseProfileProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs gap-1.5 font-semibold text-primary border-primary/30 hover:bg-primary/5"
+            onClick={async () => {
+              const res = await createVerificationRecord({ caseId: caseItem.id, verifierName: "Verification Officer" });
+              if (res.success && res.id) {
+                toast.success(`Verification ${res.code} initiated!`);
+                router.push(`/dashboard/verification/${res.id}`);
+              } else {
+                toast.error(res.error || "Failed to launch verification");
+              }
+            }}
+
+          >
+            <ShieldCheck className="h-3.5 w-3.5" />
+            Verification Audit
+          </Button>
+
           {caseItem.isOpen && nextStatus && nextStatus !== "CLOSED" && (
             <Button
               size="sm"
@@ -298,6 +320,7 @@ export function CaseProfile({ caseItem, staffList }: CaseProfileProps) {
               {advancingStatus ? "Advancing..." : `Move to ${STATUS_CONFIG[nextStatus]?.label}`}
             </Button>
           )}
+
           <DropdownMenu>
             <DropdownMenuTrigger
               render={

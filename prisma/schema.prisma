@@ -177,6 +177,23 @@ enum HousingType {
   HOMELESS
 }
 
+enum VerificationStatus {
+  PENDING
+  IN_PROGRESS
+  VERIFIED
+  REJECTED
+  FLAGGED_FRAUD
+  NEEDS_MORE_INFO
+}
+
+enum VerificationCheckStatus {
+  PASSED
+  FAILED
+  WARNING
+  PENDING
+}
+
+
 // ─── Beneficiary Models ────────────────────────────────────────────────────────
 
 model Beneficiary {
@@ -211,6 +228,7 @@ model Beneficiary {
   household            Household?        @relation("HouseholdMembers", fields: [householdId], references: [id], onDelete: SetNull)
   headOfHouseholds     Household[]       @relation("HouseholdHead")
   householdMemberItems HouseholdMember[]
+  verifications        VerificationRecord[]
 
   @@map("beneficiary")
 }
@@ -296,6 +314,7 @@ model BeneficiaryCase {
   notes            CaseNote[]
   visits           CaseVisit[]
   logs             CaseActivityLog[]
+  verifications    VerificationRecord[]
 
   @@map("beneficiary_case")
 }
@@ -739,6 +758,7 @@ model WelfareApplication {
   updatedAt       DateTime            @updatedAt
 
   logs            ApplicationLog[]
+  verifications   VerificationRecord[]
 
   @@map("welfare_application")
 }
@@ -762,5 +782,100 @@ model ApplicationLog {
 
   @@map("application_log")
 }
+
+// ─── Verification & Eligibility Models ───────────────────────────────────────
+
+model VerificationRecord {
+  id                     String                  @id @default(cuid())
+  verificationCode       String                  @unique
+  beneficiaryId          String?
+  beneficiary            Beneficiary?            @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  applicationId          String?
+  application            WelfareApplication?     @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  caseId                 String?
+  caseItem               BeneficiaryCase?        @relation(fields: [caseId], references: [id], onDelete: SetNull)
+
+  verifierId             String?
+  verifierName           String                  @default("Verification Officer")
+  status                 VerificationStatus      @default(PENDING)
+  overallScore           Int                     @default(0)
+
+  // 1. Identity Verification
+  identityStatus         VerificationCheckStatus @default(PENDING)
+  cnicVerified           Boolean                 @default(false)
+  bformVerified          Boolean                 @default(false)
+  biometricStatus        String?                 @default("UNVERIFIED")
+  nadraRefNo             String?
+  identityNotes          String?                 @db.Text
+
+  // 2. Document Verification
+  documentStatus         VerificationCheckStatus @default(PENDING)
+  docAuthenticityChecked Boolean                 @default(false)
+  missingDocuments       String[]
+  documentNotes          String?                 @db.Text
+
+  // 3. Household Verification
+  householdStatus        VerificationCheckStatus @default(PENDING)
+  verifiedFamilySize     Int?
+  verifiedDependents     Int?
+  verifiedHousingCondition String?
+  assetAuditSummary      String?                 @db.Text
+  householdNotes         String?                 @db.Text
+
+  // 4. Income Assessment
+  incomeStatus           VerificationCheckStatus @default(PENDING)
+  declaredIncome         Decimal?                @db.Decimal(12, 2)
+  verifiedIncome         Decimal?                @db.Decimal(12, 2)
+  incomeThreshold        Decimal?                @default(45000.00) @db.Decimal(12, 2)
+  isEligibleIncome       Boolean                 @default(true)
+  povertyScoreIndex      Int                     @default(0)
+  incomeNotes            String?                 @db.Text
+
+  // 5. Eligibility Checklist (JSON array of rule criteria)
+  checklistData          Json?
+
+  // 6. Field Verification
+  fieldStatus            VerificationCheckStatus @default(PENDING)
+  fieldOfficerId         String?
+  fieldOfficerName       String?
+  fieldVisitDate         DateTime?
+  neighborCheckPassed    Boolean?
+  physicalAddressVerified Boolean                @default(false)
+  fieldNotes             String?                 @db.Text
+
+  // Decision & Audit Log
+  decisionReason         String?                 @db.Text
+  decidedAt              DateTime?
+  decidedBy              String?
+
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+
+  logs                   VerificationLog[]
+
+  @@map("verification_record")
+}
+
+model VerificationCodeSequence {
+  year      Int @id
+  nextValue Int @default(0)
+
+  @@map("verification_code_sequence")
+}
+
+model VerificationLog {
+  id             String             @id @default(cuid())
+  verificationId String
+  verification   VerificationRecord @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+  action         String
+  fromStatus     VerificationStatus?
+  toStatus       VerificationStatus?
+  performedBy    String
+  notes          String?            @db.Text
+  timestamp      DateTime           @default(now())
+
+  @@map("verification_log")
+}
+
 
 

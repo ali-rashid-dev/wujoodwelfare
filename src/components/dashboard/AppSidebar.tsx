@@ -40,6 +40,7 @@ import {
   BookOpen,
   FileText,
   Briefcase,
+  ShieldCheck,
 } from "lucide-react";
 
 export function AppSidebar() {
@@ -75,11 +76,18 @@ export function AppSidebar() {
       exact: false,
     },
     {
+      title: "Verification & Eligibility",
+      url: "/dashboard/verification",
+      icon: ShieldCheck,
+      exact: false,
+    },
+    {
       title: "Beneficiaries",
       url: "/dashboard/beneficiaries",
       icon: Users,
       exact: false,
     },
+
     {
       title: "Households",
       url: "/dashboard/households",
