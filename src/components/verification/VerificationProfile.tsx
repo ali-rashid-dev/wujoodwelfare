@@ -182,6 +182,7 @@ export function VerificationProfile({ record }: VerificationProfileProps) {
   // Document state
   const [documentStatus, setDocumentStatus] = useState(record.documentStatus);
   const [docAuthenticityChecked, setDocAuthenticityChecked] = useState(record.docAuthenticityChecked);
+  const [missingDocuments] = useState<string[]>(record.missingDocuments || []);
   const [documentNotes, setDocumentNotes] = useState(record.documentNotes || "");
 
   // Household state
@@ -258,7 +259,7 @@ export function VerificationProfile({ record }: VerificationProfileProps) {
       const res = await updateDocumentCheck(record.id, {
         documentStatus: documentStatus as "PASSED" | "FAILED" | "WARNING" | "PENDING",
         docAuthenticityChecked,
-        missingDocuments: [],
+        missingDocuments,
         documentNotes,
       });
       if (res.success) toast.success("Document verification saved!");

@@ -120,8 +120,11 @@ export function CaseTable({ initialItems, totalItems, currentPage, totalPages, s
   const updateSearch = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
     if (search) params.set("search", search);
+    else params.delete("search");
     if (status && status !== "ALL") params.set("status", status);
+    else params.delete("status");
     if (priority && priority !== "ALL") params.set("priority", priority);
+    else params.delete("priority");
     params.set("page", "1");
     router.push(`${pathname}?${params.toString()}`);
   }, [search, status, priority, router, pathname, searchParams]);

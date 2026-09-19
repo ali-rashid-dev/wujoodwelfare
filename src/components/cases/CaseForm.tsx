@@ -70,6 +70,8 @@ const CASE_PRIORITIES = [
   { value: "URGENT", label: "Urgent", color: "bg-red-100 text-red-700" },
 ];
 
+const UNASSIGNED = "UNASSIGNED";
+
 export function CaseForm({ beneficiaries, staffList, initialData, isEditing = false }: CaseFormProps) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -277,14 +279,14 @@ export function CaseForm({ beneficiaries, staffList, initialData, isEditing = fa
                 Assigned Case Worker (Optional)
               </Label>
               <Select
-                value={formData.assignedStaffId ?? ""}
-                onValueChange={(v) => updateField("assignedStaffId", v || undefined)}
+                value={formData.assignedStaffId || UNASSIGNED}
+                onValueChange={(v) => updateField("assignedStaffId", v === UNASSIGNED ? "" : v || "")}
               >
                 <SelectTrigger id="case-staff" className="text-xs h-9">
                   <SelectValue placeholder="Assign later..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="" className="text-xs text-muted-foreground">
+                  <SelectItem value={UNASSIGNED} className="text-xs text-muted-foreground">
                     — Unassigned —
                   </SelectItem>
                   {staffList.map((s) => (

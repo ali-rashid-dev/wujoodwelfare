@@ -121,6 +121,11 @@ export async function updateCase(id: string, data: CaseFormInput) {
             },
           });
         }
+      } else {
+        await tx.caseAssignment.updateMany({
+          where: { caseId: id, roleInCase: "Primary Officer", status: "ACTIVE" },
+          data: { status: "INACTIVE" },
+        });
       }
 
       await tx.caseActivityLog.create({

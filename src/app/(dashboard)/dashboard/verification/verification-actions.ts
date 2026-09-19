@@ -60,7 +60,7 @@ export async function createVerificationRecord(data: VerificationFormInput) {
           beneficiaryId: beneficiaryId || undefined,
           applicationId: validated.applicationId || undefined,
           caseId: validated.caseId || undefined,
-          verifierName: session.user?.name || validated.verifierName || "Verification Officer",
+          verifierName: validated.verifierName || session.user?.name || "Verification Officer",
           status: "IN_PROGRESS",
           identityStatus: "PENDING",
           documentStatus: "PENDING",
@@ -440,7 +440,12 @@ export async function decideVerification(id: string, data: VerificationDecisionI
   }
 }
 
-export async function checkDuplicateCNIC(cnic?: string | null) {
+export async function checkDuplicateCNIC(
+  cnic?: string | null,
+  currentBeneficiaryId?: string | null,
+  currentCaseId?: string | null,
+  currentApplicationId?: string | null,
+) {
   try {
     await requireServerSession();
     if (!cnic || cnic.trim() === "") return { isDuplicate: false, count: 0, details: [] };
@@ -449,20 +454,29 @@ export async function checkDuplicateCNIC(cnic?: string | null) {
 
     const [existingBeneficiaries, existingCases, existingApps] = await Promise.all([
       prisma.beneficiary.findMany({
-        where: { cnic: formattedCnic },
+        where: {
+          cnic: formattedCnic,
+          ...(currentBeneficiaryId ? { NOT: { id: currentBeneficiaryId } } : {}),
+        },
         select: { id: true, name: true, cnic: true, status: true, registeredAt: true },
       }),
       prisma.beneficiaryCase.findMany({
-        where: { beneficiary: { cnic: formattedCnic } },
+        where: {
+          beneficiary: { cnic: formattedCnic },
+          ...(currentCaseId ? { NOT: { id: currentCaseId } } : {}),
+        },
         select: { id: true, caseNumber: true, title: true, status: true, isOpen: true },
       }),
       prisma.welfareApplication.findMany({
-        where: { beneficiary: { cnic: formattedCnic } },
+        where: {
+          beneficiary: { cnic: formattedCnic },
+          ...(currentApplicationId ? { NOT: { id: currentApplicationId } } : {}),
+        },
         select: { id: true, applicationCode: true, status: true, submittedAt: true },
       }),
     ]);
 
-    const isDuplicate = existingBeneficiaries.length > 1 || existingCases.length > 0 || existingApps.length > 0;
+    const isDuplicate = existingBeneficiaries.length > 0 || existingCases.length > 0 || existingApps.length > 0;
 
     return {
       isDuplicate,
@@ -589,7 +603,12 @@ export async function getVerificationById(id: string) {
 
     let duplicateInfo = null;
     if (record.beneficiary?.cnic) {
-      duplicateInfo = await checkDuplicateCNIC(record.beneficiary.cnic);
+      duplicateInfo = await checkDuplicateCNIC(
+        record.beneficiary.cnic,
+        record.beneficiaryId,
+        record.caseId,
+        record.applicationId,
+      );
     }
 
     return {

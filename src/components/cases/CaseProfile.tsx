@@ -162,6 +162,7 @@ export function CaseProfile({ caseItem, staffList }: CaseProfileProps) {
   const [showVisitModal, setShowVisitModal] = useState(false);
   const [showFollowUpModal, setShowFollowUpModal] = useState(false);
   const [advancingStatus, setAdvancingStatus] = useState(false);
+  const [launchingVerification, setLaunchingVerification] = useState(false);
   const [closingCase, setClosingCase] = useState(false);
   const [noteContent, setNoteContent] = useState("");
   const [isInternal, setIsInternal] = useState(true);
@@ -291,18 +292,21 @@ export function CaseProfile({ caseItem, staffList }: CaseProfileProps) {
             size="sm"
             className="text-xs gap-1.5 font-semibold text-primary border-primary/30 hover:bg-primary/5"
             onClick={async () => {
+              setLaunchingVerification(true);
               const res = await createVerificationRecord({ caseId: caseItem.id, verifierName: "Verification Officer" });
               if (res.success && res.id) {
                 toast.success(`Verification ${res.code} initiated!`);
                 router.push(`/dashboard/verification/${res.id}`);
               } else {
                 toast.error(res.error || "Failed to launch verification");
+                setLaunchingVerification(false);
               }
             }}
+            disabled={launchingVerification}
 
           >
-            <ShieldCheck className="h-3.5 w-3.5" />
-            Verification Audit
+            {launchingVerification ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5" />}
+            {launchingVerification ? "Launching..." : "Verification Audit"}
           </Button>
 
           {caseItem.isOpen && nextStatus && nextStatus !== "CLOSED" && (
@@ -435,7 +439,7 @@ export function CaseProfile({ caseItem, staffList }: CaseProfileProps) {
                   👨‍👩‍👧 {caseItem.beneficiary.family.totalChildren} children in family
                 </p>
               )}
-              {caseItem.beneficiary.economic?.monthlyIncome && (
+              {caseItem.beneficiary.economic?.monthlyIncome !== null && caseItem.beneficiary.economic?.monthlyIncome !== undefined && (
                 <p className="text-xs text-muted-foreground">
                   💰 PKR {caseItem.beneficiary.economic.monthlyIncome.toLocaleString()} / month
                 </p>

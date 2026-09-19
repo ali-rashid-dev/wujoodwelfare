@@ -142,11 +142,16 @@ export function ApplicationTable({
   const priority = searchParams.get("priority") || "ALL";
   const programId = searchParams.get("programId") || "ALL";
   const [searchValue, setSearchValue] = useState(search);
+  const [filterState, setFilterState] = useState({ search, status, priority, programId });
+  const filterStateRef = useRef(filterState);
   const lastSearchSentRef = useRef<string | null>(null);
 
   const updateFilters = useCallback((newParams: Record<string, string | undefined>) => {
+    const nextFilters = { ...filterStateRef.current, ...newParams };
+    filterStateRef.current = nextFilters;
+    setFilterState(nextFilters);
     const params = new URLSearchParams(searchParams.toString());
-    Object.entries(newParams).forEach(([key, val]) => {
+    Object.entries(nextFilters).forEach(([key, val]) => {
       if (val && val !== "ALL" && val !== "") {
         params.set(key, val);
       } else {
@@ -161,6 +166,15 @@ export function ApplicationTable({
     }
     router.push(`${pathname}?${params.toString()}`);
   }, [pathname, router, searchParams]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      const nextFilters = { search, status, priority, programId };
+      filterStateRef.current = nextFilters;
+      setFilterState(nextFilters);
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [search, status, priority, programId]);
 
   useEffect(() => {
     if (lastSearchSentRef.current === search) {

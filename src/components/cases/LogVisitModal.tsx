@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, UserCheck, Send } from "lucide-react";
 import { addCaseVisit } from "@/app/(dashboard)/dashboard/cases/case-actions";
 import { toast } from "sonner";
+import { formatLocalDate } from "@/components/cases/ScheduleFollowUpModal";
 
 interface LogVisitModalProps {
   isOpen: boolean;
@@ -30,7 +31,7 @@ export function LogVisitModal({
   caseId,
   caseTitle,
 }: LogVisitModalProps) {
-  const [visitDate, setVisitDate] = useState(new Date().toISOString().split("T")[0]);
+  const [visitDate, setVisitDate] = useState(() => formatLocalDate(new Date()));
   const [location, setLocation] = useState("");
   const [purpose, setPurpose] = useState("Home Inspection & Document Verification");
   const [findings, setFindings] = useState("");

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -80,9 +80,10 @@ export function VerificationTable({
   options,
 }: VerificationTableProps) {
   const router = useRouter();
-  const [items] = useState<VerificationItem[]>(initialItems);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const searchParams = useSearchParams();
+  const items = initialItems;
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const statusFilter = searchParams.get("status") || "ALL";
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleFilter = (key: string, val: string) => {
@@ -138,7 +139,7 @@ export function VerificationTable({
 
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-muted-foreground shrink-0 hidden sm:block" />
-            <Select value={statusFilter} onValueChange={(val) => { if (val) { setStatusFilter(val); handleFilter("status", val); } }}>
+            <Select value={statusFilter} onValueChange={(val) => { if (val) handleFilter("status", val); }}>
 
               <SelectTrigger className="text-xs h-9 w-[180px]">
                 <SelectValue placeholder="All Statuses" />
