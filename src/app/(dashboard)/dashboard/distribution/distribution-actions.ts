@@ -139,19 +139,27 @@ export async function createDistributionCenter(data: DistributionCenterInput) {
     const validated = distributionCenterSchema.parse(data);
 
     const year = new Date().getFullYear();
-    const count = await prisma.distributionCenter.count();
-    const code = `DC-${validated.city.slice(0, 3).toUpperCase()}-${String(count + 1).padStart(2, "0")}`;
+    const center = await prisma.$transaction(async (tx) => {
+      const [sequence] = await tx.$queryRaw<Array<{ nextValue: number }>>`
+        INSERT INTO "distribution_code_sequence" ("year", "nextValue")
+        VALUES (${year}, 1)
+        ON CONFLICT ("year") DO UPDATE
+        SET "nextValue" = "distribution_code_sequence"."nextValue" + 1
+        RETURNING "nextValue"
+      `;
+      const code = `DC-${validated.city.slice(0, 3).toUpperCase()}-${String(Number(sequence.nextValue)).padStart(2, "0")}`;
 
-    const center = await prisma.distributionCenter.create({
-      data: {
-        code,
-        name: validated.name,
-        city: validated.city,
-        address: validated.address,
-        inChargeName: validated.inChargeName || null,
-        phone: validated.phone || null,
-        isActive: validated.isActive,
-      },
+      return tx.distributionCenter.create({
+        data: {
+          code,
+          name: validated.name,
+          city: validated.city,
+          address: validated.address,
+          inChargeName: validated.inChargeName || null,
+          phone: validated.phone || null,
+          isActive: validated.isActive,
+        },
+      });
     });
 
     revalidatePath("/dashboard/distribution");
@@ -202,6 +210,7 @@ export async function getDistributionList(params?: {
         { centerName: { contains: q, mode: "insensitive" } },
         { beneficiary: { name: { contains: q, mode: "insensitive" } } },
         { beneficiary: { cnic: { contains: q, mode: "insensitive" } } },
+        { receiptNumber: { contains: q, mode: "insensitive" } },
       ];
     }
 

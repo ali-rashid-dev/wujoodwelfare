@@ -268,7 +268,19 @@ export async function getAssistanceOptions() {
 export async function deleteAssistance(id: string) {
   try {
     await requireServerSession();
-    await prisma.assistanceRecord.delete({ where: { id } });
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.assistanceRecord.findUnique({ where: { id } });
+      if (!existing) throw new Error("Assistance record not found");
+
+      await tx.assistanceRecord.delete({ where: { id } });
+
+      if (existing.programId && existing.amount && Number(existing.amount) > 0) {
+        await tx.welfareProgram.update({
+          where: { id: existing.programId },
+          data: { spentBudget: { decrement: existing.amount } },
+        });
+      }
+    });
     revalidatePath("/dashboard/assistance");
     return { success: true };
   } catch (err: unknown) {

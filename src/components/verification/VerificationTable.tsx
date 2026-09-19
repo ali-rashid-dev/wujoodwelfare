@@ -93,7 +93,8 @@ export function VerificationTable({
     } else {
       params.delete(key);
     }
-    params.set("page", "1");
+    if (key === "page") params.set("page", val);
+    else params.set("page", "1");
     router.push(`/dashboard/verification?${params.toString()}`);
   };
 

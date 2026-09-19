@@ -22,49 +22,52 @@ export const verificationFormSchema = z.object({
   caseId: z.string().optional().or(z.literal("")),
   verifierName: z.string().default("Verification Officer"),
   notes: z.string().optional().or(z.literal("")),
-});
+}).refine(
+  (data) => Boolean(data.beneficiaryId || data.applicationId || data.caseId),
+  { message: "A beneficiary, application, or case must be selected.", path: ["beneficiaryId"] },
+);
 
 export const identityVerificationSchema = z.object({
-  identityStatus: verificationCheckStatusEnum.default("PASSED"),
-  cnicVerified: z.boolean().default(true),
-  bformVerified: z.boolean().default(true),
-  biometricStatus: z.string().default("VERIFIED"),
+  identityStatus: verificationCheckStatusEnum.default("PENDING"),
+  cnicVerified: z.boolean().default(false),
+  bformVerified: z.boolean().default(false),
+  biometricStatus: z.string().default("UNVERIFIED"),
   nadraRefNo: z.string().optional().or(z.literal("")),
   identityNotes: z.string().optional().or(z.literal("")),
 });
 
 export const documentVerificationSchema = z.object({
-  documentStatus: verificationCheckStatusEnum.default("PASSED"),
-  docAuthenticityChecked: z.boolean().default(true),
+  documentStatus: verificationCheckStatusEnum.default("PENDING"),
+  docAuthenticityChecked: z.boolean().default(false),
   missingDocuments: z.array(z.string()).default([]),
   documentNotes: z.string().optional().or(z.literal("")),
 });
 
 export const householdVerificationSchema = z.object({
-  householdStatus: verificationCheckStatusEnum.default("PASSED"),
-  verifiedFamilySize: z.coerce.number().int().min(1).default(1),
-  verifiedDependents: z.coerce.number().int().min(0).default(0),
+  householdStatus: verificationCheckStatusEnum.default("PENDING"),
+  verifiedFamilySize: z.coerce.number().int().min(1).optional(),
+  verifiedDependents: z.coerce.number().int().min(0).optional(),
   verifiedHousingCondition: z.string().optional().or(z.literal("")),
   assetAuditSummary: z.string().optional().or(z.literal("")),
   householdNotes: z.string().optional().or(z.literal("")),
 });
 
 export const incomeAssessmentSchema = z.object({
-  incomeStatus: verificationCheckStatusEnum.default("PASSED"),
-  declaredIncome: z.coerce.number().min(0).default(0),
-  verifiedIncome: z.coerce.number().min(0).default(0),
+  incomeStatus: verificationCheckStatusEnum.default("PENDING"),
+  declaredIncome: z.coerce.number().min(0),
+  verifiedIncome: z.coerce.number().min(0),
   incomeThreshold: z.coerce.number().min(0).default(45000),
-  povertyScoreIndex: z.coerce.number().int().min(0).max(100).default(35),
+  povertyScoreIndex: z.coerce.number().int().min(0).max(100),
   incomeNotes: z.string().optional().or(z.literal("")),
 });
 
 export const fieldVerificationSchema = z.object({
-  fieldStatus: verificationCheckStatusEnum.default("PASSED"),
+  fieldStatus: verificationCheckStatusEnum.default("PENDING"),
   fieldOfficerId: z.string().optional().or(z.literal("")),
   fieldOfficerName: z.string().optional().or(z.literal("")),
   fieldVisitDate: z.string().optional().or(z.literal("")),
-  neighborCheckPassed: z.boolean().default(true),
-  physicalAddressVerified: z.boolean().default(true),
+  neighborCheckPassed: z.boolean().default(false),
+  physicalAddressVerified: z.boolean().default(false),
   fieldNotes: z.string().optional().or(z.literal("")),
 });
 

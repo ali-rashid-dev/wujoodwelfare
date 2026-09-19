@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -82,10 +82,13 @@ export function AssistanceTable({
   options,
 }: AssistanceTableProps) {
   const router = useRouter();
-  const [items, setItems] = useState<AssistanceItem[]>(initialItems);
-  const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState("ALL");
+  const searchParams = useSearchParams();
+  const items = initialItems;
+  const [deletedIds, setDeletedIds] = useState<string[]>([]);
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [typeFilter, setTypeFilter] = useState(searchParams.get("type") || "ALL");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const visibleItems = items.filter((item) => !deletedIds.includes(item.id));
 
   const handleFilter = (key: string, val: string) => {
     const params = new URLSearchParams(window.location.search);
@@ -94,7 +97,8 @@ export function AssistanceTable({
     } else {
       params.delete(key);
     }
-    params.set("page", "1");
+    if (key === "page") params.set("page", val);
+    else params.set("page", "1");
     router.push(`/dashboard/assistance?${params.toString()}`);
   };
 
@@ -108,7 +112,7 @@ export function AssistanceTable({
     const res = await deleteAssistance(id);
     if (res.success) {
       toast.success("Assistance record deleted");
-      setItems(items.filter((item) => item.id !== id));
+      setDeletedIds((ids) => [...ids, id]);
       router.refresh();
     } else {
       toast.error(res.error || "Failed to delete assistance record");
@@ -125,7 +129,7 @@ export function AssistanceTable({
               <span>Assistance Disbursements Log</span>
             </CardTitle>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Showing {items.length} of {total} aid disbursements provided across beneficiaries, cases, and programs
+              Showing {visibleItems.length} of {total} aid disbursements provided across beneficiaries, cases, and programs
             </p>
           </div>
 
@@ -173,7 +177,7 @@ export function AssistanceTable({
       </CardHeader>
 
       <CardContent className="p-0">
-        {items.length === 0 ? (
+        {visibleItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 text-center">
             <div className="p-4 rounded-full bg-slate-100 text-slate-400 mb-3">
               <Gift className="h-8 w-8" />
@@ -206,7 +210,7 @@ export function AssistanceTable({
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">
-                {items.map((ast) => {
+                {visibleItems.map((ast) => {
                   const typeInfo = TYPE_CONFIG[ast.type] || TYPE_CONFIG.CASH;
                   const TypeIcon = typeInfo.icon;
 

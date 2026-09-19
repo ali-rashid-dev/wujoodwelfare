@@ -41,6 +41,8 @@ const ASSISTANCE_TYPES = [
   { value: "EMERGENCY_PACKAGE", label: "Emergency Relief Package", icon: ShieldAlert, color: "text-purple-600" },
 ];
 
+const NO_SELECTION = "__NONE__";
+
 export function RecordAssistanceModal({ isOpen, onClose, options }: RecordAssistanceModalProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -158,12 +160,12 @@ export function RecordAssistanceModal({ isOpen, onClose, options }: RecordAssist
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold">Linked Case File (Optional)</Label>
-              <Select value={caseId} onValueChange={(val) => val && setCaseId(val)}>
+              <Select value={caseId || NO_SELECTION} onValueChange={(val) => setCaseId(val === NO_SELECTION ? "" : val || "")}>
                 <SelectTrigger className="text-xs">
                   <SelectValue placeholder="Select case file..." />
                 </SelectTrigger>
                 <SelectContent className="max-h-60">
-                  <SelectItem value="">No Case File</SelectItem>
+                  <SelectItem value={NO_SELECTION}>No Case File</SelectItem>
                   {options.cases.map((c) => (
                     <SelectItem key={c.id} value={c.id} className="text-xs">
                       {c.caseNumber || c.id} — {c.title}
@@ -175,12 +177,12 @@ export function RecordAssistanceModal({ isOpen, onClose, options }: RecordAssist
 
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold">Linked Welfare Program (Optional)</Label>
-              <Select value={programId} onValueChange={(val) => val && setProgramId(val)}>
+              <Select value={programId || NO_SELECTION} onValueChange={(val) => setProgramId(val === NO_SELECTION ? "" : val || "")}>
                 <SelectTrigger className="text-xs">
                   <SelectValue placeholder="Select program..." />
                 </SelectTrigger>
                 <SelectContent className="max-h-60">
-                  <SelectItem value="">No Program Link</SelectItem>
+                  <SelectItem value={NO_SELECTION}>No Program Link</SelectItem>
                   {options.programs.map((p) => (
                     <SelectItem key={p.id} value={p.id} className="text-xs">
                       {p.code} — {p.name}
@@ -275,8 +277,17 @@ export function RecordAssistanceModal({ isOpen, onClose, options }: RecordAssist
 
           {/* Description & Notes */}
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold">Description & Audit Notes</Label>
+            <Label htmlFor="assistance-description" className="text-xs font-semibold">Description</Label>
+            <Input
+              id="assistance-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Brief description of the assistance provided"
+              className="text-xs"
+            />
+            <Label htmlFor="assistance-notes" className="text-xs font-semibold">Audit Notes</Label>
             <Textarea
+              id="assistance-notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Package contents, bank reference #, or voucher details..."

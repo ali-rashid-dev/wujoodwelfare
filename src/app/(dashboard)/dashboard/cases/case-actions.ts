@@ -106,13 +106,23 @@ export async function updateCase(id: string, data: CaseFormInput) {
 
       if (validated.assignedStaffId) {
         const existingAssignment = await tx.caseAssignment.findFirst({
-          where: { caseId: id, staffId: validated.assignedStaffId },
+          where: { caseId: id, staffId: validated.assignedStaffId, roleInCase: "Primary Officer" },
         });
-        if (!existingAssignment) {
-          await tx.caseAssignment.updateMany({
-            where: { caseId: id, roleInCase: "Primary Officer", status: "ACTIVE" },
-            data: { status: "INACTIVE" },
+        await tx.caseAssignment.updateMany({
+          where: {
+            caseId: id,
+            roleInCase: "Primary Officer",
+            status: "ACTIVE",
+            NOT: { staffId: validated.assignedStaffId },
+          },
+          data: { status: "INACTIVE" },
+        });
+        if (existingAssignment) {
+          await tx.caseAssignment.update({
+            where: { id: existingAssignment.id },
+            data: { status: "ACTIVE" },
           });
+        } else {
           await tx.caseAssignment.create({
             data: {
               caseId: id,
@@ -380,11 +390,22 @@ export async function assignCaseStaff(caseId: string, staffId: string, roleInCas
 
     const assignment = await prisma.$transaction(async (tx) => {
       const existingAssignment = await tx.caseAssignment.findFirst({
-        where: { caseId, staffId },
+        where: { caseId, staffId, roleInCase },
       });
 
       let created;
-      if (!existingAssignment) {
+      if (roleInCase === "Primary Officer") {
+        await tx.caseAssignment.updateMany({
+          where: { caseId, roleInCase, status: "ACTIVE", NOT: { staffId } },
+          data: { status: "INACTIVE" },
+        });
+      }
+      if (existingAssignment) {
+        created = await tx.caseAssignment.update({
+          where: { id: existingAssignment.id },
+          data: { status: "ACTIVE" },
+        });
+      } else {
         created = await tx.caseAssignment.create({
           data: {
             caseId,
@@ -392,8 +413,6 @@ export async function assignCaseStaff(caseId: string, staffId: string, roleInCas
             roleInCase,
           },
         });
-      } else {
-        created = existingAssignment;
       }
 
       const existingCase = await tx.beneficiaryCase.findUnique({ where: { id: caseId } });

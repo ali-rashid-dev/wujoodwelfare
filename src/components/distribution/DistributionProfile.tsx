@@ -114,7 +114,7 @@ export function DistributionProfile({ record }: DistributionProfileProps) {
 
   const [recipientName, setRecipientName] = useState(record.recipientName || record.beneficiary?.name || "");
   const [recipientCnic, setRecipientCnic] = useState(record.recipientCnic || record.beneficiary?.cnic || "");
-  const [receiptNumber, setReceiptNumber] = useState(record.receiptNumber || `RCPT-${record.distributionCode}`);
+  const [receiptNumber, setReceiptNumber] = useState(record.receiptNumber || "");
   const [proofPhotoUrl, setProofPhotoUrl] = useState(record.proofPhotoUrl || "");
   const [confirmationNotes, setConfirmationNotes] = useState(record.confirmationNotes || "");
 
@@ -458,6 +458,14 @@ export function DistributionProfile({ record }: DistributionProfileProps) {
                     {step.label}
                   </Button>
                 ))}
+                <Button
+                  type="button"
+                  variant={targetStatus === "FAILED_DELIVERY" ? "default" : "outline"}
+                  className="text-xs justify-start py-2 h-auto"
+                  onClick={() => setTargetStatus("FAILED_DELIVERY")}
+                >
+                  Failed Delivery
+                </Button>
               </div>
             </div>
 

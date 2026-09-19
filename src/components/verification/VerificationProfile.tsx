@@ -210,7 +210,9 @@ export function VerificationProfile({ record }: VerificationProfileProps) {
   const [fieldNotes, setFieldNotes] = useState(record.fieldNotes || "");
 
   // Checklist state
-  const initialItems: ChecklistItem[] = (record.checklistData as ChecklistItem[]) || DEFAULT_CHECKLIST;
+  const initialItems: ChecklistItem[] = Array.isArray(record.checklistData) && record.checklistData.length > 0
+    ? (record.checklistData as ChecklistItem[])
+    : DEFAULT_CHECKLIST;
   const [checklist, setChecklist] = useState<ChecklistItem[]>(initialItems);
 
   // Decision Modal State

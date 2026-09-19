@@ -79,7 +79,7 @@ export function DistributionTable({
   options,
 }: DistributionTableProps) {
   const router = useRouter();
-  const [items] = useState<DistributionItem[]>(initialItems);
+  const items = initialItems;
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [centerFilter, setCenterFilter] = useState("ALL");

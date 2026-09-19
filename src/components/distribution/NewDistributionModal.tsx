@@ -31,6 +31,8 @@ interface NewDistributionModalProps {
   };
 }
 
+const NO_SELECTION = "__NONE__";
+
 export function NewDistributionModal({ isOpen, onClose, options }: NewDistributionModalProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -123,12 +125,12 @@ export function NewDistributionModal({ isOpen, onClose, options }: NewDistributi
           {/* Distribution Center */}
           <div className="space-y-1.5">
             <Label className="text-xs font-semibold">Distribution Center / Warehouse</Label>
-            <Select value={centerId} onValueChange={(val) => val && setCenterId(val)}>
+            <Select value={centerId || NO_SELECTION} onValueChange={(val) => setCenterId(val === NO_SELECTION ? "" : val || "")}>
               <SelectTrigger className="text-xs">
                 <SelectValue placeholder="Choose warehouse / distribution center..." />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                <SelectItem value="">General Field Dispatch</SelectItem>
+                <SelectItem value={NO_SELECTION}>General Field Dispatch</SelectItem>
                 {options.centers.map((c) => (
                   <SelectItem key={c.id} value={c.id} className="text-xs">
                     {c.name} ({c.city})
@@ -156,7 +158,10 @@ export function NewDistributionModal({ isOpen, onClose, options }: NewDistributi
                 type="number"
                 min={1}
                 value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  setQuantity(Number.isFinite(value) && value >= 1 ? value : 1);
+                }}
                 className="text-xs"
               />
             </div>
@@ -165,12 +170,12 @@ export function NewDistributionModal({ isOpen, onClose, options }: NewDistributi
           {/* Linked Assistance Record */}
           <div className="space-y-1.5">
             <Label className="text-xs font-semibold">Linked Assistance Record (Optional)</Label>
-            <Select value={assistanceRecordId} onValueChange={(val) => val && setAssistanceRecordId(val)}>
+            <Select value={assistanceRecordId || NO_SELECTION} onValueChange={(val) => setAssistanceRecordId(val === NO_SELECTION ? "" : val || "")}>
               <SelectTrigger className="text-xs">
                 <SelectValue placeholder="Link to recorded assistance..." />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                <SelectItem value="">No Direct Assistance Record</SelectItem>
+                <SelectItem value={NO_SELECTION}>No Direct Assistance Record</SelectItem>
                 {options.assistanceRecords.map((ast) => (
                   <SelectItem key={ast.id} value={ast.id} className="text-xs">
                     {ast.assistanceCode || ast.id} — {ast.type} ({ast.beneficiary.name})
