@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -88,6 +88,17 @@ export function AssistanceTable({
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [typeFilter, setTypeFilter] = useState(searchParams.get("type") || "ALL");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSearch(searchParams.get("search") ?? "");
+  }, [searchParams]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTypeFilter(searchParams.get("type") ?? "ALL");
+  }, [searchParams]);
+
   const visibleItems = items.filter((item) => !deletedIds.includes(item.id));
 
   const handleFilter = (key: string, val: string) => {

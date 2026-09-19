@@ -54,10 +54,19 @@ export const householdVerificationSchema = z.object({
 
 export const incomeAssessmentSchema = z.object({
   incomeStatus: verificationCheckStatusEnum.default("PENDING"),
-  declaredIncome: z.coerce.number().min(0),
-  verifiedIncome: z.coerce.number().min(0),
+  declaredIncome: z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    z.coerce.number().min(0),
+  ),
+  verifiedIncome: z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    z.coerce.number().min(0),
+  ),
   incomeThreshold: z.coerce.number().min(0).default(45000),
-  povertyScoreIndex: z.coerce.number().int().min(0).max(100),
+  povertyScoreIndex: z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    z.coerce.number().int().min(0).max(100),
+  ),
   incomeNotes: z.string().optional().or(z.literal("")),
 });
 
