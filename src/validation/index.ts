@@ -15,4 +15,7 @@ export * from "./program";
 export * from "./application";
 export * from "./case";
 export * from "./verification";
+export * from "./assistance";
+export * from "./distribution";
+
 

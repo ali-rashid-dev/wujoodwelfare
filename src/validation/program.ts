@@ -9,12 +9,16 @@ export const programStatusEnum = z.enum([
 ]);
 
 export const assistanceTypeEnum = z.enum([
+  "CASH",
   "FOOD",
   "MEDICAL",
+  "MEDICINE",
   "EDUCATION",
   "FINANCIAL",
   "HOUSING",
   "CLOTHING",
+  "EQUIPMENT",
+  "EMERGENCY_PACKAGE",
   "ORPHAN_SUPPORT",
   "DISABILITY_SUPPORT",
   "EMERGENCY_RELIEF",
@@ -23,6 +27,7 @@ export const assistanceTypeEnum = z.enum([
   "MONTHLY_FINANCIAL_AID",
   "OTHER",
 ]);
+
 
 export const documentTypeEnum = z.enum([
   "CNIC",

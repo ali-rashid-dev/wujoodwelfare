@@ -41,7 +41,10 @@ import {
   FileText,
   Briefcase,
   ShieldCheck,
+  Gift,
+  Truck,
 } from "lucide-react";
+
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -82,11 +85,24 @@ export function AppSidebar() {
       exact: false,
     },
     {
+      title: "Assistance History",
+      url: "/dashboard/assistance",
+      icon: Gift,
+      exact: false,
+    },
+    {
+      title: "Physical Distribution",
+      url: "/dashboard/distribution",
+      icon: Truck,
+      exact: false,
+    },
+    {
       title: "Beneficiaries",
       url: "/dashboard/beneficiaries",
       icon: Users,
       exact: false,
     },
+
 
     {
       title: "Households",
