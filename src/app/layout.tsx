@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Noto_Nastaliq_Urdu, Poppins } from "next/font/google";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "@/app/api/uploadthing/core";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -31,9 +34,11 @@ export default function RootLayout({
       className={`${poppins.variable} ${urdu.variable} h-full antialiased`}
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col">
+        <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         {children}
         <Toaster position="top-right" richColors />
       </body>
     </html>
   );
 }
+
