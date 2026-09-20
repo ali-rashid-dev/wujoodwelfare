@@ -3,22 +3,47 @@
 import { Check } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { volunteerApplicationSchema } from "@/validation";
 
 export function VolunteerApplicationForm() {
   const [done, setDone] = useState(false);
   const [sop, setSop] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const wordCount = sop.trim().split(/\s+/).filter(Boolean).length;
   const sopError = wordCount > 200;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    if (sopError || wordCount === 0) {
+    setFieldErrors({});
+
+    const formData = new FormData(e.currentTarget);
+    const rawData = {
+      name: formData.get("name") as string,
+      father_name: formData.get("father_name") as string,
+      email: formData.get("email") as string,
+      phone: formData.get("phone") as string,
+      city: formData.get("city") as string,
+      qualification: formData.get("qualification") as string,
+      gender: formData.get("gender") as string,
+      skills: formData.get("skills") as string,
+      availability: formData.get("availability") as string,
+      statement_of_purpose: sop,
+    };
+
+    const validation = volunteerApplicationSchema.safeParse(rawData);
+    if (!validation.success) {
       e.preventDefault();
-      toast.error(
-        sopError
-          ? "Statement of Purpose must be 200 words or less."
-          : "Statement of Purpose is required."
-      );
+      const errors: Record<string, string> = {};
+      validation.error.issues.forEach((issue) => {
+        if (issue.path[0]) {
+          errors[issue.path[0].toString()] = issue.message;
+        }
+      });
+      setFieldErrors(errors);
+      const firstMessage = validation.error.issues[0]?.message;
+      if (firstMessage) {
+        toast.error(firstMessage);
+      }
       return;
     }
 
@@ -55,12 +80,12 @@ export function VolunteerApplicationForm() {
       </p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <Field label="Full Name" name="name" required />
-        <Field label="Father Name" name="father_name" required />
-        <Field label="Email" name="email" type="email" required />
-        <Field label="Phone" name="phone" type="tel" required />
-        <Field label="City" name="city" required />
-        <Field label="Qualification" name="qualification" required />
+        <Field label="Full Name" name="name" required error={fieldErrors.name} />
+        <Field label="Father Name" name="father_name" required error={fieldErrors.father_name} />
+        <Field label="Email" name="email" type="email" required error={fieldErrors.email} />
+        <Field label="Phone" name="phone" type="tel" required error={fieldErrors.phone} />
+        <Field label="City" name="city" required error={fieldErrors.city} />
+        <Field label="Qualification" name="qualification" required error={fieldErrors.qualification} />
 
         <div>
           <label className="text-sm font-medium">Gender</label>
@@ -74,6 +99,9 @@ export function VolunteerApplicationForm() {
             <option>Female</option>
             <option>Other</option>
           </select>
+          {fieldErrors.gender && (
+            <p className="mt-1 text-xs text-destructive">{fieldErrors.gender}</p>
+          )}
         </div>
 
         <Field
@@ -81,6 +109,7 @@ export function VolunteerApplicationForm() {
           name="skills"
           placeholder="Teaching, medical, logistics…"
           className="md:col-span-2"
+          error={fieldErrors.skills}
         />
 
         <div className="md:col-span-2">
@@ -96,6 +125,9 @@ export function VolunteerApplicationForm() {
             <option>Full week</option>
             <option>One-off events</option>
           </select>
+          {fieldErrors.availability && (
+            <p className="mt-1 text-xs text-destructive">{fieldErrors.availability}</p>
+          )}
         </div>
 
         <div className="md:col-span-2">
@@ -116,9 +148,9 @@ export function VolunteerApplicationForm() {
             className="mt-2 w-full resize-y rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
 
-          {sopError && (
+          {(sopError || fieldErrors.statement_of_purpose) && (
             <p className="mt-1 text-xs text-destructive">
-              Maximum 200 words allowed. Currently {wordCount} words.
+              {fieldErrors.statement_of_purpose || `Maximum 200 words allowed. Currently ${wordCount} words.`}
             </p>
           )}
         </div>
@@ -143,10 +175,12 @@ export function VolunteerApplicationForm() {
 function Field({
   label,
   className,
+  error,
   ...rest
 }: {
   label: string;
   className?: string;
+  error?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div className={className}>
@@ -156,6 +190,7 @@ function Field({
         {...rest}
         className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
       />
+      {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
     </div>
   );
 }
