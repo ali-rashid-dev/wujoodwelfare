@@ -27,22 +27,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   LayoutDashboard,
-  Users,
-  UserPlus,
   UserCheck,
   HeartHandshake,
-  User,
   Home,
   LogOut,
   Heart,
   ChevronsUpDown,
   ExternalLink,
   BookOpen,
-  FileText,
-  Briefcase,
-  ShieldCheck,
-  Gift,
-  Truck,
 } from "lucide-react";
 
 
@@ -61,58 +53,14 @@ export function AppSidebar() {
       exact: true,
     },
     {
-      title: "Applications",
-      url: "/dashboard/applications",
-      icon: FileText,
-      exact: false,
-    },
-    {
       title: "Welfare Programs",
       url: "/dashboard/programs",
       icon: BookOpen,
       exact: false,
     },
     {
-      title: "Case Management",
-      url: "/dashboard/cases",
-      icon: Briefcase,
-      exact: false,
-    },
-    {
-      title: "Verification & Eligibility",
-      url: "/dashboard/verification",
-      icon: ShieldCheck,
-      exact: false,
-    },
-    {
-      title: "Assistance History",
-      url: "/dashboard/assistance",
-      icon: Gift,
-      exact: false,
-    },
-    {
-      title: "Physical Distribution",
-      url: "/dashboard/distribution",
-      icon: Truck,
-      exact: false,
-    },
-    {
-      title: "Beneficiaries",
-      url: "/dashboard/beneficiaries",
-      icon: Users,
-      exact: false,
-    },
-
-
-    {
-      title: "Households",
-      url: "/dashboard/households",
-      icon: Home,
-      exact: false,
-    },
-    {
       title: "Staff & Team",
-      url: "/dashboard/staff",
+      url: "dashboard/programs",
       icon: UserCheck,
       exact: false,
     },
@@ -121,12 +69,6 @@ export function AppSidebar() {
       url: "/dashboard/volunteers",
       icon: HeartHandshake,
       exact: false,
-    },
-    {
-      title: "Register Beneficiary",
-      url: "/dashboard/beneficiaries/new",
-      icon: UserPlus,
-      exact: true,
     },
   ];
 
@@ -262,14 +204,6 @@ export function AppSidebar() {
                     </div>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => router.push("/dashboard/profile")}
-                  className="gap-2 text-xs cursor-pointer"
-                >
-                  <User className="h-4 w-4 text-primary" />
-                  My Profile
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={async () => {
