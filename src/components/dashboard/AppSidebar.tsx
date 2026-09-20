@@ -28,13 +28,11 @@ import {
 import {
   LayoutDashboard,
   UserCheck,
-  HeartHandshake,
   Home,
   LogOut,
   Heart,
   ChevronsUpDown,
   ExternalLink,
-  BookOpen,
 } from "lucide-react";
 
 
@@ -52,24 +50,7 @@ export function AppSidebar() {
       icon: LayoutDashboard,
       exact: true,
     },
-    {
-      title: "Welfare Programs",
-      url: "/dashboard/programs",
-      icon: BookOpen,
-      exact: false,
-    },
-    {
-      title: "Staff & Team",
-      url: "dashboard/programs",
-      icon: UserCheck,
-      exact: false,
-    },
-    {
-      title: "Volunteers",
-      url: "/dashboard/volunteers",
-      icon: HeartHandshake,
-      exact: false,
-    },
+    
   ];
 
   const getInitials = (name?: string | null) => {
