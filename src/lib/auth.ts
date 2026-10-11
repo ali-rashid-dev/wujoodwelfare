@@ -4,8 +4,6 @@ import prisma from "@/lib/prisma";
 import { Resend } from "resend";
 import ForgotPasswordEmail from "@/components/emails/reset-password";
 import VerifyEmail from "@/components/emails/verify-email";
-import { Role } from "@/generated/prisma";
-
 import { admin } from "better-auth/plugins";
 
 const resend = new Resend(process.env.RESEND_API_KEY as string);
