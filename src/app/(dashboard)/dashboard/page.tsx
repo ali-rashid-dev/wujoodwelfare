@@ -1,16 +1,16 @@
-import type { Metadata } from "next";
-import { getCurrentUser } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
-import { DashboardRoleView } from "@/components/dashboard/DashboardRoleView";
+import { getCurrentUser } from "@/lib/auth-server";
 
-export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Wujood Welfare role-based management portal.",
-};
-
-export default async function DashboardPage() {
+export default async function DashboardRedirectPage() {
   const user = await getCurrentUser();
-  if (!user) redirect("/sign-in");
 
-  return <DashboardRoleView />;
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  if (user.role === "admin") {
+    redirect("/admin/dashboard");
+  } else {
+    redirect("/volunteer/dashboard");
+  }
 }

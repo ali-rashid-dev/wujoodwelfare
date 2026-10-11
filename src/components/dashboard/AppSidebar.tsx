@@ -42,7 +42,6 @@ import {
   Heart,
   ChevronsUpDown,
   ExternalLink,
-  ArrowLeftRight,
 } from "lucide-react";
 
 interface AppSidebarProps {
@@ -52,6 +51,7 @@ interface AppSidebarProps {
     image?: string | null;
     role?: string | null;
   } | null;
+  role?: "admin" | "volunteer";
 }
 
 /* ─── Navigation definitions ──────────────────────────────────── */
@@ -60,22 +60,22 @@ const ADMIN_NAV = [
   {
     groupLabel: "Overview",
     items: [
-      { title: "Admin Dashboard", url: "/dashboard", icon: LayoutDashboard, exact: true },
+      { title: "Admin Dashboard", url: "/admin/dashboard", icon: LayoutDashboard, exact: true },
     ],
   },
   {
     groupLabel: "Welfare Content",
     items: [
-      { title: "Programs", url: "/dashboard/programs", icon: Calendar, exact: false },
-      { title: "Projects", url: "/dashboard/projects", icon: Layers, exact: false },
-      { title: "Gallery", url: "/dashboard/gallery", icon: ImageIcon, exact: false },
+      { title: "Programs", url: "/admin/programs", icon: Calendar, exact: false },
+      { title: "Projects", url: "/admin/projects", icon: Layers, exact: false },
+      { title: "Gallery", url: "/admin/gallery", icon: ImageIcon, exact: false },
     ],
   },
   {
     groupLabel: "People",
     items: [
-      { title: "Volunteers", url: "/dashboard/volunteers", icon: Users, exact: false },
-      { title: "Contact Messages", url: "/dashboard/messages", icon: Mail, exact: false },
+      { title: "Volunteers", url: "/admin/volunteers", icon: Users, exact: false },
+      { title: "Contact Messages", url: "/admin/messages", icon: Mail, exact: false },
     ],
   },
 ];
@@ -84,27 +84,30 @@ const VOLUNTEER_NAV = [
   {
     groupLabel: "Overview",
     items: [
-      { title: "Volunteer Dashboard", url: "/dashboard", icon: LayoutDashboard, exact: true },
+      { title: "Volunteer Dashboard", url: "/volunteer/dashboard", icon: LayoutDashboard, exact: true },
     ],
   },
   {
     groupLabel: "My Work",
     items: [
-      { title: "Opportunities", url: "/dashboard/opportunities", icon: Compass, exact: false },
-      { title: "My Assignments", url: "/dashboard/assignments", icon: HandHeart, exact: false },
-      { title: "Progress & Hours", url: "/dashboard/progress", icon: Clock, exact: false },
+      { title: "Opportunities", url: "/volunteer/opportunities", icon: Compass, exact: false },
+      { title: "My Assignments", url: "/volunteer/assignments", icon: HandHeart, exact: false },
+      { title: "Progress & Hours", url: "/volunteer/progress", icon: Clock, exact: false },
     ],
   },
 ];
 
 /* ─── Component ────────────────────────────────────────────────── */
 
-export function AppSidebar({ user }: AppSidebarProps) {
+export function AppSidebar({ user, role: propRole }: AppSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { role, setRole, isAdmin } = useRole();
+  const roleContext = useRole();
 
+  const activeRole = propRole || roleContext.role || "volunteer";
+  const isAdmin = activeRole === "admin";
   const navGroups = isAdmin ? ADMIN_NAV : VOLUNTEER_NAV;
+  const homeUrl = isAdmin ? "/admin/dashboard" : "/volunteer/dashboard";
 
   const getInitials = (name?: string | null) => {
     if (!name) return "WW";
@@ -118,7 +121,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
     <Sidebar variant="sidebar" collapsible="icon">
       {/* Brand Header */}
       <SidebarHeader className="border-b border-sidebar-border px-4 py-3.5">
-        <Link href="/dashboard" className="flex items-center gap-3 group">
+        <Link href={homeUrl} className="flex items-center gap-3 group">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold shadow-md group-hover:scale-105 transition-transform">
             <Heart className="h-5 w-5 fill-current" />
           </div>
@@ -143,7 +146,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
                     : "border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10"
                 }`}
               >
-                {role}
+                {activeRole}
               </Badge>
             </div>
           </div>
@@ -186,22 +189,6 @@ export function AppSidebar({ user }: AppSidebarProps) {
             </SidebarGroupContent>
           </SidebarGroup>
         ))}
-
-        {/* Role Switcher Card */}
-        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-          <div className="rounded-xl border border-border/80 bg-muted/40 p-2.5 space-y-1.5">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-0.5">
-              Active View
-            </p>
-            <button
-              onClick={() => setRole(isAdmin ? "volunteer" : "admin")}
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-background border border-border px-2.5 py-1.5 text-xs font-semibold text-foreground hover:bg-accent transition-colors"
-            >
-              <ArrowLeftRight className="h-3.5 w-3.5 text-primary" />
-              Switch to {isAdmin ? "Volunteer" : "Admin"} View
-            </button>
-          </div>
-        </SidebarGroup>
 
         {/* Public Site Link */}
         <SidebarGroup className="mt-auto pt-2 border-t border-sidebar-border">
@@ -246,7 +233,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
                           {user?.name || "User"}
                         </span>
                         <Badge variant="secondary" className="text-[9px] px-1 py-0 uppercase shrink-0">
-                          {role}
+                          {activeRole}
                         </Badge>
                       </div>
                       <span className="truncate text-[10px] text-muted-foreground">
@@ -272,7 +259,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
                           {user?.name || "User"}
                         </span>
                         <Badge variant="secondary" className="text-[9px] px-1 py-0 uppercase shrink-0">
-                          {role}
+                          {activeRole}
                         </Badge>
                       </div>
                       <span className="truncate text-[10px] text-muted-foreground">
@@ -282,13 +269,6 @@ export function AppSidebar({ user }: AppSidebarProps) {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => setRole(isAdmin ? "volunteer" : "admin")}
-                  className="gap-2 text-xs cursor-pointer"
-                >
-                  <ArrowLeftRight className="h-4 w-4 text-primary" />
-                  Switch to {isAdmin ? "Volunteer" : "Admin"} View
-                </DropdownMenuItem>
                 <DropdownMenuItem
                   render={<Link href="/" />}
                   className="gap-2 text-xs cursor-pointer"
@@ -315,3 +295,4 @@ export function AppSidebar({ user }: AppSidebarProps) {
     </Sidebar>
   );
 }
+
