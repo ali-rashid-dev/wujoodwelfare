@@ -54,7 +54,15 @@ export const ModelName = {
   User: 'User',
   Session: 'Session',
   Account: 'Account',
-  Verification: 'Verification'
+  Verification: 'Verification',
+  Program: 'Program',
+  Project: 'Project',
+  GalleryItem: 'GalleryItem',
+  ContactMessage: 'ContactMessage',
+  VolunteerApplication: 'VolunteerApplication',
+  VolunteerOpportunity: 'VolunteerOpportunity',
+  VolunteerAssignment: 'VolunteerAssignment',
+  ProgressLog: 'ProgressLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -79,6 +87,13 @@ export const UserScalarFieldEnum = {
   email: 'email',
   emailVerified: 'emailVerified',
   image: 'image',
+  role: 'role',
+  banned: 'banned',
+  banReason: 'banReason',
+  banExpires: 'banExpires',
+  phone: 'phone',
+  city: 'city',
+  skills: 'skills',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -94,7 +109,8 @@ export const SessionScalarFieldEnum = {
   updatedAt: 'updatedAt',
   ipAddress: 'ipAddress',
   userAgent: 'userAgent',
-  userId: 'userId'
+  userId: 'userId',
+  impersonatedBy: 'impersonatedBy'
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
@@ -129,6 +145,137 @@ export const VerificationScalarFieldEnum = {
 } as const
 
 export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
+
+
+export const ProgramScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  slug: 'slug',
+  category: 'category',
+  description: 'description',
+  targetBeneficiaries: 'targetBeneficiaries',
+  currentBeneficiaries: 'currentBeneficiaries',
+  budget: 'budget',
+  status: 'status',
+  imageUrl: 'imageUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProgramScalarFieldEnum = (typeof ProgramScalarFieldEnum)[keyof typeof ProgramScalarFieldEnum]
+
+
+export const ProjectScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  tag: 'tag',
+  description: 'description',
+  progress: 'progress',
+  targetAmount: 'targetAmount',
+  raisedAmount: 'raisedAmount',
+  imageUrl: 'imageUrl',
+  status: 'status',
+  location: 'location',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
+
+
+export const GalleryItemScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  category: 'category',
+  imageUrl: 'imageUrl',
+  description: 'description',
+  createdAt: 'createdAt'
+} as const
+
+export type GalleryItemScalarFieldEnum = (typeof GalleryItemScalarFieldEnum)[keyof typeof GalleryItemScalarFieldEnum]
+
+
+export const ContactMessageScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  phone: 'phone',
+  subject: 'subject',
+  message: 'message',
+  status: 'status',
+  createdAt: 'createdAt'
+} as const
+
+export type ContactMessageScalarFieldEnum = (typeof ContactMessageScalarFieldEnum)[keyof typeof ContactMessageScalarFieldEnum]
+
+
+export const VolunteerApplicationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  fatherName: 'fatherName',
+  email: 'email',
+  phone: 'phone',
+  city: 'city',
+  qualification: 'qualification',
+  gender: 'gender',
+  skills: 'skills',
+  availability: 'availability',
+  statementOfPurpose: 'statementOfPurpose',
+  status: 'status',
+  createdAt: 'createdAt'
+} as const
+
+export type VolunteerApplicationScalarFieldEnum = (typeof VolunteerApplicationScalarFieldEnum)[keyof typeof VolunteerApplicationScalarFieldEnum]
+
+
+export const VolunteerOpportunityScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  category: 'category',
+  description: 'description',
+  location: 'location',
+  date: 'date',
+  timeCommitment: 'timeCommitment',
+  spotsNeeded: 'spotsNeeded',
+  spotsFilled: 'spotsFilled',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VolunteerOpportunityScalarFieldEnum = (typeof VolunteerOpportunityScalarFieldEnum)[keyof typeof VolunteerOpportunityScalarFieldEnum]
+
+
+export const VolunteerAssignmentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  opportunityId: 'opportunityId',
+  title: 'title',
+  description: 'description',
+  location: 'location',
+  status: 'status',
+  priority: 'priority',
+  deadline: 'deadline',
+  volunteerNotes: 'volunteerNotes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VolunteerAssignmentScalarFieldEnum = (typeof VolunteerAssignmentScalarFieldEnum)[keyof typeof VolunteerAssignmentScalarFieldEnum]
+
+
+export const ProgressLogScalarFieldEnum = {
+  id: 'id',
+  assignmentId: 'assignmentId',
+  userId: 'userId',
+  hoursSpent: 'hoursSpent',
+  notes: 'notes',
+  statusUpdate: 'statusUpdate',
+  createdAt: 'createdAt'
+} as const
+
+export type ProgressLogScalarFieldEnum = (typeof ProgressLogScalarFieldEnum)[keyof typeof ProgressLogScalarFieldEnum]
 
 
 export const SortOrder = {

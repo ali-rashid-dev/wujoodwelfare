@@ -8,29 +8,40 @@ datasource db {
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String    @unique
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  accounts      Account[]
-  sessions      Session[]
+  id                    String                 @id
+  name                  String
+  email                 String                 @unique
+  emailVerified         Boolean
+  image                 String?
+  role                  Role                   @default(volunteer)
+  banned                Boolean?               @default(false)
+  banReason             String?
+  banExpires            DateTime?
+  phone                 String?
+  city                  String?
+  skills                String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  accounts              Account[]
+  sessions              Session[]
+  assignments           VolunteerAssignment[]
+  progressLogs          ProgressLog[]
+  volunteerApplications VolunteerApplication[]
 
   @@map("user")
 }
 
 model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String   @unique
-  createdAt DateTime
-  updatedAt DateTime
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String    @id
+  expiresAt      DateTime
+  token          String    @unique
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  impersonatedBy String?
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("session")
 }
@@ -47,8 +58,8 @@ model Account {
   refreshTokenExpiresAt DateTime?
   scope                 String?
   password              String?
-  createdAt             DateTime
-  updatedAt             DateTime
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("account")
@@ -59,8 +70,143 @@ model Verification {
   identifier String
   value      String
   expiresAt  DateTime
-  createdAt  DateTime?
-  updatedAt  DateTime?
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
 
   @@map("verification")
+}
+
+model Program {
+  id                    String   @id @default(cuid())
+  title                 String
+  slug                  String   @unique
+  category              String
+  description           String
+  targetBeneficiaries   Int      @default(0)
+  currentBeneficiaries  Int      @default(0)
+  budget                Float?
+  status                String   @default("active") // active, paused, completed
+  imageUrl              String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("program")
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  title        String
+  tag          String // Food, Medical, Education, Clothes, Relief, Awareness
+  description  String
+  progress     Int      @default(0) // 0-100
+  targetAmount Float?
+  raisedAmount Float?
+  imageUrl     String
+  status       String   @default("ongoing") // ongoing, completed, upcoming
+  location     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("project")
+}
+
+model GalleryItem {
+  id          String   @id @default(cuid())
+  title       String
+  category    String // Food Distribution, Medical Camps, Education Support, Volunteer Activities, Community Events
+  imageUrl    String
+  description String?
+  createdAt   DateTime @default(now())
+
+  @@map("gallery_item")
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  status    String   @default("unread") // unread, read, replied, archived
+  createdAt DateTime @default(now())
+
+  @@map("contact_message")
+}
+
+model VolunteerApplication {
+  id                  String   @id @default(cuid())
+  userId              String?
+  user                User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name                String
+  fatherName          String?
+  email               String
+  phone               String
+  city                String
+  qualification       String
+  gender              String
+  skills              String
+  availability        String
+  statementOfPurpose  String?
+  status              String   @default("pending") // pending, approved, rejected
+  createdAt           DateTime @default(now())
+
+  @@map("volunteer_application")
+}
+
+model VolunteerOpportunity {
+  id             String                @id @default(cuid())
+  title          String
+  category       String
+  description    String
+  location       String
+  date           DateTime?
+  timeCommitment String
+  spotsNeeded    Int                   @default(5)
+  spotsFilled    Int                   @default(0)
+  status         String                @default("open") // open, closed
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  assignments    VolunteerAssignment[]
+
+  @@map("volunteer_opportunity")
+}
+
+model VolunteerAssignment {
+  id             String                @id @default(cuid())
+  userId         String
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunityId  String?
+  opportunity    VolunteerOpportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  title          String
+  description    String
+  location       String?
+  status         String                @default("pending") // pending, accepted, declined, in_progress, completed
+  priority       String                @default("medium") // low, medium, high, urgent
+  deadline       DateTime?
+  volunteerNotes String?
+  progressLogs   ProgressLog[]
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  @@map("volunteer_assignment")
+}
+
+model ProgressLog {
+  id           String              @id @default(cuid())
+  assignmentId String
+  assignment   VolunteerAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hoursSpent   Float               @default(0)
+  notes        String
+  statusUpdate String? // in_progress, completed
+  createdAt    DateTime            @default(now())
+
+  @@map("progress_log")
+}
+
+enum Role {
+  admin
+  volunteer
 }

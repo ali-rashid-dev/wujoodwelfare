@@ -37,3 +37,43 @@ export type Account = Prisma.AccountModel
  * 
  */
 export type Verification = Prisma.VerificationModel
+/**
+ * Model Program
+ * 
+ */
+export type Program = Prisma.ProgramModel
+/**
+ * Model Project
+ * 
+ */
+export type Project = Prisma.ProjectModel
+/**
+ * Model GalleryItem
+ * 
+ */
+export type GalleryItem = Prisma.GalleryItemModel
+/**
+ * Model ContactMessage
+ * 
+ */
+export type ContactMessage = Prisma.ContactMessageModel
+/**
+ * Model VolunteerApplication
+ * 
+ */
+export type VolunteerApplication = Prisma.VolunteerApplicationModel
+/**
+ * Model VolunteerOpportunity
+ * 
+ */
+export type VolunteerOpportunity = Prisma.VolunteerOpportunityModel
+/**
+ * Model VolunteerAssignment
+ * 
+ */
+export type VolunteerAssignment = Prisma.VolunteerAssignmentModel
+/**
+ * Model ProgressLog
+ * 
+ */
+export type ProgressLog = Prisma.ProgressLogModel

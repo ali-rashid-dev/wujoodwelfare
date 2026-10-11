@@ -4,6 +4,9 @@ import prisma from "@/lib/prisma";
 import { Resend } from "resend";
 import ForgotPasswordEmail from "@/components/emails/reset-password";
 import VerifyEmail from "@/components/emails/verify-email";
+import { Role } from "@/generated/prisma";
+
+import { admin } from "better-auth/plugins";
 
 const resend = new Resend(process.env.RESEND_API_KEY as string);
 
@@ -11,6 +14,12 @@ export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
+    plugins: [
+        admin({
+            defaultRole: "volunteer",
+            adminRole: ["admin"],
+        }),
+    ],
     emailVerification: {
         sendVerificationEmail: async ({ user, url, token }, request) => {
             void resend.emails.send({
