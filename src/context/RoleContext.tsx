@@ -14,7 +14,7 @@ const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export function RoleProvider({
   children,
-  role = "volunteer",
+  role,
   userId: _userId,
   initialRole,
 }: {
@@ -43,4 +43,3 @@ export function useRole() {
   if (!context) throw new Error("useRole must be used within a RoleProvider");
   return context;
 }
-
