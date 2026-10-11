@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
@@ -14,38 +14,17 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import {
-  Bell,
-  Search,
   ArrowLeftRight,
   ShieldCheck,
   HandHeart,
 } from "lucide-react";
 
-interface DashboardHeaderProps {
-  user?: {
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-    role?: string | null;
-  } | null;
-}
-
-export function DashboardHeader({ user }: DashboardHeaderProps) {
+export function DashboardHeader() {
   const pathname = usePathname();
-  const { role, setRole, isAdmin } = useRole();
-  const [searchQuery, setSearchQuery] = useState("");
+  const { setRole, isAdmin } = useRole();
 
   /* ── Breadcrumbs ─────────────────────────────────────────────── */
   const getBreadcrumbs = () => {
@@ -67,14 +46,6 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   };
 
   const breadcrumbs = getBreadcrumbs();
-
-  /* ── Mock notifications ──────────────────────────────────────── */
-  const notifications = [
-    { id: "1", title: "New volunteer application", time: "10m ago", unread: true },
-    { id: "2", title: "Contact message from donor", time: "1h ago", unread: true },
-    { id: "3", title: "Assignment accepted", time: "3h ago", unread: false },
-  ];
-  const unreadCount = notifications.filter((n) => n.unread).length;
 
   return (
     <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border bg-background/95 px-4 backdrop-blur">
@@ -122,23 +93,8 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
         </Badge>
       </div>
 
-      {/* ── Right: Search + Role Switcher + Bell ─────────────────── */}
+      {/* ── Right: Role Switcher ─────────────────────────────────── */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Search */}
-        <div className="relative hidden lg:flex items-center w-52">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-8 pl-8 pr-10 text-xs bg-muted/40 border-border rounded-lg"
-          />
-          <kbd className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none inline-flex h-4 select-none items-center rounded border border-border bg-muted px-1.5 font-mono text-[9px] text-muted-foreground">
-            ⌘K
-          </kbd>
-        </div>
-
         {/* Role Switcher Button */}
         <Button
           variant="outline"
@@ -154,53 +110,6 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
           </span>
         </Button>
 
-        {/* Notification Bell */}
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative h-8 w-8 text-muted-foreground hover:text-foreground rounded-lg"
-              >
-                <Bell className="h-4 w-4" />
-                {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-                  </span>
-                )}
-              </Button>
-            }
-          />
-          <DropdownMenuContent align="end" className="w-72 rounded-xl p-0 shadow-lg">
-            <div className="flex items-center justify-between border-b border-border px-4 py-3">
-              <span className="font-semibold text-xs text-foreground">Notifications</span>
-              {unreadCount > 0 && (
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-primary/10 text-primary">
-                  {unreadCount} new
-                </Badge>
-              )}
-            </div>
-            <div className="divide-y divide-border">
-              {notifications.map((n) => (
-                <div
-                  key={n.id}
-                  className={`p-3 text-xs cursor-pointer hover:bg-muted/50 transition-colors ${
-                    n.unread ? "bg-primary/5" : ""
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="font-medium text-foreground">{n.title}</span>
-                    <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                      {n.time}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </header>
   );

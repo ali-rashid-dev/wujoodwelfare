@@ -343,79 +343,116 @@ async function seed() {
     console.log("✓ Seeded Volunteer Applications");
   }
 
-  // 7. Seed assignments for the current user so volunteer dashboard has active work
-  const currentUser = await prisma.user.findFirst();
-  if (currentUser) {
+  // 7. Seed volunteer users and assignments for the volunteer dashboard
+  const seededVolunteers = [
+    {
+      id: "seed-volunteer-hamza",
+      name: "Hamza Farooq",
+      email: "hamza@seed.wujoodwelfare.invalid",
+    },
+    {
+      id: "seed-volunteer-amina",
+      name: "Amina Tariq",
+      email: "amina@seed.wujoodwelfare.invalid",
+    },
+  ];
+
+  for (const volunteer of seededVolunteers) {
+    await prisma.user.upsert({
+      where: { id: volunteer.id },
+      create: {
+        ...volunteer,
+        emailVerified: true,
+        role: "volunteer",
+      },
+      update: {
+        ...volunteer,
+        emailVerified: true,
+        role: "volunteer",
+      },
+    });
+  }
+
+  const volunteers = await prisma.user.findMany({
+    where: {
+      id: { in: seededVolunteers.map((volunteer) => volunteer.id) },
+      role: "volunteer",
+    },
+    select: { id: true },
+  });
+  const opps = await prisma.volunteerOpportunity.findMany({
+    take: 3,
+    select: { id: true },
+  });
+
+  for (const volunteer of volunteers) {
     const existingAssignments = await prisma.volunteerAssignment.count({
-      where: { userId: currentUser.id },
+      where: { userId: volunteer.id },
     });
 
-    if (existingAssignments === 0) {
-      const opps = await prisma.volunteerOpportunity.findMany({ take: 3 });
+    if (existingAssignments > 0) continue;
 
-      const assignment1 = await prisma.volunteerAssignment.create({
-        data: {
-          userId: currentUser.id,
-          opportunityId: opps[0]?.id,
-          title: "Coordinate Weekend Ration Distribution Drive",
-          description: "Lead the on-site verification counter and ensure 150 ration packages are safely distributed with token receipts.",
-          location: "Taj Colony Distribution Point",
-          status: "in_progress",
-          priority: "high",
-          deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-          volunteerNotes: "Confirmed token lists with field manager. Preparing distribution tokens.",
+    const assignment1 = await prisma.volunteerAssignment.create({
+      data: {
+        userId: volunteer.id,
+        opportunityId: opps[0]?.id,
+        title: "Coordinate Weekend Ration Distribution Drive",
+        description: "Lead the on-site verification counter and ensure 150 ration packages are safely distributed with token receipts.",
+        location: "Taj Colony Distribution Point",
+        status: "in_progress",
+        priority: "high",
+        deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        volunteerNotes: "Confirmed token lists with field manager. Preparing distribution tokens.",
+      },
+    });
+
+    await prisma.volunteerAssignment.create({
+      data: {
+        userId: volunteer.id,
+        opportunityId: opps[1]?.id,
+        title: "Medical Camp Patient Intake & Vitals Desk",
+        description: "Assist attending physician by taking initial blood pressure, temperature, and recording basic patient complaint history.",
+        location: "Ghaziabad Welfare Center",
+        status: "pending",
+        priority: "medium",
+        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    const assignment3 = await prisma.volunteerAssignment.create({
+      data: {
+        userId: volunteer.id,
+        opportunityId: opps[2]?.id,
+        title: "Primary Students Math Tutoring Session",
+        description: "Conducted 2-hour remedial arithmetic session for 18 Grade 4 and 5 pupils.",
+        location: "Sargodha Road Learning Hub",
+        status: "completed",
+        priority: "medium",
+        deadline: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        volunteerNotes: "Completed session on multiplication tables and fraction basics. Great student engagement.",
+      },
+    });
+
+    await prisma.progressLog.createMany({
+      data: [
+        {
+          assignmentId: assignment1.id,
+          userId: volunteer.id,
+          hoursSpent: 2.5,
+          notes: "Inspected warehouse stock, counted 150 bags, verified seal integrity and arranged volunteer badges.",
+          statusUpdate: "in_progress",
         },
-      });
-
-      const assignment2 = await prisma.volunteerAssignment.create({
-        data: {
-          userId: currentUser.id,
-          opportunityId: opps[1]?.id,
-          title: "Medical Camp Patient Intake & Vitals Desk",
-          description: "Assist attending physician by taking initial blood pressure, temperature, and recording basic patient complaint history.",
-          location: "Ghaziabad Welfare Center",
-          status: "pending",
-          priority: "medium",
-          deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        {
+          assignmentId: assignment3.id,
+          userId: volunteer.id,
+          hoursSpent: 3.0,
+          notes: "Finished classroom instruction and graded practice sheets. Submitted attendance sheet.",
+          statusUpdate: "completed",
         },
-      });
-
-      const assignment3 = await prisma.volunteerAssignment.create({
-        data: {
-          userId: currentUser.id,
-          opportunityId: opps[2]?.id,
-          title: "Primary Students Math Tutoring Session",
-          description: "Conducted 2-hour remedial arithmetic session for 18 Grade 4 and 5 pupils.",
-          location: "Sargodha Road Learning Hub",
-          status: "completed",
-          priority: "medium",
-          deadline: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-          volunteerNotes: "Completed session on multiplication tables and fraction basics. Great student engagement.",
-        },
-      });
-
-      // Add sample progress logs
-      await prisma.progressLog.createMany({
-        data: [
-          {
-            assignmentId: assignment1.id,
-            userId: currentUser.id,
-            hoursSpent: 2.5,
-            notes: "Inspected warehouse stock, counted 150 bags, verified seal integrity and arranged volunteer badges.",
-            statusUpdate: "in_progress",
-          },
-          {
-            assignmentId: assignment3.id,
-            userId: currentUser.id,
-            hoursSpent: 3.0,
-            notes: "Finished classroom instruction and graded practice sheets. Submitted attendance sheet.",
-            statusUpdate: "completed",
-          },
-        ],
-      });
-      console.log("✓ Seeded User Assignments and Progress Logs");
-    }
+      ],
+    });
   }
+  console.log("✓ Seeded Volunteer Assignments and Progress Logs");
 
   console.log("Database seeding completed successfully!");
 }
