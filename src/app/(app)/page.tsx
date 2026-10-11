@@ -7,8 +7,8 @@ import { WhyUs } from "@/components/sections/WhyUs";
 import { Stories } from "@/components/sections/Stories";
 import { Gallery } from "@/components/sections/Gallery";
 import { VolunteerCTA } from "@/components/sections/VolunteerCTA";
+import { getPublishedPrograms } from "@/actions/programs";
 import type { Metadata } from "next";
-
 
 export const metadata: Metadata = {
   title: {
@@ -22,12 +22,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const publishedPrograms = await getPublishedPrograms();
+
   return (
     <>
       <Hero />
       <About />
-      <Programs />
+      <Programs items={publishedPrograms} />
       <Impact />
       <Campaign />
       <WhyUs />
@@ -37,3 +39,4 @@ export default function HomePage() {
     </>
   );
 }
+
