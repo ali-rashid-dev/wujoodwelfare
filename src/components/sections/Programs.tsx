@@ -223,7 +223,7 @@ export function Programs({ items }: ProgramsProps) {
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
-                    <div className="absolute inset-0 bg-linear-to-t from-background/90 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-secondary/20 via-transparent to-transparent" />
                     <div className="absolute top-3 right-3">
                       <Badge
                         variant="secondary"
@@ -294,16 +294,16 @@ export function Programs({ items }: ProgramsProps) {
       {/* Program Details Modal */}
       <Dialog open={!!openProgram} onOpenChange={() => setOpenProgram(null)}>
         {openProgram && (
-          <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-xl p-6 overflow-hidden">
             {openProgram.imageUrl && (
-              <div className="relative h-48 sm:h-56 -mx-6 -mt-6 mb-4 overflow-hidden rounded-t-lg bg-muted">
+              <div className="relative h-44 sm:h-52 -mx-6 -mt-6 mb-3 overflow-hidden rounded-t-xl bg-muted">
                 <Image
                   src={openProgram.imageUrl}
                   alt={openProgram.title}
                   fill
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-background via-background/40 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-primary/20 via-transparent to-transparent" />
                 <div className="absolute bottom-3 left-6">
                   <Badge className="bg-primary text-primary-foreground font-semibold text-xs">
                     {openProgram.category}

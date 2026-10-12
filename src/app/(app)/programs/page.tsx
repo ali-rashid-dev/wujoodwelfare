@@ -31,8 +31,6 @@ export default async function ProgramsPage() {
       />
 
       <Programs items={publishedPrograms} />
-      <Impact />
-      <Campaign />
     </>
   );
 }

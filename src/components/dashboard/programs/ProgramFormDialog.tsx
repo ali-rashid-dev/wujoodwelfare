@@ -20,8 +20,9 @@ import {
 } from "@/validation/program";
 import { createProgram, updateProgram, type ProgramRecord } from "@/actions/programs";
 import { toast } from "sonner";
-import { Loader2, Sparkles, Image as ImageIcon } from "lucide-react";
+import { Loader2, Sparkles, Image as ImageIcon, Upload, X } from "lucide-react";
 import Image from "next/image";
+import { UploadDropzone } from "@/lib/uploadthing";
 
 interface ProgramFormDialogProps {
   open: boolean;
@@ -161,7 +162,7 @@ export function ProgramFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             {isEditing ? "Edit Welfare Program" : "Create New Welfare Program"}
@@ -318,30 +319,53 @@ export function ProgramFormDialog({
           </div>
 
           {/* Cover Image */}
-          <div className="space-y-2 rounded-xl border border-border/80 bg-muted/20 p-3.5">
+          <div className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-3.5">
             <div className="flex items-center justify-between">
-              <Label htmlFor="prog-img" className="text-xs font-semibold flex items-center gap-1.5">
+              <Label className="text-xs font-semibold flex items-center gap-1.5">
                 <ImageIcon className="h-4 w-4 text-primary" />
-                Cover Image URL
+                Cover Image
               </Label>
               {imageUrl && (
                 <button
                   type="button"
                   onClick={() => setImageUrl("")}
-                  className="text-[11px] text-destructive hover:underline"
+                  className="flex items-center gap-1 text-[11px] text-destructive hover:underline"
                 >
-                  Clear image
+                  <X className="h-3 w-3" /> Clear image
                 </button>
               )}
             </div>
-            <Input
-              id="prog-img"
-              placeholder="e.g. /gallery-food.jpg or https://images.unsplash.com/..."
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-            />
 
-            {/* Presets preview */}
+            {/* Live preview */}
+            {imageUrl && (
+              <div className="relative h-36 w-full rounded-lg overflow-hidden border border-border bg-muted">
+                <Image
+                  src={imageUrl}
+                  alt="Cover preview"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 672px"
+                />
+              </div>
+            )}
+
+            {/* UploadThing dropzone */}
+            {!imageUrl && (
+              <UploadDropzone
+                endpoint="programImage"
+                onClientUploadComplete={(res) => {
+                  if (res?.[0]?.ufsUrl) {
+                    setImageUrl(res[0].ufsUrl);
+                  }
+                }}
+                onUploadError={(err) => {
+                  console.error("Upload error:", err);
+                }}
+                className="ut-label:text-xs ut-label:font-semibold ut-label:text-foreground ut-allowed-content:text-muted-foreground ut-button:bg-primary ut-button:text-primary-foreground ut-button:rounded-lg ut-button:text-xs border-border bg-background"
+              />
+            )}
+
+            {/* Presets fallback */}
             <div>
               <p className="text-[11px] font-medium text-muted-foreground mb-1.5">
                 Or select an existing impact asset:
