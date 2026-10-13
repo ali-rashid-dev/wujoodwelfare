@@ -1,5 +1,7 @@
 import { PageHero } from "@/components/site/SiteLayout";
 import { Gallery } from "@/components/sections/Gallery";
+import { getPublishedGalleryItems } from "@/actions/gallery";
+import { connection } from "next/server";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -15,14 +17,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function GalleryPage() {
+export default async function GalleryPage() {
+  await connection();
+  const items = await getPublishedGalleryItems();
+
   return (
     <>
       <PageHero
         eyebrow="Gallery"
         title="Moments worth a thousand thanks."
       />
-      <Gallery />
+      <Gallery items={items} />
     </>
   );
 }

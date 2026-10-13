@@ -8,6 +8,8 @@ import { Stories } from "@/components/sections/Stories";
 import { Gallery } from "@/components/sections/Gallery";
 import { VolunteerCTA } from "@/components/sections/VolunteerCTA";
 import { getPublishedPrograms } from "@/actions/programs";
+import { getPublishedGalleryItems } from "@/actions/gallery";
+import { connection } from "next/server";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -23,7 +25,11 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const publishedPrograms = await getPublishedPrograms();
+  await connection();
+  const [publishedPrograms, galleryItems] = await Promise.all([
+    getPublishedPrograms(),
+    getPublishedGalleryItems(),
+  ]);
 
   return (
     <>
@@ -34,9 +40,8 @@ export default async function HomePage() {
       <Campaign />
       <WhyUs />
       <Stories />
-      <Gallery />
+      <Gallery items={galleryItems} />
       <VolunteerCTA />
     </>
   );
 }
-

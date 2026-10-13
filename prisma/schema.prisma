@@ -109,6 +109,7 @@ model Project {
   location    String?
   programId   String?
   program     Program?  @relation(fields: [programId], references: [id], onDelete: SetNull)
+  galleryItems GalleryItem[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -128,8 +129,12 @@ model GalleryItem {
   category    String // Food Distribution, Medical Camps, Education Support, Volunteer Activities, Community Events
   imageUrl    String
   description String?
+  published   Boolean  @default(false)
+  projectId   String?
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
   createdAt   DateTime @default(now())
 
+  @@index([published, createdAt])
   @@map("gallery_item")
 }
 
