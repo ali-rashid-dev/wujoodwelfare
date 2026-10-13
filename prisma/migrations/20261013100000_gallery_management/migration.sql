@@ -8,11 +8,23 @@ CREATE TABLE IF NOT EXISTS "gallery_item" (
   CONSTRAINT "gallery_item_pkey" PRIMARY KEY ("id")
 );
 
-ALTER TABLE "gallery_item"
-  ADD COLUMN IF NOT EXISTS "published" BOOLEAN NOT NULL DEFAULT false,
-  ADD COLUMN IF NOT EXISTS "projectId" TEXT;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_attribute
+    WHERE attrelid = '"gallery_item"'::regclass
+      AND attname = 'published'
+      AND NOT attisdropped
+  ) THEN
+    ALTER TABLE "gallery_item"
+      ADD COLUMN "published" BOOLEAN NOT NULL DEFAULT false;
+    UPDATE "gallery_item" SET "published" = true;
+  END IF;
+END $$;
 
-UPDATE "gallery_item" SET "published" = true;
+ALTER TABLE "gallery_item"
+  ADD COLUMN IF NOT EXISTS "projectId" TEXT;
 
 DO $$
 BEGIN

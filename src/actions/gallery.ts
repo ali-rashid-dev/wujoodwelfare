@@ -84,6 +84,10 @@ function revalidateGallery() {
   revalidatePath("/");
 }
 
+function galleryActionErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof z.ZodError ? error.issues[0]?.message ?? fallback : fallback;
+}
+
 function uploadThingKey(imageUrl: string): string | null {
   try {
     const url = new URL(imageUrl);
@@ -132,7 +136,7 @@ export async function createGalleryItem(rawInput: unknown) {
     console.error("Create gallery item failed:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create gallery item.",
+      error: galleryActionErrorMessage(error, "Failed to create gallery item."),
     };
   }
 }
@@ -168,7 +172,7 @@ export async function updateGalleryItem(id: string, rawInput: unknown) {
     console.error("Update gallery item failed:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update gallery item.",
+      error: galleryActionErrorMessage(error, "Failed to update gallery item."),
     };
   }
 }
@@ -236,7 +240,7 @@ export async function deleteGalleryItem(id: string) {
     console.error("Delete gallery item failed:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to delete gallery image.",
+      error: galleryActionErrorMessage(error, "Failed to delete gallery image."),
     };
   }
 }
