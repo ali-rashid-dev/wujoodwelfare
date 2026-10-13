@@ -77,37 +77,49 @@ model Verification {
 }
 
 model Program {
-  id                    String   @id @default(cuid())
+  id                    String    @id @default(cuid())
   title                 String
-  slug                  String   @unique
+  slug                  String    @unique
   category              String
   description           String
-  targetBeneficiaries   Int      @default(0)
-  currentBeneficiaries  Int      @default(0)
+  targetBeneficiaries   Int       @default(0)
+  currentBeneficiaries  Int       @default(0)
   budget                Float?
-  status                String   @default("active") // active, paused, completed
+  status                String    @default("active") // active, paused, completed
   imageUrl              String?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  projects              Project[]
 
   @@map("program")
 }
 
+
 model Project {
-  id           String   @id @default(cuid())
-  title        String
-  tag          String // Food, Medical, Education, Clothes, Relief, Awareness
-  description  String
-  progress     Int      @default(0) // 0-100
-  targetAmount Float?
-  raisedAmount Float?
-  imageUrl     String
-  status       String   @default("ongoing") // ongoing, completed, upcoming
-  location     String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  description String
+  images      String    @default("") // JSON array of image URLs
+  status      ProjectStatus @default(planned)
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  startDate   DateTime?
+  endDate     DateTime?
+  location    String?
+  programId   String?
+  program     Program?  @relation(fields: [programId], references: [id], onDelete: SetNull)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@map("project")
+}
+
+enum ProjectStatus {
+  planned
+  active
+  completed
+  archived
 }
 
 model GalleryItem {

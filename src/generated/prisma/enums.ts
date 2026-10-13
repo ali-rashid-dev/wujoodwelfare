@@ -9,6 +9,16 @@
 * 🟢 You can import this file directly.
 */
 
+export const ProjectStatus = {
+  planned: 'planned',
+  active: 'active',
+  completed: 'completed',
+  archived: 'archived'
+} as const
+
+export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus]
+
+
 export const Role = {
   admin: 'admin',
   volunteer: 'volunteer'

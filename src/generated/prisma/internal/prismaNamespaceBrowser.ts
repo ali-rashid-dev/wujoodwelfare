@@ -168,14 +168,16 @@ export type ProgramScalarFieldEnum = (typeof ProgramScalarFieldEnum)[keyof typeo
 export const ProjectScalarFieldEnum = {
   id: 'id',
   title: 'title',
-  tag: 'tag',
+  slug: 'slug',
   description: 'description',
-  progress: 'progress',
-  targetAmount: 'targetAmount',
-  raisedAmount: 'raisedAmount',
-  imageUrl: 'imageUrl',
+  images: 'images',
   status: 'status',
+  published: 'published',
+  publishedAt: 'publishedAt',
+  startDate: 'startDate',
+  endDate: 'endDate',
   location: 'location',
+  programId: 'programId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

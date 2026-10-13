@@ -280,6 +280,7 @@ export type ProgramWhereInput = {
   imageUrl?: Prisma.StringNullableFilter<"Program"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Program"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Program"> | Date | string
+  projects?: Prisma.ProjectListRelationFilter
 }
 
 export type ProgramOrderByWithRelationInput = {
@@ -295,6 +296,7 @@ export type ProgramOrderByWithRelationInput = {
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  projects?: Prisma.ProjectOrderByRelationAggregateInput
 }
 
 export type ProgramWhereUniqueInput = Prisma.AtLeast<{
@@ -313,6 +315,7 @@ export type ProgramWhereUniqueInput = Prisma.AtLeast<{
   imageUrl?: Prisma.StringNullableFilter<"Program"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Program"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Program"> | Date | string
+  projects?: Prisma.ProjectListRelationFilter
 }, "id" | "slug">
 
 export type ProgramOrderByWithAggregationInput = {
@@ -366,6 +369,7 @@ export type ProgramCreateInput = {
   imageUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  projects?: Prisma.ProjectCreateNestedManyWithoutProgramInput
 }
 
 export type ProgramUncheckedCreateInput = {
@@ -381,6 +385,7 @@ export type ProgramUncheckedCreateInput = {
   imageUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutProgramInput
 }
 
 export type ProgramUpdateInput = {
@@ -396,6 +401,7 @@ export type ProgramUpdateInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  projects?: Prisma.ProjectUpdateManyWithoutProgramNestedInput
 }
 
 export type ProgramUncheckedUpdateInput = {
@@ -411,6 +417,7 @@ export type ProgramUncheckedUpdateInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutProgramNestedInput
 }
 
 export type ProgramCreateManyInput = {
@@ -515,6 +522,11 @@ export type ProgramSumOrderByAggregateInput = {
   budget?: Prisma.SortOrder
 }
 
+export type ProgramNullableScalarRelationFilter = {
+  is?: Prisma.ProgramWhereInput | null
+  isNot?: Prisma.ProgramWhereInput | null
+}
+
 export type IntFieldUpdateOperationsInput = {
   set?: number
   increment?: number
@@ -531,6 +543,127 @@ export type NullableFloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type ProgramCreateNestedOneWithoutProjectsInput = {
+  create?: Prisma.XOR<Prisma.ProgramCreateWithoutProjectsInput, Prisma.ProgramUncheckedCreateWithoutProjectsInput>
+  connectOrCreate?: Prisma.ProgramCreateOrConnectWithoutProjectsInput
+  connect?: Prisma.ProgramWhereUniqueInput
+}
+
+export type ProgramUpdateOneWithoutProjectsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProgramCreateWithoutProjectsInput, Prisma.ProgramUncheckedCreateWithoutProjectsInput>
+  connectOrCreate?: Prisma.ProgramCreateOrConnectWithoutProjectsInput
+  upsert?: Prisma.ProgramUpsertWithoutProjectsInput
+  disconnect?: Prisma.ProgramWhereInput | boolean
+  delete?: Prisma.ProgramWhereInput | boolean
+  connect?: Prisma.ProgramWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProgramUpdateToOneWithWhereWithoutProjectsInput, Prisma.ProgramUpdateWithoutProjectsInput>, Prisma.ProgramUncheckedUpdateWithoutProjectsInput>
+}
+
+export type ProgramCreateWithoutProjectsInput = {
+  id?: string
+  title: string
+  slug: string
+  category: string
+  description: string
+  targetBeneficiaries?: number
+  currentBeneficiaries?: number
+  budget?: number | null
+  status?: string
+  imageUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProgramUncheckedCreateWithoutProjectsInput = {
+  id?: string
+  title: string
+  slug: string
+  category: string
+  description: string
+  targetBeneficiaries?: number
+  currentBeneficiaries?: number
+  budget?: number | null
+  status?: string
+  imageUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProgramCreateOrConnectWithoutProjectsInput = {
+  where: Prisma.ProgramWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProgramCreateWithoutProjectsInput, Prisma.ProgramUncheckedCreateWithoutProjectsInput>
+}
+
+export type ProgramUpsertWithoutProjectsInput = {
+  update: Prisma.XOR<Prisma.ProgramUpdateWithoutProjectsInput, Prisma.ProgramUncheckedUpdateWithoutProjectsInput>
+  create: Prisma.XOR<Prisma.ProgramCreateWithoutProjectsInput, Prisma.ProgramUncheckedCreateWithoutProjectsInput>
+  where?: Prisma.ProgramWhereInput
+}
+
+export type ProgramUpdateToOneWithWhereWithoutProjectsInput = {
+  where?: Prisma.ProgramWhereInput
+  data: Prisma.XOR<Prisma.ProgramUpdateWithoutProjectsInput, Prisma.ProgramUncheckedUpdateWithoutProjectsInput>
+}
+
+export type ProgramUpdateWithoutProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  targetBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
+  currentBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
+  budget?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProgramUncheckedUpdateWithoutProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  targetBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
+  currentBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
+  budget?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type ProgramCountOutputType
+ */
+
+export type ProgramCountOutputType = {
+  projects: number
+}
+
+export type ProgramCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  projects?: boolean | ProgramCountOutputTypeCountProjectsArgs
+}
+
+/**
+ * ProgramCountOutputType without action
+ */
+export type ProgramCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProgramCountOutputType
+   */
+  select?: Prisma.ProgramCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ProgramCountOutputType without action
+ */
+export type ProgramCountOutputTypeCountProjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProjectWhereInput
+}
 
 
 export type ProgramSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -546,6 +679,8 @@ export type ProgramSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   imageUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  projects?: boolean | Prisma.Program$projectsArgs<ExtArgs>
+  _count?: boolean | Prisma.ProgramCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["program"]>
 
 export type ProgramSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -594,10 +729,18 @@ export type ProgramSelectScalar = {
 }
 
 export type ProgramOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "category" | "description" | "targetBeneficiaries" | "currentBeneficiaries" | "budget" | "status" | "imageUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["program"]>
+export type ProgramInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  projects?: boolean | Prisma.Program$projectsArgs<ExtArgs>
+  _count?: boolean | Prisma.ProgramCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type ProgramIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ProgramIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $ProgramPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Program"
-  objects: {}
+  objects: {
+    projects: Prisma.$ProjectPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     title: string
@@ -1005,6 +1148,7 @@ readonly fields: ProgramFieldRefs;
  */
 export interface Prisma__ProgramClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  projects<T extends Prisma.Program$projectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Program$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1063,6 +1207,10 @@ export type ProgramFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   omit?: Prisma.ProgramOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProgramInclude<ExtArgs> | null
+  /**
    * Filter, which Program to fetch.
    */
   where: Prisma.ProgramWhereUniqueInput
@@ -1081,6 +1229,10 @@ export type ProgramFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.ProgramOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProgramInclude<ExtArgs> | null
+  /**
    * Filter, which Program to fetch.
    */
   where: Prisma.ProgramWhereUniqueInput
@@ -1098,6 +1250,10 @@ export type ProgramFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the Program
    */
   omit?: Prisma.ProgramOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProgramInclude<ExtArgs> | null
   /**
    * Filter, which Program to fetch.
    */
@@ -1147,6 +1303,10 @@ export type ProgramFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.ProgramOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProgramInclude<ExtArgs> | null
+  /**
    * Filter, which Program to fetch.
    */
   where?: Prisma.ProgramWhereInput
@@ -1194,6 +1354,10 @@ export type ProgramFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Omit specific fields from the Program
    */
   omit?: Prisma.ProgramOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProgramInclude<ExtArgs> | null
   /**
    * Filter, which Programs to fetch.
    */
@@ -1243,6 +1407,10 @@ export type ProgramCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.ProgramOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProgramInclude<ExtArgs> | null
+  /**
    * The data needed to create a Program.
    */
   data: Prisma.XOR<Prisma.ProgramCreateInput, Prisma.ProgramUncheckedCreateInput>
@@ -1290,6 +1458,10 @@ export type ProgramUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Program
    */
   omit?: Prisma.ProgramOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProgramInclude<ExtArgs> | null
   /**
    * The data needed to update a Program.
    */
@@ -1357,6 +1529,10 @@ export type ProgramUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.ProgramOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProgramInclude<ExtArgs> | null
+  /**
    * The filter to search for the Program to update in case it exists.
    */
   where: Prisma.ProgramWhereUniqueInput
@@ -1383,6 +1559,10 @@ export type ProgramDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.ProgramOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProgramInclude<ExtArgs> | null
+  /**
    * Filter which Program to delete.
    */
   where: Prisma.ProgramWhereUniqueInput
@@ -1403,6 +1583,30 @@ export type ProgramDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
+ * Program.projects
+ */
+export type Program$projectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Project
+   */
+  select?: Prisma.ProjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Project
+   */
+  omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  where?: Prisma.ProjectWhereInput
+  orderBy?: Prisma.ProjectOrderByWithRelationInput | Prisma.ProjectOrderByWithRelationInput[]
+  cursor?: Prisma.ProjectWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProjectScalarFieldEnum | Prisma.ProjectScalarFieldEnum[]
+}
+
+/**
  * Program without action
  */
 export type ProgramDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1414,4 +1618,8 @@ export type ProgramDefaultArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the Program
    */
   omit?: Prisma.ProgramOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProgramInclude<ExtArgs> | null
 }

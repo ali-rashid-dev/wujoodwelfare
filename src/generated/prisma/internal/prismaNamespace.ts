@@ -1442,14 +1442,16 @@ export type ProgramScalarFieldEnum = (typeof ProgramScalarFieldEnum)[keyof typeo
 export const ProjectScalarFieldEnum = {
   id: 'id',
   title: 'title',
-  tag: 'tag',
+  slug: 'slug',
   description: 'description',
-  progress: 'progress',
-  targetAmount: 'targetAmount',
-  raisedAmount: 'raisedAmount',
-  imageUrl: 'imageUrl',
+  images: 'images',
   status: 'status',
+  published: 'published',
+  publishedAt: 'publishedAt',
+  startDate: 'startDate',
+  endDate: 'endDate',
   location: 'location',
+  programId: 'programId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1656,6 +1658,20 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ProjectStatus'
+ */
+export type EnumProjectStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProjectStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ProjectStatus[]'
+ */
+export type ListEnumProjectStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProjectStatus[]'>
     
 
 /**
