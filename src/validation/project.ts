@@ -1,9 +1,28 @@
 import { z } from "zod";
+import { isValid, parseISO } from "date-fns";
 
 export const PROJECT_STATUSES = ["planned", "active", "completed", "archived"] as const;
 export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
 
 export const projectStatusSchema = z.enum(PROJECT_STATUSES);
+
+function isValidDateString(value: string): boolean {
+  if (Number.isNaN(Date.parse(value))) {
+    return false;
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}(?:$|T)/.test(value)) {
+    return isValid(parseISO(value));
+  }
+
+  return true;
+}
+
+const optionalDateSchema = z
+  .string()
+  .refine((value) => value === "" || isValidDateString(value), "Enter a valid date.")
+  .optional()
+  .nullable();
 
 export const projectSchema = z.object({
   title: z
@@ -27,10 +46,21 @@ export const projectSchema = z.object({
   images: z.array(z.string().url("Each image must be a valid URL.")).optional().default([]),
   status: projectStatusSchema.default("planned"),
   published: z.boolean().default(false),
-  startDate: z.string().optional().nullable().or(z.literal("")),
-  endDate: z.string().optional().nullable().or(z.literal("")),
+  startDate: optionalDateSchema,
+  endDate: optionalDateSchema,
   location: z.string().max(200).optional().nullable().or(z.literal("")),
   programId: z.string().optional().nullable().or(z.literal("")),
-});
+}).refine(
+  ({ startDate, endDate }) =>
+    !startDate ||
+    !endDate ||
+    !isValidDateString(startDate) ||
+    !isValidDateString(endDate) ||
+    Date.parse(endDate) >= Date.parse(startDate),
+  {
+    message: "End date must be on or after the start date.",
+    path: ["endDate"],
+  }
+);
 
 export type ProjectInput = z.infer<typeof projectSchema>;

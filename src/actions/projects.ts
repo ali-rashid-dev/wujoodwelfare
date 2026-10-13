@@ -256,6 +256,7 @@ export async function updateProject(id: string, rawInput: unknown) {
 
     revalidatePath("/admin/projects");
     revalidatePath("/projects");
+    revalidatePath(`/projects/${existing.slug}`);
     revalidatePath(`/projects/${finalSlug}`);
     revalidatePath("/");
 
