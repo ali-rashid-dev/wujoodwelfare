@@ -7,15 +7,7 @@ export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
 export const projectStatusSchema = z.enum(PROJECT_STATUSES);
 
 function isValidDateString(value: string): boolean {
-  if (Number.isNaN(Date.parse(value))) {
-    return false;
-  }
-
-  if (/^\d{4}-\d{2}-\d{2}(?:$|T)/.test(value)) {
-    return isValid(parseISO(value));
-  }
-
-  return true;
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && isValid(parseISO(value));
 }
 
 const optionalDateSchema = z

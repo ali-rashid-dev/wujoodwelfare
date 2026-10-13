@@ -100,7 +100,7 @@ model Project {
   title       String
   slug        String    @unique
   description String
-  images      String    @default("") // JSON array of image URLs
+  images      String    @default("[]") // JSON array of image URLs
   status      ProjectStatus @default(planned)
   published   Boolean   @default(false)
   publishedAt DateTime?

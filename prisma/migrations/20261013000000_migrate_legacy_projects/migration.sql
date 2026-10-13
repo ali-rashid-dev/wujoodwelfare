@@ -28,7 +28,7 @@ END $$;
 
 ALTER TABLE "project"
   ADD COLUMN IF NOT EXISTS "slug" TEXT,
-  ADD COLUMN IF NOT EXISTS "images" TEXT NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS "images" TEXT NOT NULL DEFAULT '[]',
   ADD COLUMN IF NOT EXISTS "published" BOOLEAN NOT NULL DEFAULT false,
   ADD COLUMN IF NOT EXISTS "publishedAt" TIMESTAMP(3),
   ADD COLUMN IF NOT EXISTS "startDate" TIMESTAMP(3),
@@ -49,9 +49,15 @@ BEGIN
       WHEN "imageUrl" IS NULL OR "imageUrl" = '' THEN '[]'
       ELSE json_build_array("imageUrl")::TEXT
     END
-    WHERE "images" = '';
+    WHERE "images" IN ('', '[]');
   END IF;
 END $$;
+
+UPDATE "project"
+SET "images" = '[]'
+WHERE "images" = '';
+
+ALTER TABLE "project" ALTER COLUMN "images" SET DEFAULT '[]';
 
 ALTER TABLE "project" ALTER COLUMN "slug" DROP NOT NULL;
 
