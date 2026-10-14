@@ -20,22 +20,8 @@ export type ProgramModel = runtime.Types.Result.DefaultSelection<Prisma.$Program
 
 export type AggregateProgram = {
   _count: ProgramCountAggregateOutputType | null
-  _avg: ProgramAvgAggregateOutputType | null
-  _sum: ProgramSumAggregateOutputType | null
   _min: ProgramMinAggregateOutputType | null
   _max: ProgramMaxAggregateOutputType | null
-}
-
-export type ProgramAvgAggregateOutputType = {
-  targetBeneficiaries: number | null
-  currentBeneficiaries: number | null
-  budget: number | null
-}
-
-export type ProgramSumAggregateOutputType = {
-  targetBeneficiaries: number | null
-  currentBeneficiaries: number | null
-  budget: number | null
 }
 
 export type ProgramMinAggregateOutputType = {
@@ -44,9 +30,6 @@ export type ProgramMinAggregateOutputType = {
   slug: string | null
   category: string | null
   description: string | null
-  targetBeneficiaries: number | null
-  currentBeneficiaries: number | null
-  budget: number | null
   status: string | null
   imageUrl: string | null
   createdAt: Date | null
@@ -59,9 +42,6 @@ export type ProgramMaxAggregateOutputType = {
   slug: string | null
   category: string | null
   description: string | null
-  targetBeneficiaries: number | null
-  currentBeneficiaries: number | null
-  budget: number | null
   status: string | null
   imageUrl: string | null
   createdAt: Date | null
@@ -74,9 +54,6 @@ export type ProgramCountAggregateOutputType = {
   slug: number
   category: number
   description: number
-  targetBeneficiaries: number
-  currentBeneficiaries: number
-  budget: number
   status: number
   imageUrl: number
   createdAt: number
@@ -85,27 +62,12 @@ export type ProgramCountAggregateOutputType = {
 }
 
 
-export type ProgramAvgAggregateInputType = {
-  targetBeneficiaries?: true
-  currentBeneficiaries?: true
-  budget?: true
-}
-
-export type ProgramSumAggregateInputType = {
-  targetBeneficiaries?: true
-  currentBeneficiaries?: true
-  budget?: true
-}
-
 export type ProgramMinAggregateInputType = {
   id?: true
   title?: true
   slug?: true
   category?: true
   description?: true
-  targetBeneficiaries?: true
-  currentBeneficiaries?: true
-  budget?: true
   status?: true
   imageUrl?: true
   createdAt?: true
@@ -118,9 +80,6 @@ export type ProgramMaxAggregateInputType = {
   slug?: true
   category?: true
   description?: true
-  targetBeneficiaries?: true
-  currentBeneficiaries?: true
-  budget?: true
   status?: true
   imageUrl?: true
   createdAt?: true
@@ -133,9 +92,6 @@ export type ProgramCountAggregateInputType = {
   slug?: true
   category?: true
   description?: true
-  targetBeneficiaries?: true
-  currentBeneficiaries?: true
-  budget?: true
   status?: true
   imageUrl?: true
   createdAt?: true
@@ -181,18 +137,6 @@ export type ProgramAggregateArgs<ExtArgs extends runtime.Types.Extensions.Intern
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: ProgramAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: ProgramSumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: ProgramMinAggregateInputType
@@ -223,8 +167,6 @@ export type ProgramGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   _count?: ProgramCountAggregateInputType | true
-  _avg?: ProgramAvgAggregateInputType
-  _sum?: ProgramSumAggregateInputType
   _min?: ProgramMinAggregateInputType
   _max?: ProgramMaxAggregateInputType
 }
@@ -235,16 +177,11 @@ export type ProgramGroupByOutputType = {
   slug: string
   category: string
   description: string
-  targetBeneficiaries: number
-  currentBeneficiaries: number
-  budget: number | null
   status: string
   imageUrl: string | null
   createdAt: Date
   updatedAt: Date
   _count: ProgramCountAggregateOutputType | null
-  _avg: ProgramAvgAggregateOutputType | null
-  _sum: ProgramSumAggregateOutputType | null
   _min: ProgramMinAggregateOutputType | null
   _max: ProgramMaxAggregateOutputType | null
 }
@@ -273,9 +210,6 @@ export type ProgramWhereInput = {
   slug?: Prisma.StringFilter<"Program"> | string
   category?: Prisma.StringFilter<"Program"> | string
   description?: Prisma.StringFilter<"Program"> | string
-  targetBeneficiaries?: Prisma.IntFilter<"Program"> | number
-  currentBeneficiaries?: Prisma.IntFilter<"Program"> | number
-  budget?: Prisma.FloatNullableFilter<"Program"> | number | null
   status?: Prisma.StringFilter<"Program"> | string
   imageUrl?: Prisma.StringNullableFilter<"Program"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Program"> | Date | string
@@ -289,9 +223,6 @@ export type ProgramOrderByWithRelationInput = {
   slug?: Prisma.SortOrder
   category?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  targetBeneficiaries?: Prisma.SortOrder
-  currentBeneficiaries?: Prisma.SortOrder
-  budget?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -308,9 +239,6 @@ export type ProgramWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Program"> | string
   category?: Prisma.StringFilter<"Program"> | string
   description?: Prisma.StringFilter<"Program"> | string
-  targetBeneficiaries?: Prisma.IntFilter<"Program"> | number
-  currentBeneficiaries?: Prisma.IntFilter<"Program"> | number
-  budget?: Prisma.FloatNullableFilter<"Program"> | number | null
   status?: Prisma.StringFilter<"Program"> | string
   imageUrl?: Prisma.StringNullableFilter<"Program"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Program"> | Date | string
@@ -324,18 +252,13 @@ export type ProgramOrderByWithAggregationInput = {
   slug?: Prisma.SortOrder
   category?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  targetBeneficiaries?: Prisma.SortOrder
-  currentBeneficiaries?: Prisma.SortOrder
-  budget?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProgramCountOrderByAggregateInput
-  _avg?: Prisma.ProgramAvgOrderByAggregateInput
   _max?: Prisma.ProgramMaxOrderByAggregateInput
   _min?: Prisma.ProgramMinOrderByAggregateInput
-  _sum?: Prisma.ProgramSumOrderByAggregateInput
 }
 
 export type ProgramScalarWhereWithAggregatesInput = {
@@ -347,9 +270,6 @@ export type ProgramScalarWhereWithAggregatesInput = {
   slug?: Prisma.StringWithAggregatesFilter<"Program"> | string
   category?: Prisma.StringWithAggregatesFilter<"Program"> | string
   description?: Prisma.StringWithAggregatesFilter<"Program"> | string
-  targetBeneficiaries?: Prisma.IntWithAggregatesFilter<"Program"> | number
-  currentBeneficiaries?: Prisma.IntWithAggregatesFilter<"Program"> | number
-  budget?: Prisma.FloatNullableWithAggregatesFilter<"Program"> | number | null
   status?: Prisma.StringWithAggregatesFilter<"Program"> | string
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"Program"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Program"> | Date | string
@@ -362,9 +282,6 @@ export type ProgramCreateInput = {
   slug: string
   category: string
   description: string
-  targetBeneficiaries?: number
-  currentBeneficiaries?: number
-  budget?: number | null
   status?: string
   imageUrl?: string | null
   createdAt?: Date | string
@@ -378,9 +295,6 @@ export type ProgramUncheckedCreateInput = {
   slug: string
   category: string
   description: string
-  targetBeneficiaries?: number
-  currentBeneficiaries?: number
-  budget?: number | null
   status?: string
   imageUrl?: string | null
   createdAt?: Date | string
@@ -394,9 +308,6 @@ export type ProgramUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  targetBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
-  currentBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
-  budget?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -410,9 +321,6 @@ export type ProgramUncheckedUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  targetBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
-  currentBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
-  budget?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -426,9 +334,6 @@ export type ProgramCreateManyInput = {
   slug: string
   category: string
   description: string
-  targetBeneficiaries?: number
-  currentBeneficiaries?: number
-  budget?: number | null
   status?: string
   imageUrl?: string | null
   createdAt?: Date | string
@@ -441,9 +346,6 @@ export type ProgramUpdateManyMutationInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  targetBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
-  currentBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
-  budget?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -456,9 +358,6 @@ export type ProgramUncheckedUpdateManyInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  targetBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
-  currentBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
-  budget?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -471,19 +370,10 @@ export type ProgramCountOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   category?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  targetBeneficiaries?: Prisma.SortOrder
-  currentBeneficiaries?: Prisma.SortOrder
-  budget?: Prisma.SortOrder
   status?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-}
-
-export type ProgramAvgOrderByAggregateInput = {
-  targetBeneficiaries?: Prisma.SortOrder
-  currentBeneficiaries?: Prisma.SortOrder
-  budget?: Prisma.SortOrder
 }
 
 export type ProgramMaxOrderByAggregateInput = {
@@ -492,9 +382,6 @@ export type ProgramMaxOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   category?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  targetBeneficiaries?: Prisma.SortOrder
-  currentBeneficiaries?: Prisma.SortOrder
-  budget?: Prisma.SortOrder
   status?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -507,40 +394,15 @@ export type ProgramMinOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   category?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  targetBeneficiaries?: Prisma.SortOrder
-  currentBeneficiaries?: Prisma.SortOrder
-  budget?: Prisma.SortOrder
   status?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
-export type ProgramSumOrderByAggregateInput = {
-  targetBeneficiaries?: Prisma.SortOrder
-  currentBeneficiaries?: Prisma.SortOrder
-  budget?: Prisma.SortOrder
-}
-
 export type ProgramNullableScalarRelationFilter = {
   is?: Prisma.ProgramWhereInput | null
   isNot?: Prisma.ProgramWhereInput | null
-}
-
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
-export type NullableFloatFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
 }
 
 export type ProgramCreateNestedOneWithoutProjectsInput = {
@@ -565,9 +427,6 @@ export type ProgramCreateWithoutProjectsInput = {
   slug: string
   category: string
   description: string
-  targetBeneficiaries?: number
-  currentBeneficiaries?: number
-  budget?: number | null
   status?: string
   imageUrl?: string | null
   createdAt?: Date | string
@@ -580,9 +439,6 @@ export type ProgramUncheckedCreateWithoutProjectsInput = {
   slug: string
   category: string
   description: string
-  targetBeneficiaries?: number
-  currentBeneficiaries?: number
-  budget?: number | null
   status?: string
   imageUrl?: string | null
   createdAt?: Date | string
@@ -611,9 +467,6 @@ export type ProgramUpdateWithoutProjectsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  targetBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
-  currentBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
-  budget?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -626,9 +479,6 @@ export type ProgramUncheckedUpdateWithoutProjectsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  targetBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
-  currentBeneficiaries?: Prisma.IntFieldUpdateOperationsInput | number
-  budget?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -672,9 +522,6 @@ export type ProgramSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   slug?: boolean
   category?: boolean
   description?: boolean
-  targetBeneficiaries?: boolean
-  currentBeneficiaries?: boolean
-  budget?: boolean
   status?: boolean
   imageUrl?: boolean
   createdAt?: boolean
@@ -689,9 +536,6 @@ export type ProgramSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   slug?: boolean
   category?: boolean
   description?: boolean
-  targetBeneficiaries?: boolean
-  currentBeneficiaries?: boolean
-  budget?: boolean
   status?: boolean
   imageUrl?: boolean
   createdAt?: boolean
@@ -704,9 +548,6 @@ export type ProgramSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   slug?: boolean
   category?: boolean
   description?: boolean
-  targetBeneficiaries?: boolean
-  currentBeneficiaries?: boolean
-  budget?: boolean
   status?: boolean
   imageUrl?: boolean
   createdAt?: boolean
@@ -719,16 +560,13 @@ export type ProgramSelectScalar = {
   slug?: boolean
   category?: boolean
   description?: boolean
-  targetBeneficiaries?: boolean
-  currentBeneficiaries?: boolean
-  budget?: boolean
   status?: boolean
   imageUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProgramOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "category" | "description" | "targetBeneficiaries" | "currentBeneficiaries" | "budget" | "status" | "imageUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["program"]>
+export type ProgramOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "category" | "description" | "status" | "imageUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["program"]>
 export type ProgramInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   projects?: boolean | Prisma.Program$projectsArgs<ExtArgs>
   _count?: boolean | Prisma.ProgramCountOutputTypeDefaultArgs<ExtArgs>
@@ -747,9 +585,6 @@ export type $ProgramPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     slug: string
     category: string
     description: string
-    targetBeneficiaries: number
-    currentBeneficiaries: number
-    budget: number | null
     status: string
     imageUrl: string | null
     createdAt: Date
@@ -1183,9 +1018,6 @@ export interface ProgramFieldRefs {
   readonly slug: Prisma.FieldRef<"Program", 'String'>
   readonly category: Prisma.FieldRef<"Program", 'String'>
   readonly description: Prisma.FieldRef<"Program", 'String'>
-  readonly targetBeneficiaries: Prisma.FieldRef<"Program", 'Int'>
-  readonly currentBeneficiaries: Prisma.FieldRef<"Program", 'Int'>
-  readonly budget: Prisma.FieldRef<"Program", 'Float'>
   readonly status: Prisma.FieldRef<"Program", 'String'>
   readonly imageUrl: Prisma.FieldRef<"Program", 'String'>
   readonly createdAt: Prisma.FieldRef<"Program", 'DateTime'>

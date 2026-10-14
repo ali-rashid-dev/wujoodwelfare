@@ -14,10 +14,8 @@ import {
   Layers,
   CheckCircle2,
   FileText,
-  Users,
   AlertTriangle,
   Loader2,
-  Calendar,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -68,10 +66,6 @@ export function ProgramsManagementTable({
     (p) => p.status === "published" || p.status === "active"
   ).length;
   const draftCount = programs.filter((p) => p.status === "draft").length;
-  const totalBeneficiaries = programs.reduce(
-    (acc, p) => acc + (p.targetBeneficiaries || 0),
-    0
-  );
 
   // Filtered list
   const filtered = useMemo(() => {
@@ -180,8 +174,7 @@ export function ProgramsManagementTable({
 
   return (
     <div className="space-y-6">
-      {/* ── Stat Cards ────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="p-4 sm:p-5 rounded-2xl border border-border bg-card shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -225,21 +218,6 @@ export function ProgramsManagementTable({
             {draftCount}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">Unpublished drafts</p>
-        </div>
-
-        <div className="p-4 sm:p-5 rounded-2xl border border-border bg-card shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Target Beneficiaries
-            </span>
-            <div className="h-8 w-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-              <Users className="h-4 w-4" />
-            </div>
-          </div>
-          <p className="mt-3 text-2xl sm:text-3xl font-extrabold text-foreground">
-            {totalBeneficiaries.toLocaleString()}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">Across all programs</p>
         </div>
       </div>
 
@@ -301,7 +279,6 @@ export function ProgramsManagementTable({
               <tr>
                 <th className="px-5 py-3.5">Program</th>
                 <th className="px-4 py-3.5">Category</th>
-                <th className="px-4 py-3.5">Beneficiaries</th>
                 <th className="px-4 py-3.5">Status</th>
                 <th className="px-4 py-3.5">Publish Toggle</th>
                 <th className="px-4 py-3.5">Updated</th>
@@ -312,7 +289,7 @@ export function ProgramsManagementTable({
               {filtered.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={6}
                     className="px-5 py-12 text-center text-muted-foreground"
                   >
                     <div className="max-w-sm mx-auto flex flex-col items-center">
@@ -376,36 +353,6 @@ export function ProgramsManagementTable({
                         >
                           {p.category}
                         </Badge>
-                      </td>
-
-                      {/* Beneficiaries */}
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-xs">
-                          <span className="font-semibold text-foreground">
-                            {(p.currentBeneficiaries || 0).toLocaleString()}
-                          </span>
-                          <span className="text-muted-foreground">
-                            {" "}
-                            / {(p.targetBeneficiaries || 0).toLocaleString()}
-                          </span>
-                        </div>
-                        {p.targetBeneficiaries > 0 && (
-                          <div className="mt-1.5 h-1.5 w-24 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-primary rounded-full"
-                              style={{
-                                width: `${Math.min(
-                                  100,
-                                  Math.round(
-                                    ((p.currentBeneficiaries || 0) /
-                                      p.targetBeneficiaries) *
-                                      100
-                                  )
-                                )}%`,
-                              }}
-                            />
-                          </div>
-                        )}
                       </td>
 
                       {/* Status */}

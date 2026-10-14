@@ -36,9 +36,6 @@ export const programSchema = z.object({
     .string()
     .min(10, "Description must be at least 10 characters.")
     .max(3000, "Description cannot exceed 3000 characters."),
-  targetBeneficiaries: z.coerce.number().int().min(0).default(0),
-  currentBeneficiaries: z.coerce.number().int().min(0).default(0),
-  budget: z.coerce.number().min(0).optional().nullable(),
   status: programStatusSchema.default("draft"),
   imageUrl: z.string().optional().nullable().or(z.literal("")),
 });

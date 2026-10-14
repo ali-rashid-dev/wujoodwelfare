@@ -16,9 +16,6 @@ export type ProgramRecord = {
   slug: string;
   category: string;
   description: string;
-  targetBeneficiaries: number;
-  currentBeneficiaries: number;
-  budget: number | null;
   status: string;
   imageUrl: string | null;
   createdAt: Date;
@@ -140,9 +137,6 @@ export async function createProgram(rawInput: unknown) {
         slug: finalSlug,
         category: parsed.category,
         description: parsed.description,
-        targetBeneficiaries: parsed.targetBeneficiaries,
-        currentBeneficiaries: parsed.currentBeneficiaries,
-        budget: parsed.budget ?? null,
         status: parsed.status,
         imageUrl: parsed.imageUrl ? parsed.imageUrl.trim() : null,
       },
@@ -189,9 +183,6 @@ export async function updateProgram(id: string, rawInput: unknown) {
         slug: finalSlug,
         category: parsed.category,
         description: parsed.description,
-        targetBeneficiaries: parsed.targetBeneficiaries,
-        currentBeneficiaries: parsed.currentBeneficiaries,
-        budget: parsed.budget ?? null,
         status: parsed.status,
         imageUrl: parsed.imageUrl ? parsed.imageUrl.trim() : null,
       },

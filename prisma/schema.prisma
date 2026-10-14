@@ -77,19 +77,16 @@ model Verification {
 }
 
 model Program {
-  id                    String    @id @default(cuid())
-  title                 String
-  slug                  String    @unique
-  category              String
-  description           String
-  targetBeneficiaries   Int       @default(0)
-  currentBeneficiaries  Int       @default(0)
-  budget                Float?
-  status                String    @default("active") // active, paused, completed
-  imageUrl              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-  projects              Project[]
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  category    String
+  description String
+  status      String    @default("active")
+  imageUrl    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  projects    Project[]
 
   @@map("program")
 }

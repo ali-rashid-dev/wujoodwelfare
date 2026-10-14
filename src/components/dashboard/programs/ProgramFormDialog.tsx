@@ -15,12 +15,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   PROGRAM_CATEGORIES,
-  PROGRAM_STATUSES,
   type ProgramStatus,
 } from "@/validation/program";
 import { createProgram, updateProgram, type ProgramRecord } from "@/actions/programs";
 import { toast } from "sonner";
-import { Loader2, Sparkles, Image as ImageIcon, Upload, X } from "lucide-react";
+import { Loader2, Sparkles, Image as ImageIcon, X } from "lucide-react";
 import Image from "next/image";
 import { UploadDropzone } from "@/lib/uploadthing";
 
@@ -61,9 +60,6 @@ export function ProgramFormDialog({
   const [slug, setSlug] = useState("");
   const [category, setCategory] = useState("Food");
   const [description, setDescription] = useState("");
-  const [targetBeneficiaries, setTargetBeneficiaries] = useState("0");
-  const [currentBeneficiaries, setCurrentBeneficiaries] = useState("0");
-  const [budget, setBudget] = useState("");
   const [status, setStatus] = useState<ProgramStatus>("draft");
   const [imageUrl, setImageUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,9 +71,6 @@ export function ProgramFormDialog({
       setSlug(program.slug);
       setCategory(program.category);
       setDescription(program.description);
-      setTargetBeneficiaries(String(program.targetBeneficiaries || 0));
-      setCurrentBeneficiaries(String(program.currentBeneficiaries || 0));
-      setBudget(program.budget ? String(program.budget) : "");
       setStatus(
         program.status === "active"
           ? "published"
@@ -90,9 +83,6 @@ export function ProgramFormDialog({
       setSlug("");
       setCategory("Food");
       setDescription("");
-      setTargetBeneficiaries("0");
-      setCurrentBeneficiaries("0");
-      setBudget("");
       setStatus("published");
       setImageUrl("/gallery-food.jpg");
       setAutoSlug(true);
@@ -126,9 +116,6 @@ export function ProgramFormDialog({
       slug: slug.trim() || slugify(title),
       category,
       description: description.trim(),
-      targetBeneficiaries: Number(targetBeneficiaries) || 0,
-      currentBeneficiaries: Number(currentBeneficiaries) || 0,
-      budget: budget ? Number(budget) : null,
       status,
       imageUrl: imageUrl.trim() || null,
     };
@@ -271,51 +258,6 @@ export function ProgramFormDialog({
             <p className="text-[11px] text-muted-foreground">
               Shown on the public programs overview card and detail dialog.
             </p>
-          </div>
-
-          {/* Beneficiaries & Budget */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="prog-target" className="text-xs font-semibold">
-                Target Beneficiaries
-              </Label>
-              <Input
-                id="prog-target"
-                type="number"
-                min="0"
-                placeholder="5000"
-                value={targetBeneficiaries}
-                onChange={(e) => setTargetBeneficiaries(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="prog-current" className="text-xs font-semibold">
-                Current Beneficiaries
-              </Label>
-              <Input
-                id="prog-current"
-                type="number"
-                min="0"
-                placeholder="3200"
-                value={currentBeneficiaries}
-                onChange={(e) => setCurrentBeneficiaries(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="prog-budget" className="text-xs font-semibold">
-                Budget (PKR)
-              </Label>
-              <Input
-                id="prog-budget"
-                type="number"
-                min="0"
-                placeholder="1500000"
-                value={budget}
-                onChange={(e) => setBudget(e.target.value)}
-              />
-            </div>
           </div>
 
           {/* Cover Image */}

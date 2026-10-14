@@ -521,6 +521,14 @@ export type VolunteerOpportunityNullableScalarRelationFilter = {
   isNot?: Prisma.VolunteerOpportunityWhereInput | null
 }
 
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type VolunteerOpportunityCreateNestedOneWithoutAssignmentsInput = {
   create?: Prisma.XOR<Prisma.VolunteerOpportunityCreateWithoutAssignmentsInput, Prisma.VolunteerOpportunityUncheckedCreateWithoutAssignmentsInput>
   connectOrCreate?: Prisma.VolunteerOpportunityCreateOrConnectWithoutAssignmentsInput
