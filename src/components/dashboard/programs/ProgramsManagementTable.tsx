@@ -20,6 +20,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ListPagination } from "@/components/ui/list-pagination";
+import { useClientPagination } from "@/hooks/use-client-pagination";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,6 +52,7 @@ export function ProgramsManagementTable({
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const pageSize = 10;
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingProgram, setEditingProgram] = useState<ProgramRecord | null>(null);
@@ -90,6 +93,13 @@ export function ProgramsManagementTable({
       return matchesQuery && matchesStatus && matchesCategory;
     });
   }, [programs, query, statusFilter, categoryFilter]);
+  const {
+    currentPage,
+    pageCount,
+    pageItems: paginatedPrograms,
+    setPage,
+    resetPage,
+  } = useClientPagination(filtered, pageSize);
 
   const handleCreateNew = () => {
     setEditingProgram(null);
@@ -229,7 +239,10 @@ export function ProgramsManagementTable({
           <Input
             placeholder="Search programs by title, category, slug..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              resetPage();
+            }}
             className="pl-9 h-10 rounded-xl bg-background"
           />
         </div>
@@ -238,7 +251,10 @@ export function ProgramsManagementTable({
         <div className="flex items-center gap-2 flex-wrap">
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              resetPage();
+            }}
             className="h-10 px-3 rounded-xl border border-input bg-background text-xs font-medium focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="all">All Statuses</option>
@@ -249,7 +265,10 @@ export function ProgramsManagementTable({
 
           <select
             value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value);
+              resetPage();
+            }}
             className="h-10 px-3 rounded-xl border border-input bg-background text-xs font-medium focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="all">All Categories</option>
@@ -306,7 +325,7 @@ export function ProgramsManagementTable({
                   </td>
                 </tr>
               ) : (
-                filtered.map((p) => {
+                paginatedPrograms.map((p) => {
                   const isPublished =
                     p.status === "published" || p.status === "active";
                   const isDraft = p.status === "draft";
@@ -456,6 +475,14 @@ export function ProgramsManagementTable({
           </table>
         </div>
       </div>
+      <ListPagination
+        currentPage={currentPage}
+        pageCount={pageCount}
+        totalItems={filtered.length}
+        pageSize={pageSize}
+        itemLabel="programs"
+        onPageChange={setPage}
+      />
 
       {/* ── Create / Edit Dialog ─────────────────────────────── */}
       <ProgramFormDialog

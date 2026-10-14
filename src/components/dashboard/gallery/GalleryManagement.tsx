@@ -23,8 +23,10 @@ import { UploadDropzone } from "@/lib/uploadthing";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ListPagination } from "@/components/ui/list-pagination";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useClientPagination } from "@/hooks/use-client-pagination";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -61,6 +63,7 @@ export function GalleryManagement({
   const [deleteItem, setDeleteItem] = useState<GalleryItemRecord | null>(null);
   const [filter, setFilter] = useState<"all" | "published" | "unpublished">("all");
   const [query, setQuery] = useState("");
+  const pageSize = 12;
 
   const filtered = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -77,6 +80,13 @@ export function GalleryManagement({
       return visibilityMatches && queryMatches;
     });
   }, [filter, items, query]);
+  const {
+    currentPage,
+    pageCount,
+    pageItems: paginatedItems,
+    setPage,
+    resetPage,
+  } = useClientPagination(filtered, pageSize);
 
   const openCreate = () => {
     setEditingItem(null);
@@ -94,6 +104,7 @@ export function GalleryManagement({
         ? current.map((existing) => (existing.id === item.id ? item : existing))
         : [item, ...current],
     );
+    if (!editingItem) resetPage();
     setFormOpen(false);
     setEditingItem(null);
   };
@@ -160,16 +171,20 @@ export function GalleryManagement({
         <div className="flex flex-1 flex-col gap-3 sm:flex-row">
           <Input
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              resetPage();
+            }}
             placeholder="Search captions, categories, or projects..."
             className="sm:max-w-sm"
           />
           <select
             aria-label="Filter gallery by publication status"
             value={filter}
-            onChange={(event) =>
+            onChange={(event) => {
               setFilter(event.target.value as typeof filter)
-            }
+              resetPage();
+            }}
             className="h-10 rounded-md border border-input bg-background px-3 text-sm"
           >
             <option value="all">All images</option>
@@ -185,7 +200,7 @@ export function GalleryManagement({
 
       {filtered.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((item) => (
+          {paginatedItems.map((item) => (
             <article
               key={item.id}
               className="overflow-hidden rounded-2xl border border-border bg-card"
@@ -261,6 +276,15 @@ export function GalleryManagement({
           </p>
         </div>
       )}
+
+      <ListPagination
+        currentPage={currentPage}
+        pageCount={pageCount}
+        totalItems={filtered.length}
+        pageSize={pageSize}
+        itemLabel="images"
+        onPageChange={setPage}
+      />
 
       {formOpen && (
         <GalleryItemDialog

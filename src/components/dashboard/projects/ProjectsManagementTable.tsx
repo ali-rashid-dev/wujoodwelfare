@@ -26,6 +26,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ListPagination } from "@/components/ui/list-pagination";
+import { useClientPagination } from "@/hooks/use-client-pagination";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -94,6 +96,7 @@ export function ProjectsManagementTable({
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [publishedFilter, setPublishedFilter] = useState("all");
+  const pageSize = 10;
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<ProjectRecord | null>(null);
@@ -132,6 +135,13 @@ export function ProjectsManagementTable({
       return matchesQuery && matchesStatus && matchesPublished;
     });
   }, [projects, query, statusFilter, publishedFilter]);
+  const {
+    currentPage,
+    pageCount,
+    pageItems: paginatedProjects,
+    setPage,
+    resetPage,
+  } = useClientPagination(filtered, pageSize);
 
   const handleCreateNew = () => {
     setEditingProject(null);
@@ -280,7 +290,10 @@ export function ProjectsManagementTable({
             placeholder="Search projects by title, slug, location, or program..."
             aria-label="Search projects"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              resetPage();
+            }}
             className="pl-9 h-10 rounded-xl bg-background"
           />
         </div>
@@ -288,7 +301,10 @@ export function ProjectsManagementTable({
         <div className="flex items-center gap-2 flex-wrap">
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              resetPage();
+            }}
             aria-label="Filter projects by status"
             className="h-10 px-3 rounded-xl border border-input bg-background text-xs font-medium focus:outline-none focus:ring-2 focus:ring-ring"
           >
@@ -302,7 +318,10 @@ export function ProjectsManagementTable({
 
           <select
             value={publishedFilter}
-            onChange={(e) => setPublishedFilter(e.target.value)}
+            onChange={(e) => {
+              setPublishedFilter(e.target.value);
+              resetPage();
+            }}
             aria-label="Filter projects by visibility"
             className="h-10 px-3 rounded-xl border border-input bg-background text-xs font-medium focus:outline-none focus:ring-2 focus:ring-ring"
           >
@@ -345,7 +364,7 @@ export function ProjectsManagementTable({
           </div>
         ) : (
           <div className="space-y-3">
-            {filtered.map((p) => {
+            {paginatedProjects.map((p) => {
               const imgs = parseImages(p.images);
               const coverImg = imgs[0] || null;
               const statusCfg =
@@ -534,6 +553,14 @@ export function ProjectsManagementTable({
             })}
           </div>
         )}
+        <ListPagination
+          currentPage={currentPage}
+          pageCount={pageCount}
+          totalItems={filtered.length}
+          pageSize={pageSize}
+          itemLabel="projects"
+          onPageChange={setPage}
+        />
       </section>
 
       {/* ── Create / Edit Dialog ─────────────────────────────────── */}
