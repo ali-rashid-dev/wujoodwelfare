@@ -162,7 +162,7 @@ export function ProgramFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
+      <DialogContent className="max-w-2xl lg:max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             {isEditing ? "Edit Welfare Program" : "Create New Welfare Program"}

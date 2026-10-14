@@ -195,7 +195,6 @@ export function GalleryManagement({
                   src={item.imageUrl}
                   alt={item.title}
                   fill
-                  unoptimized
                   sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
                   className="object-cover"
                 />
@@ -356,7 +355,7 @@ function GalleryItemDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-xl overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-xl lg:max-w-3xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{item ? "Edit gallery image" : "Add gallery image"}</DialogTitle>
           <DialogDescription>
@@ -375,7 +374,6 @@ function GalleryItemDialog({
                   src={imageUrl}
                   alt={title || "Gallery image preview"}
                   fill
-                  unoptimized
                   className="object-contain"
                 />
               </div>

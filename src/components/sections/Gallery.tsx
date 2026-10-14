@@ -68,7 +68,6 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                 src={item.imageUrl}
                 alt={item.title}
                 fill
-                unoptimized
                 sizes="(min-width: 768px) 33vw, 50vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
               />
@@ -121,7 +120,6 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                   src={openItem.imageUrl}
                   alt={openItem.title}
                   fill
-                  unoptimized
                   sizes="90vw"
                   className="rounded-2xl object-contain shadow-2xl"
                 />

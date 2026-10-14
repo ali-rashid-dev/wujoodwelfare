@@ -35,7 +35,25 @@ export const projectSchema = z.object({
     .string()
     .min(10, "Description must be at least 10 characters.")
     .max(5000, "Description cannot exceed 5000 characters."),
-  images: z.array(z.string().url("Each image must be a valid URL.")).optional().default([]),
+  images: z
+    .array(
+      z
+        .string()
+        .refine(
+          (val) => {
+            if (val.startsWith("/")) return true;
+            try {
+              new URL(val);
+              return true;
+            } catch {
+              return false;
+            }
+          },
+          { message: "Each image must be a valid URL or a relative path starting with /." }
+        )
+    )
+    .optional()
+    .default([]),
   status: projectStatusSchema.default("planned"),
   published: z.boolean().default(false),
   startDate: optionalDateSchema,
