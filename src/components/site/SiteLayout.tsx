@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
-import { CraftedBy } from "./CraftedBy";
 import { MessageCircle } from "lucide-react";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
@@ -9,7 +8,6 @@ export function SiteLayout({ children }: { children: ReactNode }) {
     <div className="min-h-dvh flex flex-col bg-background text-foreground">
       <Navbar />
       <main className="flex-1 pt-16 md:pt-20">{children}</main>
-      <CraftedBy />
       <Footer />
       <a
         href="https://wa.me/923295941457"

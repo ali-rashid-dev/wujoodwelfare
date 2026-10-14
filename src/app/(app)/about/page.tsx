@@ -2,7 +2,6 @@ import {  PageHero } from "@/components/site/SiteLayout";
 import { About } from "@/components/sections/About";
 import { WhyUs } from "@/components/sections/WhyUs";
 import { Stories } from "@/components/sections/Stories";
-import { TeamHierarchy } from "@/components/sections/TeamHierarchy";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -28,7 +27,6 @@ export default function AboutPage() {
       />
       <About />
       <WhyUs />
-      <TeamHierarchy />
       <Stories />
     </>
   );
