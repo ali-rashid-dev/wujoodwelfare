@@ -274,10 +274,11 @@ export function ProjectsManagementTable({
 
       {/* ── Filters & Action Bar ─────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl border border-border bg-card">
-        <div className="relative flex-1 min-w-[240px]">
+        <div className="relative min-w-0 flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search projects by title, slug, location, or program..."
+            aria-label="Search projects"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="pl-9 h-10 rounded-xl bg-background"
@@ -288,6 +289,7 @@ export function ProjectsManagementTable({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
+            aria-label="Filter projects by status"
             className="h-10 px-3 rounded-xl border border-input bg-background text-xs font-medium focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="all">All Statuses</option>
@@ -301,6 +303,7 @@ export function ProjectsManagementTable({
           <select
             value={publishedFilter}
             onChange={(e) => setPublishedFilter(e.target.value)}
+            aria-label="Filter projects by visibility"
             className="h-10 px-3 rounded-xl border border-input bg-background text-xs font-medium focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="all">All Visibility</option>
@@ -318,105 +321,91 @@ export function ProjectsManagementTable({
         </div>
       </div>
 
-      {/* ── Projects Table ─────────────────────────────────────── */}
-      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-muted/50 border-b border-border text-xs uppercase font-bold text-muted-foreground">
-              <tr>
-                <th className="px-5 py-3.5">Project</th>
-                <th className="px-4 py-3.5">Status</th>
-                <th className="px-4 py-3.5">Program</th>
-                <th className="px-4 py-3.5">Dates</th>
-                <th className="px-4 py-3.5">Visibility</th>
-                <th className="px-4 py-3.5">Updated</th>
-                <th className="px-5 py-3.5 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filtered.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="px-5 py-12 text-center text-muted-foreground"
-                  >
-                    <div className="max-w-sm mx-auto flex flex-col items-center">
-                      <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground mb-3">
-                        <Layers className="h-6 w-6" />
-                      </div>
-                      <p className="font-semibold text-foreground">No projects found</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {query || statusFilter !== "all" || publishedFilter !== "all"
-                          ? "Try adjusting your search criteria or filters."
-                          : "Create your first welfare project using the button above."}
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((p) => {
-                  const imgs = parseImages(p.images);
-                  const coverImg = imgs[0] || null;
-                  const statusCfg = STATUS_CONFIG[p.status as ProjectStatus] || STATUS_CONFIG.planned;
-                  const StatusIcon = statusCfg.icon;
+      {/* ── Projects ────────────────────────────────────────────── */}
+      <section aria-label="Projects" className="space-y-3">
+        <div className="flex items-center justify-between gap-3 px-1">
+          <h2 className="font-semibold text-foreground">Projects</h2>
+          <p className="text-xs text-muted-foreground">
+            Showing {filtered.length} of {totalCount}
+          </p>
+        </div>
+        {filtered.length === 0 ? (
+          <div className="rounded-2xl border border-border bg-card px-5 py-12 text-center text-muted-foreground shadow-xs">
+            <div className="mx-auto flex max-w-sm flex-col items-center">
+              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                <Layers className="h-6 w-6" />
+              </div>
+              <p className="font-semibold text-foreground">No projects found</p>
+              <p className="mt-1 text-xs">
+                {query || statusFilter !== "all" || publishedFilter !== "all"
+                  ? "Try adjusting your search criteria or filters."
+                  : "Create your first welfare project using the button above."}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map((p) => {
+              const imgs = parseImages(p.images);
+              const coverImg = imgs[0] || null;
+              const statusCfg =
+                STATUS_CONFIG[p.status as ProjectStatus] || STATUS_CONFIG.planned;
+              const StatusIcon = statusCfg.icon;
 
-                  return (
-                    <tr
-                      key={p.id}
-                      className="hover:bg-muted/30 transition-colors group"
-                    >
-                      {/* Project Info */}
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="relative h-12 w-12 rounded-xl overflow-hidden shrink-0 border border-border bg-muted">
-                            {coverImg ? (
-                              <Image
-                                src={coverImg}
-                                alt={p.title}
-                                fill
-                                className="object-cover"
-                                sizes="48px"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-primary/5">
-                                <Layers className="h-5 w-5 text-primary" />
-                              </div>
-                            )}
-                          </div>
-                          <div className="min-w-0 max-w-xs sm:max-w-md">
-                            <p className="font-bold text-foreground text-sm truncate">
-                              {p.title}
-                            </p>
-                            <p className="text-xs text-muted-foreground font-mono truncate">
-                              /{p.slug}
-                            </p>
-                            {p.location && (
-                              <p className="text-[11px] text-muted-foreground flex items-center gap-0.5 mt-0.5">
-                                <MapPin className="h-3 w-3 shrink-0" />
-                                {p.location}
-                              </p>
-                            )}
-                          </div>
+              return (
+                <article
+                  key={p.id}
+                  className="min-w-0 rounded-2xl border border-border bg-card p-4 shadow-xs transition-colors hover:border-primary/30 sm:p-5"
+                >
+                  <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-border bg-muted sm:h-14 sm:w-14">
+                      {coverImg ? (
+                        <Image
+                          src={coverImg}
+                          alt={p.title}
+                          fill
+                          className="object-cover"
+                          sizes="56px"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-primary/5 text-primary">
+                          <Layers className="h-5 w-5" />
                         </div>
-                      </td>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="break-words text-sm font-bold text-foreground sm:text-base">
+                        {p.title}
+                      </h3>
+                      <p className="truncate font-mono text-xs text-muted-foreground">
+                        /{p.slug}
+                      </p>
+                      {p.location && (
+                        <p className="mt-1 flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
+                          <MapPin className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{p.location}</span>
+                        </p>
+                      )}
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className={`shrink-0 gap-1 px-2 py-0.5 text-[11px] font-bold ${statusCfg.className}`}
+                    >
+                      <StatusIcon className="h-3 w-3" />
+                      {statusCfg.label}
+                    </Badge>
+                  </div>
 
-                      {/* Status */}
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <Badge
-                          variant="outline"
-                          className={`font-bold text-[11px] gap-1 px-2 py-0.5 ${statusCfg.className}`}
-                        >
-                          <StatusIcon className="h-3 w-3" />
-                          {statusCfg.label}
-                        </Badge>
-                      </td>
-
-                      {/* Program */}
-                      <td className="px-4 py-4 whitespace-nowrap">
+                  <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-4 border-y border-border py-4 sm:grid-cols-4 sm:gap-x-5">
+                    <div className="min-w-0">
+                      <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Program
+                      </dt>
+                      <dd className="mt-1 min-w-0">
                         {p.program ? (
                           <Badge
                             variant="secondary"
-                            className="font-medium text-xs px-2.5 py-0.5 rounded-lg max-w-[140px] truncate"
+                            className="block max-w-full truncate rounded-lg px-2.5 py-0.5 text-xs font-medium"
                             title={p.program.title}
                           >
                             {p.program.title}
@@ -424,101 +413,128 @@ export function ProjectsManagementTable({
                         ) : (
                           <span className="text-xs text-muted-foreground">—</span>
                         )}
-                      </td>
-
-                      {/* Dates */}
-                      <td className="px-4 py-4">
-                        <div className="text-xs space-y-0.5">
-                          {p.startDate ? (
-                            <div className="flex items-center gap-1 text-muted-foreground">
-                              <Calendar className="h-3 w-3 shrink-0" />
-                              <span>{formatDate(p.startDate)}</span>
-                            </div>
-                          ) : null}
-                          {p.endDate ? (
-                            <div className="flex items-center gap-1 text-muted-foreground">
-                              <span className="ml-3.5">→ {formatDate(p.endDate)}</span>
-                            </div>
-                          ) : null}
-                          {!p.startDate && !p.endDate && (
-                            <span className="text-muted-foreground">—</span>
-                          )}
-                        </div>
-                      </td>
-
-                      {/* Publish Toggle */}
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <Button
-                          variant={p.published ? "outline" : "default"}
-                          size="sm"
-                          onClick={() => handleTogglePublish(p)}
-                          disabled={isPending}
-                          className={`h-8 text-xs font-semibold rounded-lg gap-1.5 ${
-                            p.published
-                              ? "text-muted-foreground hover:text-destructive hover:border-destructive/40"
-                              : "bg-emerald-600 hover:bg-emerald-700 text-white"
-                          }`}
-                        >
-                          {p.published ? (
-                            <>
-                              <EyeOff className="h-3.5 w-3.5" />
-                              Unpublish
-                            </>
-                          ) : (
-                            <>
-                              <Globe className="h-3.5 w-3.5" />
-                              Publish
-                            </>
-                          )}
-                        </Button>
-                      </td>
-
-                      {/* Updated Date */}
-                      <td className="px-4 py-4 text-xs text-muted-foreground whitespace-nowrap">
+                      </dd>
+                    </div>
+                    <div className="min-w-0">
+                      <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Schedule
+                      </dt>
+                      <dd className="mt-1 space-y-1 text-xs text-muted-foreground">
+                        {p.startDate || p.endDate ? (
+                          <>
+                            {p.startDate && (
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3 shrink-0" />
+                                <span className="truncate">{formatDate(p.startDate)}</span>
+                              </div>
+                            )}
+                            {p.endDate && (
+                              <div className="truncate">
+                                {p.startDate ? "→ " : ""}
+                                {formatDate(p.endDate)}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <span>—</span>
+                        )}
+                      </dd>
+                    </div>
+                    <div className="min-w-0">
+                      <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Visibility
+                      </dt>
+                      <dd className="mt-1 flex items-center gap-1.5 text-xs">
+                        {p.published ? (
+                          <>
+                            <Globe className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                            <span className="font-medium text-emerald-700 dark:text-emerald-400">
+                              Published
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                            <span className="text-muted-foreground">Unpublished</span>
+                          </>
+                        )}
+                      </dd>
+                    </div>
+                    <div className="min-w-0">
+                      <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Updated
+                      </dt>
+                      <dd className="mt-1 truncate text-xs text-muted-foreground">
                         {formatDate(p.updatedAt || p.createdAt)}
-                      </td>
+                      </dd>
+                    </div>
+                  </dl>
 
-                      {/* Actions */}
-                      <td className="px-5 py-4 text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1">
-                          {p.published && (
-                            <Link
-                              href={`/projects/${p.slug}`}
-                              target="_blank"
-                              title="View on public site"
-                              className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                            </Link>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(p)}
-                            title="Edit project"
-                            className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeletePrompt(p)}
-                            title="Delete project"
-                            className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
+                    <Button
+                      variant={p.published ? "outline" : "default"}
+                      size="sm"
+                      onClick={() => handleTogglePublish(p)}
+                      disabled={isPending}
+                      className={`h-9 gap-1.5 rounded-lg text-xs font-semibold ${
+                        p.published
+                          ? "text-muted-foreground hover:border-destructive/40 hover:text-destructive"
+                          : "bg-emerald-600 text-white hover:bg-emerald-700"
+                      }`}
+                    >
+                      {p.published ? (
+                        <>
+                          <EyeOff className="h-3.5 w-3.5" />
+                          Unpublish
+                        </>
+                      ) : (
+                        <>
+                          <Globe className="h-3.5 w-3.5" />
+                          Publish
+                        </>
+                      )}
+                    </Button>
+                    <div className="ml-auto flex items-center gap-1">
+                      {p.published && (
+                        <Link
+                          href={`/projects/${p.slug}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={`View ${p.title} on public site`}
+                          title="View on public site"
+                          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Link>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(p)}
+                        aria-label={`Edit ${p.title}`}
+                        title="Edit project"
+                        className="h-9 w-9 rounded-lg p-0 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeletePrompt(p)}
+                        aria-label={`Delete ${p.title}`}
+                        title="Delete project"
+                        className="h-9 w-9 rounded-lg p-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </section>
 
       {/* ── Create / Edit Dialog ─────────────────────────────────── */}
       <ProjectFormDialog
