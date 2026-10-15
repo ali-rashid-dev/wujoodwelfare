@@ -16,11 +16,16 @@ export default async function VolunteerApplicationStatusPage() {
       ],
     },
     orderBy: { createdAt: "desc" },
-    select: { status: true },
+    select: { status: true, userId: true },
   });
 
   let role = user.role;
-  if (application?.status === "approved" && !user.banned && role !== "volunteer") {
+  if (
+    application?.status === "approved" &&
+    !user.banned &&
+    role !== "volunteer" &&
+    (application.userId === user.id || user.emailVerified)
+  ) {
     await prisma.user.update({
       where: { id: user.id },
       data: { role: "volunteer" },
