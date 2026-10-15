@@ -44,12 +44,14 @@ export type ContactSubmissionState = {
   status: "idle" | "success" | "error";
   message: string;
   fieldErrors: Partial<Record<ContactFormField, string>>;
+  fieldValues: Record<ContactFormField, string>;
 };
 
 export const initialContactSubmissionState: ContactSubmissionState = {
   status: "idle",
   message: "",
   fieldErrors: {},
+  fieldValues: { name: "", email: "", phone: "", subject: "", message: "" },
 };
 
 export const volunteerApplicationSchema = z.object({

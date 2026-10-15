@@ -1,6 +1,7 @@
 "use server";
 
 import { createHmac } from "node:crypto";
+import { isIP } from "node:net";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -27,26 +28,33 @@ const contactMessageSelect = {
 const contactMessageIdSchema = z.string().trim().min(1).max(128);
 
 function getContactFormData(formData: FormData) {
+  const getText = (key: string) => {
+    const value = formData.get(key);
+    return typeof value === "string" ? value : "";
+  };
+
   return {
-    name: formData.get("name"),
-    email: formData.get("email"),
-    phone: formData.get("phone") ?? "",
-    subject: formData.get("subject"),
-    message: formData.get("message"),
+    name: getText("name"),
+    email: getText("email"),
+    phone: getText("phone"),
+    subject: getText("subject"),
+    message: getText("message"),
   };
 }
 
 function getClientAddress(requestHeaders: Headers): string {
-  const forwardedAddress = requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim();
-  const address = forwardedAddress || requestHeaders.get("x-real-ip")?.trim();
-  return (address || "unknown").slice(0, 128);
+  const forwardedAddresses = requestHeaders.get("x-forwarded-for")?.split(",");
+  const address = forwardedAddresses?.at(-1)?.trim();
+  if (!address || isIP(address) === 0) {
+    throw new Error("Unable to determine the visitor IP address from the trusted proxy headers.");
+  }
+  return address;
 }
 
 async function consumeContactRateLimit(address: string): Promise<boolean> {
   const secret =
     process.env.BETTER_AUTH_SECRET ||
-    process.env.AUTH_SECRET ||
-    process.env.DATABASE_URL;
+    process.env.AUTH_SECRET;
   if (!secret) {
     throw new Error("A server secret is required to protect contact submissions.");
   }
@@ -79,7 +87,12 @@ export async function submitContactMessage(
   formData: FormData,
 ): Promise<ContactSubmissionState> {
   if (typeof formData.get("website") === "string" && formData.get("website")) {
-    return { status: "success", message: "Thank you for contacting us. We'll be in touch soon.", fieldErrors: {} };
+    return {
+      status: "success",
+      message: "Thank you for contacting us. We'll be in touch soon.",
+      fieldErrors: {},
+      fieldValues: { name: "", email: "", phone: "", subject: "", message: "" },
+    };
   }
 
   try {
@@ -90,6 +103,7 @@ export async function submitContactMessage(
         status: "error",
         message: "Too many messages were submitted. Please try again in 15 minutes.",
         fieldErrors: {},
+        fieldValues: getContactFormData(formData),
       };
     }
   } catch (error) {
@@ -98,6 +112,7 @@ export async function submitContactMessage(
       status: "error",
       message: "We couldn't send your message right now. Please try again later.",
       fieldErrors: {},
+      fieldValues: getContactFormData(formData),
     };
   }
 
@@ -117,6 +132,7 @@ export async function submitContactMessage(
       status: "error",
       message: "Please check the highlighted fields and try again.",
       fieldErrors,
+      fieldValues: getContactFormData(formData),
     };
   }
 
@@ -134,6 +150,7 @@ export async function submitContactMessage(
       status: "error",
       message: "We couldn't send your message right now. Please try again later.",
       fieldErrors: {},
+      fieldValues: getContactFormData(formData),
     };
   }
 
@@ -142,6 +159,7 @@ export async function submitContactMessage(
     status: "success",
     message: "Thank you for contacting us. We'll be in touch soon.",
     fieldErrors: {},
+    fieldValues: { name: "", email: "", phone: "", subject: "", message: "" },
   };
 }
 

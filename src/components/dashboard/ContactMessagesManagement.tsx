@@ -100,13 +100,34 @@ export function ContactMessagesManagement({
 }: {
   initialMessages: ContactMessageRecord[];
 }) {
-  const [messages, setMessages] = useState(initialMessages);
+  const [messageState, setMessageState] = useState({
+    source: initialMessages,
+    messages: initialMessages,
+  });
+  if (messageState.source !== initialMessages) {
+    setMessageState({ source: initialMessages, messages: initialMessages });
+  }
+  const messages =
+    messageState.source === initialMessages ? messageState.messages : initialMessages;
+  const setMessages = (update: (current: ContactMessageRecord[]) => ContactMessageRecord[]) => {
+    setMessageState((current) => ({ ...current, messages: update(current.messages) }));
+  };
+
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | ContactMessageStatus>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ContactMessageRecord | null>(null);
-  const [busyId, setBusyId] = useState<string | null>(null);
+  const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
   const pageSize = 10;
+
+  const setMessagePending = (id: string, pending: boolean) => {
+    setPendingIds((current) => {
+      const next = new Set(current);
+      if (pending) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  };
 
   const filteredMessages = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase();
@@ -128,7 +149,7 @@ export function ContactMessagesManagement({
   const selectedMessage = messages.find((message) => message.id === selectedId) ?? null;
 
   const handleStatusChange = async (id: string, status: ContactMessageStatus) => {
-    setBusyId(id);
+    setMessagePending(id, true);
     try {
       const result = await updateContactMessageStatus(id, status);
       if (!result.success) {
@@ -143,13 +164,13 @@ export function ContactMessagesManagement({
       console.error("Contact message status update request failed:", error);
       toast.error("Could not update this message.");
     } finally {
-      setBusyId(null);
+      setMessagePending(id, false);
     }
   };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
-    setBusyId(deleteTarget.id);
+    setMessagePending(deleteTarget.id, true);
     try {
       const result = await deleteContactMessage(deleteTarget.id);
       if (!result.success) {
@@ -164,7 +185,7 @@ export function ContactMessagesManagement({
       console.error("Contact message deletion request failed:", error);
       toast.error("Could not delete this message.");
     } finally {
-      setBusyId(null);
+      setMessagePending(deleteTarget.id, false);
     }
   };
 
@@ -253,13 +274,14 @@ export function ContactMessagesManagement({
               <div className="flex flex-wrap items-center gap-3 sm:justify-end">
                 <MessageStatus
                   status={message.status}
-                  disabled={busyId === message.id}
+                  disabled={pendingIds.has(message.id)}
                   onChange={(status) => void handleStatusChange(message.id, status)}
                 />
                 <Button
                   type="button"
                   variant="outline"
                   size="icon"
+                  disabled={pendingIds.has(message.id)}
                   aria-label={`Delete message from ${message.name}`}
                   onClick={() => setDeleteTarget(message)}
                 >
@@ -315,7 +337,7 @@ export function ContactMessagesManagement({
                     <dd className="mt-2">
                       <MessageStatus
                         status={selectedMessage.status}
-                        disabled={busyId === selectedMessage.id}
+                        disabled={pendingIds.has(selectedMessage.id)}
                         onChange={(status) => void handleStatusChange(selectedMessage.id, status)}
                       />
                     </dd>
@@ -331,6 +353,7 @@ export function ContactMessagesManagement({
                   <Button
                     type="button"
                     variant="destructive"
+                    disabled={pendingIds.has(selectedMessage.id)}
                     onClick={() => setDeleteTarget(selectedMessage)}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
@@ -352,16 +375,16 @@ export function ContactMessagesManagement({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={busyId === deleteTarget?.id}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteTarget ? pendingIds.has(deleteTarget.id) : false}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
-              disabled={busyId === deleteTarget?.id}
+              disabled={deleteTarget ? pendingIds.has(deleteTarget.id) : false}
               onClick={(event) => {
                 event.preventDefault();
                 void handleDelete();
               }}
             >
-              {busyId === deleteTarget?.id ? "Deleting…" : "Delete message"}
+              {deleteTarget && pendingIds.has(deleteTarget.id) ? "Deleting…" : "Delete message"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

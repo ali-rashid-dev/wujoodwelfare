@@ -63,6 +63,7 @@ export function ContactForm() {
               name={name}
               type={type}
               required={name !== "phone"}
+              defaultValue={state.fieldValues[name]}
               maxLength={name === "name" ? 100 : name === "email" ? 254 : name === "subject" ? 160 : 40}
               aria-invalid={Boolean(state.fieldErrors[name])}
               aria-describedby={state.fieldErrors[name] ? `contact-${name}-error` : undefined}
@@ -87,6 +88,7 @@ export function ContactForm() {
             minLength={10}
             maxLength={5000}
             rows={5}
+            defaultValue={state.fieldValues.message}
             aria-invalid={Boolean(state.fieldErrors.message)}
             aria-describedby={state.fieldErrors.message ? "contact-message-error" : undefined}
             className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring aria-invalid:border-destructive"
