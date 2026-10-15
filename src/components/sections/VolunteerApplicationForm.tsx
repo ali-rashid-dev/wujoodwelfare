@@ -1,12 +1,33 @@
 "use client";
 
-import { Check } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useActionState, useState } from "react";
+import { submitVolunteerApplication } from "@/actions/volunteers";
+import type { VolunteerApplicationState } from "@/actions/volunteers";
 import { volunteerApplicationSchema } from "@/validation";
 
+const initialState: VolunteerApplicationState = {
+  status: "idle",
+  message: "",
+  fieldErrors: {},
+  fieldValues: {
+    name: "",
+    father_name: "",
+    email: "",
+    phone: "",
+    city: "",
+    qualification: "",
+    gender: "",
+    skills: "",
+    availability: "",
+    statement_of_purpose: "",
+  },
+};
+
 export function VolunteerApplicationForm() {
-  const [done, setDone] = useState(false);
+  const [state, formAction, isPending] = useActionState(
+    submitVolunteerApplication,
+    initialState,
+  );
   const [sop, setSop] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -40,58 +61,73 @@ export function VolunteerApplicationForm() {
         }
       });
       setFieldErrors(errors);
-      const firstMessage = validation.error.issues[0]?.message;
-      if (firstMessage) {
-        toast.error(firstMessage);
-      }
-      return;
     }
-
-    setDone(true);
-    toast.success("Submitting your application…");
-    setTimeout(() => setDone(false), 4000);
   };
 
   return (
     <form
-      action="https://formsubmit.co/6dfc1b2a42c4f7ece057e64fbc9d2416"
-      method="POST"
+      action={formAction}
       onSubmit={handleSubmit}
       className="rounded-3xl border border-border bg-card p-8 md:p-10 shadow-blue"
     >
-      <input
-        type="hidden"
-        name="_subject"
-        value="New volunteer application — Wujood Welfare"
-      />
-      <input type="hidden" name="_template" value="table" />
-      <input type="hidden" name="_captcha" value="false" />
-      <input
-        type="text"
-        name="_honey"
-        style={{ display: "none" }}
-        tabIndex={-1}
-        autoComplete="off"
-      />
-
       <h3 className="text-xl font-semibold">Volunteer Application</h3>
       <p className="mt-1 text-sm text-muted-foreground">
-        Tell us about yourself — we&apos;ll get back within 48 hours.
+        Tell us about yourself. Once approved, sign in or create an account with
+        this email to access the volunteer portal.
       </p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <Field label="Full Name" name="name" required error={fieldErrors.name} />
-        <Field label="Father Name" name="father_name" required error={fieldErrors.father_name} />
-        <Field label="Email" name="email" type="email" required error={fieldErrors.email} />
-        <Field label="Phone" name="phone" type="tel" required error={fieldErrors.phone} />
-        <Field label="City" name="city" required error={fieldErrors.city} />
-        <Field label="Qualification" name="qualification" required error={fieldErrors.qualification} />
+        <Field
+          label="Full Name"
+          name="name"
+          required
+          defaultValue={state.fieldValues.name}
+          error={fieldErrors.name || state.fieldErrors.name}
+        />
+        <Field
+          label="Father Name"
+          name="father_name"
+          required
+          defaultValue={state.fieldValues.father_name}
+          error={fieldErrors.father_name || state.fieldErrors.father_name}
+        />
+        <Field
+          label="Email"
+          name="email"
+          type="email"
+          required
+          defaultValue={state.fieldValues.email}
+          error={fieldErrors.email || state.fieldErrors.email}
+        />
+        <Field
+          label="Phone"
+          name="phone"
+          type="tel"
+          required
+          defaultValue={state.fieldValues.phone}
+          error={fieldErrors.phone || state.fieldErrors.phone}
+        />
+        <Field
+          label="City"
+          name="city"
+          required
+          defaultValue={state.fieldValues.city}
+          error={fieldErrors.city || state.fieldErrors.city}
+        />
+        <Field
+          label="Qualification"
+          name="qualification"
+          required
+          defaultValue={state.fieldValues.qualification}
+          error={fieldErrors.qualification || state.fieldErrors.qualification}
+        />
 
         <div>
           <label className="text-sm font-medium">Gender</label>
           <select
             required
             name="gender"
+            defaultValue={state.fieldValues.gender}
             className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="">Select gender</option>
@@ -99,17 +135,18 @@ export function VolunteerApplicationForm() {
             <option>Female</option>
             <option>Other</option>
           </select>
-          {fieldErrors.gender && (
-            <p className="mt-1 text-xs text-destructive">{fieldErrors.gender}</p>
+          {(fieldErrors.gender || state.fieldErrors.gender) && (
+            <p className="mt-1 text-xs text-destructive">{fieldErrors.gender || state.fieldErrors.gender}</p>
           )}
         </div>
 
         <Field
           label="Skills"
           name="skills"
+          defaultValue={state.fieldValues.skills}
           placeholder="Teaching, medical, logistics…"
           className="md:col-span-2"
-          error={fieldErrors.skills}
+          error={fieldErrors.skills || state.fieldErrors.skills}
         />
 
         <div className="md:col-span-2">
@@ -117,6 +154,7 @@ export function VolunteerApplicationForm() {
           <select
             required
             name="availability"
+            defaultValue={state.fieldValues.availability}
             className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="">Select availability</option>
@@ -125,8 +163,8 @@ export function VolunteerApplicationForm() {
             <option>Full week</option>
             <option>One-off events</option>
           </select>
-          {fieldErrors.availability && (
-            <p className="mt-1 text-xs text-destructive">{fieldErrors.availability}</p>
+          {(fieldErrors.availability || state.fieldErrors.availability) && (
+            <p className="mt-1 text-xs text-destructive">{fieldErrors.availability || state.fieldErrors.availability}</p>
           )}
         </div>
 
@@ -148,25 +186,31 @@ export function VolunteerApplicationForm() {
             className="mt-2 w-full resize-y rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
 
-          {(sopError || fieldErrors.statement_of_purpose) && (
+          {(sopError || fieldErrors.statement_of_purpose || state.fieldErrors.statement_of_purpose) && (
             <p className="mt-1 text-xs text-destructive">
-              {fieldErrors.statement_of_purpose || `Maximum 200 words allowed. Currently ${wordCount} words.`}
+              {fieldErrors.statement_of_purpose ||
+                state.fieldErrors.statement_of_purpose ||
+                `Maximum 200 words allowed. Currently ${wordCount} words.`}
             </p>
           )}
         </div>
       </div>
 
+      {state.message && (
+        <p
+          role={state.status === "error" ? "alert" : "status"}
+          className={`mt-4 text-sm ${state.status === "error" ? "text-destructive" : "text-emerald-700 dark:text-emerald-400"}`}
+        >
+          {state.message}
+        </p>
+      )}
+
       <button
         type="submit"
+        disabled={isPending}
         className="mt-7 inline-flex items-center gap-2 rounded-full gradient-gold px-7 py-3 text-sm font-semibold text-secondary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
       >
-        {done ? (
-          <>
-            <Check className="h-4 w-4" /> Submitted
-          </>
-        ) : (
-          <>Submit Application</>
-        )}
+        {isPending ? "Submitting…" : "Submit Application"}
       </button>
     </form>
   );

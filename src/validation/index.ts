@@ -55,14 +55,20 @@ export const initialContactSubmissionState: ContactSubmissionState = {
 };
 
 export const volunteerApplicationSchema = z.object({
-  name: z.string().min(2, "Full name is required."),
-  father_name: z.string().min(2, "Father name is required."),
-  email: z.string().email("Please enter a valid email address."),
-  phone: z.string().min(7, "Phone number is required."),
-  city: z.string().min(2, "City is required."),
-  qualification: z.string().min(2, "Qualification is required."),
+  name: z.string().trim().min(2, "Full name is required.").max(100, "Full name cannot exceed 100 characters."),
+  father_name: z.string().trim().min(2, "Father name is required.").max(100, "Father name cannot exceed 100 characters."),
+  email: z.string().trim().email("Please enter a valid email address.").max(254, "Email cannot exceed 254 characters."),
+  phone: z.string().trim().min(7, "Phone number is required.").max(40, "Phone number cannot exceed 40 characters."),
+  city: z.string().trim().min(2, "City is required.").max(100, "City cannot exceed 100 characters."),
+  qualification: z.string().trim().min(2, "Qualification is required.").max(160, "Qualification cannot exceed 160 characters."),
   gender: z.enum(["Male", "Female", "Other"]),
-  skills: z.string().optional().or(z.literal("")),
+  skills: z.string().trim().max(1000, "Skills cannot exceed 1,000 characters.").optional().or(z.literal("")),
   availability: z.enum(["Weekends only", "Weekdays evenings", "Full week", "One-off events"]),
-  statement_of_purpose: z.string().min(20, "Statement of purpose must be at least 20 characters."),
-});
+  statement_of_purpose: z.string().trim().min(20, "Statement of purpose must be at least 20 characters.").max(4000, "Statement of purpose cannot exceed 4,000 characters."),
+}).refine(
+  (data) => data.statement_of_purpose.split(/\s+/).filter(Boolean).length <= 200,
+  {
+    message: "Statement of purpose cannot exceed 200 words.",
+    path: ["statement_of_purpose"],
+  },
+);

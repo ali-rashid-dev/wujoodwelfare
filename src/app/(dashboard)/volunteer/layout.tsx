@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth-server";
+import { prisma } from "@/lib/prisma";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/dashboard/AppSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -25,9 +26,31 @@ export default async function VolunteerLayout({
     redirect("/sign-in");
   }
 
-  // Strictly enforce volunteer area access
   if (user.role === "admin") {
     redirect("/admin/dashboard");
+  }
+
+  if (user.banned) {
+    redirect("/volunteer/status");
+  }
+
+  if (user.role !== "volunteer") {
+    redirect("/volunteer/status");
+  }
+
+  const approvedApplication = await prisma.volunteerApplication.findFirst({
+    where: {
+      status: "approved",
+      OR: [
+        { userId: user.id },
+        { email: { equals: user.email, mode: "insensitive" } },
+      ],
+    },
+    select: { id: true },
+  });
+
+  if (!approvedApplication) {
+    redirect("/volunteer/status");
   }
 
   return (
