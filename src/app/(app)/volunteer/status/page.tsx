@@ -19,7 +19,17 @@ export default async function VolunteerApplicationStatusPage() {
     select: { status: true },
   });
 
-  if (application?.status === "approved" && !user.banned) {
+  let role = user.role;
+  if (application?.status === "approved" && !user.banned && role !== "volunteer") {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { role: "volunteer" },
+      select: { id: true },
+    });
+    role = "volunteer";
+  }
+
+  if (application?.status === "approved" && role === "volunteer" && !user.banned) {
     redirect("/volunteer/dashboard");
   }
 

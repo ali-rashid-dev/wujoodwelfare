@@ -66,6 +66,7 @@ export function VolunteerApplicationForm() {
 
   return (
     <form
+      key={JSON.stringify(state.fieldValues)}
       action={formAction}
       onSubmit={handleSubmit}
       className="rounded-3xl border border-border bg-card p-8 md:p-10 shadow-blue"
@@ -180,7 +181,7 @@ export function VolunteerApplicationForm() {
             name="statement_of_purpose"
             required
             rows={5}
-            value={sop}
+            defaultValue={state.fieldValues.statement_of_purpose}
             onChange={(e) => setSop(e.target.value)}
             placeholder="Explain in about 200 words how you can connect with Wujood Welfare and why you want to join us."
             className="mt-2 w-full resize-y rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"

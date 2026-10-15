@@ -76,49 +76,93 @@ export async function submitVolunteerApplication(
   }
 
   const email = validation.data.email.trim().toLowerCase();
+  const session = await getServerSession();
+  const linkedUserId =
+    session?.user.emailVerified === true &&
+    session.user.email?.toLowerCase() === email
+      ? session.user.id
+      : null;
 
   try {
-    const existingApplication = await prisma.volunteerApplication.findFirst({
-      where: {
-        email: { equals: email, mode: "insensitive" },
-        status: { in: ["pending", "approved"] },
-      },
-      select: { status: true },
-    });
+    const result = await prisma.$transaction(
+      async (tx) => {
+        const existingApplication = await tx.volunteerApplication.findFirst({
+          where: {
+            email: { equals: email, mode: "insensitive" },
+            status: { in: ["pending", "approved"] },
+          },
+          select: { status: true },
+        });
 
-    if (existingApplication) {
+        if (existingApplication) {
+          return { duplicateStatus: existingApplication.status };
+        }
+
+        await tx.volunteerApplication.create({
+          data: {
+            userId: linkedUserId,
+            name: validation.data.name.trim(),
+            fatherName: validation.data.father_name.trim(),
+            email,
+            phone: validation.data.phone.trim(),
+            city: validation.data.city.trim(),
+            qualification: validation.data.qualification.trim(),
+            gender: validation.data.gender,
+            skills: validation.data.skills?.trim() ?? "",
+            availability: validation.data.availability,
+            statementOfPurpose: validation.data.statement_of_purpose.trim(),
+          },
+          select: { id: true },
+        });
+
+        return { duplicateStatus: null };
+      },
+      { isolationLevel: "Serializable" },
+    );
+
+    if (result.duplicateStatus) {
       return {
         status: "error",
         message:
-          existingApplication.status === "approved"
+          result.duplicateStatus === "approved"
             ? "An application for this email has already been approved. Sign in to access the volunteer portal."
             : "An application for this email is already under review.",
         fieldErrors: {},
         fieldValues,
       };
     }
-
-    const session = await getServerSession();
-    const linkedUserId =
-      session?.user.email?.toLowerCase() === email ? session.user.id : null;
-
-    await prisma.volunteerApplication.create({
-      data: {
-        userId: linkedUserId,
-        name: validation.data.name.trim(),
-        fatherName: validation.data.father_name.trim(),
-        email,
-        phone: validation.data.phone.trim(),
-        city: validation.data.city.trim(),
-        qualification: validation.data.qualification.trim(),
-        gender: validation.data.gender,
-        skills: validation.data.skills?.trim() ?? "",
-        availability: validation.data.availability,
-        statementOfPurpose: validation.data.statement_of_purpose.trim(),
-      },
-      select: { id: true },
-    });
   } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2034"
+    ) {
+      try {
+        const existingApplication = await prisma.volunteerApplication.findFirst({
+          where: {
+            email: { equals: email, mode: "insensitive" },
+            status: { in: ["pending", "approved"] },
+          },
+          select: { status: true },
+        });
+
+        if (existingApplication) {
+          return {
+            status: "error",
+            message:
+              existingApplication.status === "approved"
+                ? "An application for this email has already been approved. Sign in to access the volunteer portal."
+                : "An application for this email is already under review.",
+            fieldErrors: {},
+            fieldValues,
+          };
+        }
+      } catch (lookupError) {
+        console.error("Volunteer duplicate check after transaction conflict failed:", lookupError);
+      }
+    }
+
     console.error("Volunteer application submission failed:", error);
     return {
       status: "error",
@@ -261,6 +305,7 @@ export async function updateVolunteerApplicationStatus(
 
       const user = await tx.user.findFirst({
         where: {
+          emailVerified: true,
           OR: [
             ...(application.userId ? [{ id: application.userId }] : []),
             { email: { equals: application.email, mode: "insensitive" } },
