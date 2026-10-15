@@ -28,12 +28,29 @@ export const verifyEmailSchema = z.object({
 });
 
 export const contactFormSchema = z.object({
-  name: z.string().min(2, "Name is required."),
-  email: z.string().email("Please enter a valid email address."),
-  phone: z.string().min(7, "Phone number is required."),
-  subject: z.string().min(3, "Subject is required."),
-  message: z.string().min(10, "Message must be at least 10 characters."),
+  name: z.string().trim().min(2, "Name must be at least 2 characters.").max(100, "Name cannot exceed 100 characters."),
+  email: z.string().trim().email("Please enter a valid email address.").max(254, "Email cannot exceed 254 characters."),
+  phone: z.string().trim().max(40, "Phone number cannot exceed 40 characters.").optional().or(z.literal("")),
+  subject: z.string().trim().min(3, "Subject must be at least 3 characters.").max(160, "Subject cannot exceed 160 characters."),
+  message: z.string().trim().min(10, "Message must be at least 10 characters.").max(5000, "Message cannot exceed 5000 characters."),
 });
+
+export const CONTACT_MESSAGE_STATUSES = ["new", "in_progress", "resolved"] as const;
+export type ContactMessageStatus = (typeof CONTACT_MESSAGE_STATUSES)[number];
+export const contactMessageStatusSchema = z.enum(CONTACT_MESSAGE_STATUSES);
+
+export type ContactFormField = "name" | "email" | "phone" | "subject" | "message";
+export type ContactSubmissionState = {
+  status: "idle" | "success" | "error";
+  message: string;
+  fieldErrors: Partial<Record<ContactFormField, string>>;
+};
+
+export const initialContactSubmissionState: ContactSubmissionState = {
+  status: "idle",
+  message: "",
+  fieldErrors: {},
+};
 
 export const volunteerApplicationSchema = z.object({
   name: z.string().min(2, "Full name is required."),

@@ -405,6 +405,7 @@ export const ModelName = {
   Project: 'Project',
   GalleryItem: 'GalleryItem',
   ContactMessage: 'ContactMessage',
+  ContactRateLimit: 'ContactRateLimit',
   VolunteerApplication: 'VolunteerApplication',
   VolunteerOpportunity: 'VolunteerOpportunity',
   VolunteerAssignment: 'VolunteerAssignment',
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "program" | "project" | "galleryItem" | "contactMessage" | "volunteerApplication" | "volunteerOpportunity" | "volunteerAssignment" | "progressLog"
+    modelProps: "user" | "session" | "account" | "verification" | "program" | "project" | "galleryItem" | "contactMessage" | "contactRateLimit" | "volunteerApplication" | "volunteerOpportunity" | "volunteerAssignment" | "progressLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1020,6 +1021,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ContactRateLimit: {
+      payload: Prisma.$ContactRateLimitPayload<ExtArgs>
+      fields: Prisma.ContactRateLimitFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContactRateLimitFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactRateLimitPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContactRateLimitFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactRateLimitPayload>
+        }
+        findFirst: {
+          args: Prisma.ContactRateLimitFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactRateLimitPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContactRateLimitFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactRateLimitPayload>
+        }
+        findMany: {
+          args: Prisma.ContactRateLimitFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactRateLimitPayload>[]
+        }
+        create: {
+          args: Prisma.ContactRateLimitCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactRateLimitPayload>
+        }
+        createMany: {
+          args: Prisma.ContactRateLimitCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ContactRateLimitCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactRateLimitPayload>[]
+        }
+        delete: {
+          args: Prisma.ContactRateLimitDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactRateLimitPayload>
+        }
+        update: {
+          args: Prisma.ContactRateLimitUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactRateLimitPayload>
+        }
+        deleteMany: {
+          args: Prisma.ContactRateLimitDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContactRateLimitUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContactRateLimitUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactRateLimitPayload>[]
+        }
+        upsert: {
+          args: Prisma.ContactRateLimitUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactRateLimitPayload>
+        }
+        aggregate: {
+          args: Prisma.ContactRateLimitAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContactRateLimit>
+        }
+        groupBy: {
+          args: Prisma.ContactRateLimitGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContactRateLimitGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContactRateLimitCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContactRateLimitCountAggregateOutputType> | number
+        }
+      }
+    }
     VolunteerApplication: {
       payload: Prisma.$VolunteerApplicationPayload<ExtArgs>
       fields: Prisma.VolunteerApplicationFieldRefs
@@ -1484,6 +1559,15 @@ export const ContactMessageScalarFieldEnum = {
 export type ContactMessageScalarFieldEnum = (typeof ContactMessageScalarFieldEnum)[keyof typeof ContactMessageScalarFieldEnum]
 
 
+export const ContactRateLimitScalarFieldEnum = {
+  key: 'key',
+  windowStartedAt: 'windowStartedAt',
+  requests: 'requests'
+} as const
+
+export type ContactRateLimitScalarFieldEnum = (typeof ContactRateLimitScalarFieldEnum)[keyof typeof ContactRateLimitScalarFieldEnum]
+
+
 export const VolunteerApplicationScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1832,6 +1916,7 @@ export type GlobalOmitConfig = {
   project?: Prisma.ProjectOmit
   galleryItem?: Prisma.GalleryItemOmit
   contactMessage?: Prisma.ContactMessageOmit
+  contactRateLimit?: Prisma.ContactRateLimitOmit
   volunteerApplication?: Prisma.VolunteerApplicationOmit
   volunteerOpportunity?: Prisma.VolunteerOpportunityOmit
   volunteerAssignment?: Prisma.VolunteerAssignmentOmit

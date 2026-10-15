@@ -59,6 +59,7 @@ export const ModelName = {
   Project: 'Project',
   GalleryItem: 'GalleryItem',
   ContactMessage: 'ContactMessage',
+  ContactRateLimit: 'ContactRateLimit',
   VolunteerApplication: 'VolunteerApplication',
   VolunteerOpportunity: 'VolunteerOpportunity',
   VolunteerAssignment: 'VolunteerAssignment',
@@ -208,6 +209,15 @@ export const ContactMessageScalarFieldEnum = {
 } as const
 
 export type ContactMessageScalarFieldEnum = (typeof ContactMessageScalarFieldEnum)[keyof typeof ContactMessageScalarFieldEnum]
+
+
+export const ContactRateLimitScalarFieldEnum = {
+  key: 'key',
+  windowStartedAt: 'windowStartedAt',
+  requests: 'requests'
+} as const
+
+export type ContactRateLimitScalarFieldEnum = (typeof ContactRateLimitScalarFieldEnum)[keyof typeof ContactRateLimitScalarFieldEnum]
 
 
 export const VolunteerApplicationScalarFieldEnum = {

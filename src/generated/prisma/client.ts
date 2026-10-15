@@ -82,6 +82,11 @@ export type GalleryItem = Prisma.GalleryItemModel
  */
 export type ContactMessage = Prisma.ContactMessageModel
 /**
+ * Model ContactRateLimit
+ *
+ */
+export type ContactRateLimit = Prisma.ContactRateLimitModel
+/**
  * Model VolunteerApplication
  * 
  */

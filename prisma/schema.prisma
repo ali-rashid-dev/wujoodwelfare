@@ -142,10 +142,20 @@ model ContactMessage {
   phone     String?
   subject   String
   message   String
-  status    String   @default("unread") // unread, read, replied, archived
+  status    String   @default("new") // new, in_progress, resolved
   createdAt DateTime @default(now())
 
+  @@index([status, createdAt])
   @@map("contact_message")
+}
+
+model ContactRateLimit {
+  key             String   @id
+  windowStartedAt DateTime @default(now())
+  requests        Int      @default(0)
+
+  @@index([windowStartedAt])
+  @@map("contact_rate_limit")
 }
 
 model VolunteerApplication {
