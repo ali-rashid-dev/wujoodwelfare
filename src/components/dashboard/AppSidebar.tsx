@@ -35,8 +35,7 @@ import {
   Users,
   Mail,
   HandHeart,
-  Clock,
-  Compass,
+  UserRound,
   Home,
   LogOut,
   Heart,
@@ -90,9 +89,8 @@ const VOLUNTEER_NAV = [
   {
     groupLabel: "My Work",
     items: [
-      { title: "Opportunities", url: "/volunteer/opportunities", icon: Compass, exact: false },
       { title: "My Assignments", url: "/volunteer/assignments", icon: HandHeart, exact: false },
-      { title: "Progress & Hours", url: "/volunteer/progress", icon: Clock, exact: false },
+      { title: "My Profile", url: "/volunteer/profile", icon: UserRound, exact: false },
     ],
   },
 ];
@@ -295,4 +293,3 @@ export function AppSidebar({ user, role: propRole }: AppSidebarProps) {
     </Sidebar>
   );
 }
-
