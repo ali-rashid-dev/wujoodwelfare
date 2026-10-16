@@ -58,6 +58,7 @@ export const ModelName = {
   Program: 'Program',
   Project: 'Project',
   GalleryItem: 'GalleryItem',
+  ImpactStory: 'ImpactStory',
   ContactMessage: 'ContactMessage',
   ContactRateLimit: 'ContactRateLimit',
   VolunteerApplication: 'VolunteerApplication',
@@ -195,6 +196,21 @@ export const GalleryItemScalarFieldEnum = {
 } as const
 
 export type GalleryItemScalarFieldEnum = (typeof GalleryItemScalarFieldEnum)[keyof typeof GalleryItemScalarFieldEnum]
+
+
+export const ImpactStoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  role: 'role',
+  text: 'text',
+  imageUrl: 'imageUrl',
+  sortOrder: 'sortOrder',
+  published: 'published',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ImpactStoryScalarFieldEnum = (typeof ImpactStoryScalarFieldEnum)[keyof typeof ImpactStoryScalarFieldEnum]
 
 
 export const ContactMessageScalarFieldEnum = {

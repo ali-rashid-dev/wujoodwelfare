@@ -77,6 +77,11 @@ export type Project = Prisma.ProjectModel
  */
 export type GalleryItem = Prisma.GalleryItemModel
 /**
+ * Model ImpactStory
+ *
+ */
+export type ImpactStory = Prisma.ImpactStoryModel
+/**
  * Model ContactMessage
  * 
  */

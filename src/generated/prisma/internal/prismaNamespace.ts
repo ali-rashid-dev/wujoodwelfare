@@ -404,6 +404,7 @@ export const ModelName = {
   Program: 'Program',
   Project: 'Project',
   GalleryItem: 'GalleryItem',
+  ImpactStory: 'ImpactStory',
   ContactMessage: 'ContactMessage',
   ContactRateLimit: 'ContactRateLimit',
   VolunteerApplication: 'VolunteerApplication',
@@ -425,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "program" | "project" | "galleryItem" | "contactMessage" | "contactRateLimit" | "volunteerApplication" | "volunteerOpportunity" | "volunteerAssignment" | "progressLog"
+    modelProps: "user" | "session" | "account" | "verification" | "program" | "project" | "galleryItem" | "impactStory" | "contactMessage" | "contactRateLimit" | "volunteerApplication" | "volunteerOpportunity" | "volunteerAssignment" | "progressLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -944,6 +945,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.GalleryItemCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.GalleryItemCountAggregateOutputType> | number
+        }
+      }
+    }
+    ImpactStory: {
+      payload: Prisma.$ImpactStoryPayload<ExtArgs>
+      fields: Prisma.ImpactStoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ImpactStoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpactStoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ImpactStoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpactStoryPayload>
+        }
+        findFirst: {
+          args: Prisma.ImpactStoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpactStoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ImpactStoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpactStoryPayload>
+        }
+        findMany: {
+          args: Prisma.ImpactStoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpactStoryPayload>[]
+        }
+        create: {
+          args: Prisma.ImpactStoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpactStoryPayload>
+        }
+        createMany: {
+          args: Prisma.ImpactStoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ImpactStoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpactStoryPayload>[]
+        }
+        delete: {
+          args: Prisma.ImpactStoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpactStoryPayload>
+        }
+        update: {
+          args: Prisma.ImpactStoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpactStoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.ImpactStoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ImpactStoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ImpactStoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpactStoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.ImpactStoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpactStoryPayload>
+        }
+        aggregate: {
+          args: Prisma.ImpactStoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateImpactStory>
+        }
+        groupBy: {
+          args: Prisma.ImpactStoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImpactStoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ImpactStoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImpactStoryCountAggregateOutputType> | number
         }
       }
     }
@@ -1545,6 +1620,21 @@ export const GalleryItemScalarFieldEnum = {
 export type GalleryItemScalarFieldEnum = (typeof GalleryItemScalarFieldEnum)[keyof typeof GalleryItemScalarFieldEnum]
 
 
+export const ImpactStoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  role: 'role',
+  text: 'text',
+  imageUrl: 'imageUrl',
+  sortOrder: 'sortOrder',
+  published: 'published',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ImpactStoryScalarFieldEnum = (typeof ImpactStoryScalarFieldEnum)[keyof typeof ImpactStoryScalarFieldEnum]
+
+
 export const ContactMessageScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -1915,6 +2005,7 @@ export type GlobalOmitConfig = {
   program?: Prisma.ProgramOmit
   project?: Prisma.ProjectOmit
   galleryItem?: Prisma.GalleryItemOmit
+  impactStory?: Prisma.ImpactStoryOmit
   contactMessage?: Prisma.ContactMessageOmit
   contactRateLimit?: Prisma.ContactRateLimitOmit
   volunteerApplication?: Prisma.VolunteerApplicationOmit

@@ -2,6 +2,8 @@ import {  PageHero } from "@/components/site/SiteLayout";
 import { About } from "@/components/sections/About";
 import { WhyUs } from "@/components/sections/WhyUs";
 import { Stories } from "@/components/sections/Stories";
+import { getPublishedImpactStories } from "@/actions/impact-stories";
+import { connection } from "next/server";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -17,7 +19,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  await connection();
+  const impactStories = await getPublishedImpactStories();
+
   return (
     <>
       <PageHero
@@ -27,7 +32,7 @@ export default function AboutPage() {
       />
       <About />
       <WhyUs />
-      <Stories />
+      <Stories stories={impactStories} />
     </>
   );
 }

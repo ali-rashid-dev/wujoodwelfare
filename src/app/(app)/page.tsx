@@ -10,6 +10,7 @@ import { VolunteerCTA } from "@/components/sections/VolunteerCTA";
 import { getPublishedPrograms } from "@/actions/programs";
 import { getPublishedGalleryItems } from "@/actions/gallery";
 import { getPublishedProjects } from "@/actions/projects";
+import { getPublishedImpactStories } from "@/actions/impact-stories";
 import { connection } from "next/server";
 import type { Metadata } from "next";
 import { CraftedBy } from "@/components/site/CraftedBy";
@@ -28,10 +29,11 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   await connection();
-  const [publishedPrograms, galleryItems, publishedProjects] = await Promise.all([
+  const [publishedPrograms, galleryItems, publishedProjects, impactStories] = await Promise.all([
     getPublishedPrograms(),
     getPublishedGalleryItems(),
     getPublishedProjects(),
+    getPublishedImpactStories(),
   ]);
 
   return (
@@ -41,7 +43,7 @@ export default async function HomePage() {
       <ProgramsPreview items={publishedPrograms} />
       <Projects items={publishedProjects} />
       <WhyUs />
-      <Stories />
+      <Stories stories={impactStories} />
       <GalleryPreview items={galleryItems} />
       <VolunteerCTA />
       <CraftedBy />

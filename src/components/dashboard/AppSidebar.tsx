@@ -39,6 +39,7 @@ import {
   Home,
   LogOut,
   Heart,
+  Quote,
   ChevronsUpDown,
   ExternalLink,
 } from "lucide-react";
@@ -68,6 +69,7 @@ const ADMIN_NAV = [
       { title: "Programs", url: "/admin/programs", icon: Calendar, exact: false },
       { title: "Projects", url: "/admin/projects", icon: Layers, exact: false },
       { title: "Gallery", url: "/admin/gallery", icon: ImageIcon, exact: false },
+      { title: "Impact Stories", url: "/admin/stories", icon: Quote, exact: false },
     ],
   },
   {
