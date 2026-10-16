@@ -11,6 +11,7 @@ import { getPublishedPrograms } from "@/actions/programs";
 import { getPublishedGalleryItems } from "@/actions/gallery";
 import { getPublishedProjects } from "@/actions/projects";
 import { getPublishedImpactStories } from "@/actions/impact-stories";
+import { getPublicWhoWeAre } from "@/actions/who-we-are";
 import { connection } from "next/server";
 import type { Metadata } from "next";
 import { CraftedBy } from "@/components/site/CraftedBy";
@@ -29,17 +30,18 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   await connection();
-  const [publishedPrograms, galleryItems, publishedProjects, impactStories] = await Promise.all([
+  const [publishedPrograms, galleryItems, publishedProjects, impactStories, whoWeAre] = await Promise.all([
     getPublishedPrograms(),
     getPublishedGalleryItems(),
     getPublishedProjects(),
     getPublishedImpactStories(),
+    getPublicWhoWeAre(),
   ]);
 
   return (
     <>
       <Hero />
-      <About />
+      <About content={whoWeAre.content} values={whoWeAre.values} />
       <ProgramsPreview items={publishedPrograms} />
       <Projects items={publishedProjects} />
       <WhyUs />

@@ -150,6 +150,30 @@ model ImpactStory {
   @@map("impact_story")
 }
 
+model WhoWeAre {
+  id              String   @id @default("main")
+  heading         String
+  description     String
+  imageUrl        String
+  yearsExperience Int      @default(5)
+  updatedAt       DateTime @updatedAt
+
+  @@map("who_we_are")
+}
+
+model WhoWeAreValue {
+  id        String   @id @default(cuid())
+  title     String
+  text      String
+  icon      String   @default("sparkles")
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder, createdAt])
+  @@map("who_we_are_value")
+}
+
 model ContactMessage {
   id        String   @id @default(cuid())
   name      String

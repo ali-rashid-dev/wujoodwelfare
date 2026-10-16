@@ -3,6 +3,7 @@ import { About } from "@/components/sections/About";
 import { WhyUs } from "@/components/sections/WhyUs";
 import { Stories } from "@/components/sections/Stories";
 import { getPublishedImpactStories } from "@/actions/impact-stories";
+import { getPublicWhoWeAre } from "@/actions/who-we-are";
 import { connection } from "next/server";
 import type { Metadata } from "next";
 
@@ -21,7 +22,10 @@ export const metadata: Metadata = {
 
 export default async function AboutPage() {
   await connection();
-  const impactStories = await getPublishedImpactStories();
+  const [impactStories, whoWeAre] = await Promise.all([
+    getPublishedImpactStories(),
+    getPublicWhoWeAre(),
+  ]);
 
   return (
     <>
@@ -30,7 +34,7 @@ export default async function AboutPage() {
         title="A welfare home built on trust."
         subtitle="Local, transparent and human-centered. Born in Faisalabad, growing across Pakistan."
       />
-      <About />
+      <About content={whoWeAre.content} values={whoWeAre.values} />
       <WhyUs />
       <Stories stories={impactStories} />
     </>
