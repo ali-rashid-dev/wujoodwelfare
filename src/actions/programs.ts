@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-server";
+import { deleteUnreferencedUploadThingImages } from "@/lib/uploadthing-files";
 import {
   programSchema,
   programStatusSchema,
@@ -277,15 +278,19 @@ export async function deleteProgram(id: string) {
   try {
     await requireAdmin();
 
-    await prisma.program.delete({
+    const program = await prisma.program.delete({
       where: { id },
+      select: { imageUrl: true },
     });
 
     revalidatePath("/admin/programs");
     revalidatePath("/programs");
     revalidatePath("/");
 
-    return { success: true };
+    const warning = await deleteUnreferencedUploadThingImages(
+      program.imageUrl ? [program.imageUrl] : [],
+    );
+    return { success: true, warning };
   } catch (error: any) {
     console.error("Delete program failed:", error);
     return {

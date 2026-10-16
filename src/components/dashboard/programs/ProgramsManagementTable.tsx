@@ -125,6 +125,7 @@ export function ProgramsManagementTable({
       if (result.success) {
         setPrograms((prev) => prev.filter((p) => p.id !== programToDelete.id));
         toast.success(`"${programToDelete.title}" deleted.`);
+        if (result.warning) toast.warning(result.warning);
         setDeleteDialogOpen(false);
         setProgramToDelete(null);
       } else {

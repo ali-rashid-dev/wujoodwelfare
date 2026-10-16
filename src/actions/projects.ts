@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-server";
+import { deleteUnreferencedUploadThingImages } from "@/lib/uploadthing-files";
 import {
   projectSchema,
   projectStatusSchema,
@@ -346,7 +347,7 @@ export async function deleteProject(id: string) {
 
     const existing = await prisma.project.findUnique({
       where: { id },
-      select: { slug: true },
+      select: { slug: true, images: true },
     });
 
     await prisma.project.delete({ where: { id } });
@@ -358,7 +359,17 @@ export async function deleteProject(id: string) {
     }
     revalidatePath("/");
 
-    return { success: true };
+    let imageUrls: string[] = [];
+    try {
+      const parsed: unknown = JSON.parse(existing?.images ?? "[]");
+      imageUrls = Array.isArray(parsed)
+        ? parsed.filter((image): image is string => typeof image === "string")
+        : [];
+    } catch {
+      if (existing?.images) imageUrls = [existing.images];
+    }
+    const warning = await deleteUnreferencedUploadThingImages(imageUrls);
+    return { success: true, warning };
   } catch (error: any) {
     console.error("Delete project failed:", error);
     return {

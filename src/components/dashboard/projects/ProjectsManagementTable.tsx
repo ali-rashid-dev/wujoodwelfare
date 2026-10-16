@@ -174,6 +174,7 @@ export function ProjectsManagementTable({
       if (result.success) {
         setProjects((prev) => prev.filter((p) => p.id !== projectToDelete.id));
         toast.success(`"${projectToDelete.title}" deleted.`);
+        if (result.warning) toast.warning(result.warning);
         setDeleteDialogOpen(false);
         setProjectToDelete(null);
       } else {

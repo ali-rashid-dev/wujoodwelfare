@@ -30,15 +30,6 @@ interface ProgramFormDialogProps {
   onSuccess?: () => void;
 }
 
-const PRESET_IMAGES = [
-  { label: "Food Distribution", url: "/gallery-food.jpg" },
-  { label: "Medical Care", url: "/gallery-medical.jpg" },
-  { label: "Education Support", url: "/gallery-education.jpg" },
-  { label: "Warm Clothes", url: "/gallery-clothes.jpg" },
-  { label: "Community & Awareness", url: "/gallery-community.jpg" },
-  { label: "Disaster Relief Volunteers", url: "/gallery-volunteers.jpg" },
-];
-
 function slugify(text: string) {
   return text
     .toLowerCase()
@@ -307,37 +298,6 @@ export function ProgramFormDialog({
               />
             )}
 
-            {/* Presets fallback */}
-            <div>
-              <p className="text-[11px] font-medium text-muted-foreground mb-1.5">
-                Or select an existing impact asset:
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {PRESET_IMAGES.map((preset) => (
-                  <button
-                    key={preset.url}
-                    type="button"
-                    onClick={() => setImageUrl(preset.url)}
-                    className={`flex items-center gap-2 p-1.5 rounded-lg border text-left transition-all text-[11px] ${
-                      imageUrl === preset.url
-                        ? "border-primary bg-primary/10 text-primary font-semibold ring-1 ring-primary"
-                        : "border-border bg-card hover:bg-muted/70 text-foreground"
-                    }`}
-                  >
-                    <div className="relative h-8 w-8 rounded-md overflow-hidden shrink-0 bg-muted">
-                      <Image
-                        src={preset.url}
-                        alt={preset.label}
-                        fill
-                        className="object-cover"
-                        sizes="32px"
-                      />
-                    </div>
-                    <span className="truncate">{preset.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0 pt-2">
