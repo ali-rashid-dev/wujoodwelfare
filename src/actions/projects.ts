@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-server";
-import { deleteUnreferencedUploadThingImages } from "@/lib/uploadthing-files";
+import {
+  deleteUnreferencedUploadThingImages,
+  lockUploadThingImageKeys,
+} from "@/lib/uploadthing-files";
 import {
   projectSchema,
   projectStatusSchema,
@@ -178,21 +181,24 @@ export async function createProject(rawInput: unknown) {
     const now = new Date();
     const publishedAt = parsed.published ? now : null;
 
-    const project = await prisma.project.create({
-      data: {
-        title: parsed.title,
-        slug: finalSlug,
-        description: parsed.description,
-        images: JSON.stringify(parsed.images ?? []),
-        status: parsed.status,
-        published: parsed.published,
-        publishedAt,
-        startDate: parsed.startDate ? new Date(parsed.startDate) : null,
-        endDate: parsed.endDate ? new Date(parsed.endDate) : null,
-        location: parsed.location?.trim() || null,
-        programId: parsed.programId?.trim() || null,
-      },
-      select: PROJECT_SELECT,
+    const project = await prisma.$transaction(async (transaction) => {
+      await lockUploadThingImageKeys(transaction, parsed.images ?? []);
+      return transaction.project.create({
+        data: {
+          title: parsed.title,
+          slug: finalSlug,
+          description: parsed.description,
+          images: JSON.stringify(parsed.images ?? []),
+          status: parsed.status,
+          published: parsed.published,
+          publishedAt,
+          startDate: parsed.startDate ? new Date(parsed.startDate) : null,
+          endDate: parsed.endDate ? new Date(parsed.endDate) : null,
+          location: parsed.location?.trim() || null,
+          programId: parsed.programId?.trim() || null,
+        },
+        select: PROJECT_SELECT,
+      });
     });
 
     revalidatePath("/admin/projects");
@@ -237,22 +243,25 @@ export async function updateProject(id: string, rawInput: unknown) {
       publishedAt = null;
     }
 
-    const project = await prisma.project.update({
-      where: { id },
-      data: {
-        title: parsed.title,
-        slug: finalSlug,
-        description: parsed.description,
-        images: JSON.stringify(parsed.images ?? []),
-        status: parsed.status,
-        published: parsed.published,
-        publishedAt,
-        startDate: parsed.startDate ? new Date(parsed.startDate) : null,
-        endDate: parsed.endDate ? new Date(parsed.endDate) : null,
-        location: parsed.location?.trim() || null,
-        programId: parsed.programId?.trim() || null,
-      },
-      select: PROJECT_SELECT,
+    const project = await prisma.$transaction(async (transaction) => {
+      await lockUploadThingImageKeys(transaction, parsed.images ?? []);
+      return transaction.project.update({
+        where: { id },
+        data: {
+          title: parsed.title,
+          slug: finalSlug,
+          description: parsed.description,
+          images: JSON.stringify(parsed.images ?? []),
+          status: parsed.status,
+          published: parsed.published,
+          publishedAt,
+          startDate: parsed.startDate ? new Date(parsed.startDate) : null,
+          endDate: parsed.endDate ? new Date(parsed.endDate) : null,
+          location: parsed.location?.trim() || null,
+          programId: parsed.programId?.trim() || null,
+        },
+        select: PROJECT_SELECT,
+      });
     });
 
     revalidatePath("/admin/projects");
@@ -345,28 +354,26 @@ export async function deleteProject(id: string) {
   try {
     await requireAdmin();
 
-    const existing = await prisma.project.findUnique({
+    const deletedProject = await prisma.project.delete({
       where: { id },
       select: { slug: true, images: true },
     });
 
-    await prisma.project.delete({ where: { id } });
-
     revalidatePath("/admin/projects");
     revalidatePath("/projects");
-    if (existing?.slug) {
-      revalidatePath(`/projects/${existing.slug}`);
+    if (deletedProject.slug) {
+      revalidatePath(`/projects/${deletedProject.slug}`);
     }
     revalidatePath("/");
 
     let imageUrls: string[] = [];
     try {
-      const parsed: unknown = JSON.parse(existing?.images ?? "[]");
+      const parsed: unknown = JSON.parse(deletedProject.images);
       imageUrls = Array.isArray(parsed)
         ? parsed.filter((image): image is string => typeof image === "string")
         : [];
     } catch {
-      if (existing?.images) imageUrls = [existing.images];
+      if (deletedProject.images) imageUrls = [deletedProject.images];
     }
     const warning = await deleteUnreferencedUploadThingImages(imageUrls);
     return { success: true, warning };

@@ -1,10 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-server";
+import {
+  deleteUnreferencedUploadThingImages,
+  lockUploadThingImageKeys,
+} from "@/lib/uploadthing-files";
 
 const imageUrlSchema = z.string().trim().min(1).max(2048).refine((value) => {
   if (
@@ -75,46 +78,8 @@ function revalidateImpactStories() {
   revalidatePath("/");
 }
 
-function uploadThingKey(imageUrl: string): string | null {
-  try {
-    const url = new URL(imageUrl);
-    const uploadThingHost =
-      url.hostname === "ufs.sh" ||
-      url.hostname.endsWith(".ufs.sh") ||
-      url.hostname === "utfs.io" ||
-      url.hostname.endsWith(".utfs.io");
-    if (url.protocol !== "https:" || !uploadThingHost || !url.pathname.startsWith("/f/")) {
-      return null;
-    }
-    return url.pathname.slice("/f/".length);
-  } catch {
-    return null;
-  }
-}
-
 function validationError(error: unknown, fallback: string): string {
   return error instanceof z.ZodError ? error.issues[0]?.message ?? fallback : fallback;
-}
-
-async function deleteUploadedImage(
-  imageUrl: string,
-  storyId: string,
-  failureMessage: string,
-) {
-  const key = uploadThingKey(imageUrl);
-  if (!key) return undefined;
-
-  try {
-    const result = await new UTApi().deleteFiles(key);
-    if (!result.success) {
-      console.error(`UploadThing did not delete impact story image ${storyId}.`);
-      return failureMessage;
-    }
-  } catch (error) {
-    console.error(`Failed to delete uploaded impact story image ${storyId}:`, error);
-    return failureMessage;
-  }
-  return undefined;
 }
 
 export async function createImpactStory(rawInput: unknown) {
@@ -122,9 +87,12 @@ export async function createImpactStory(rawInput: unknown) {
     await requireAdmin();
     const parsed = impactStorySchema.parse(rawInput);
     const latest = await prisma.impactStory.aggregate({ _max: { sortOrder: true } });
-    const story = await prisma.impactStory.create({
-      data: { ...parsed, sortOrder: (latest._max.sortOrder ?? -1) + 1 },
-      select: impactStorySelect,
+    const story = await prisma.$transaction(async (transaction) => {
+      await lockUploadThingImageKeys(transaction, [parsed.imageUrl]);
+      return transaction.impactStory.create({
+        data: { ...parsed, sortOrder: (latest._max.sortOrder ?? -1) + 1 },
+        select: impactStorySelect,
+      });
     });
     revalidateImpactStories();
     return { success: true as const, story, warning: undefined };
@@ -148,19 +116,21 @@ export async function updateImpactStory(id: string, rawInput: unknown) {
     });
     if (!existing) return { success: false as const, error: "Impact story was not found." };
 
-    const story = await prisma.impactStory.update({
-      where: { id: parsedId },
-      data: parsed,
-      select: impactStorySelect,
+    const story = await prisma.$transaction(async (transaction) => {
+      await lockUploadThingImageKeys(transaction, [parsed.imageUrl]);
+      return transaction.impactStory.update({
+        where: { id: parsedId },
+        data: parsed,
+        select: impactStorySelect,
+      });
     });
     revalidateImpactStories();
 
     const warning =
       existing.imageUrl === parsed.imageUrl
         ? undefined
-        : await deleteUploadedImage(
-            existing.imageUrl,
-            parsedId,
+        : await deleteUnreferencedUploadThingImages(
+            [existing.imageUrl],
             "The story was updated, but its previous uploaded image could not be removed.",
           );
     return { success: true as const, story, warning };
@@ -209,13 +179,12 @@ export async function deleteImpactStory(id: string) {
     });
     if (!existing) return { success: false as const, error: "Impact story was not found." };
 
-    await prisma.impactStory.delete({ where: { id: parsedId } });
+    const deletedStory = await prisma.impactStory.delete({
+      where: { id: parsedId },
+      select: { imageUrl: true },
+    });
     revalidateImpactStories();
-    const warning = await deleteUploadedImage(
-      existing.imageUrl,
-      parsedId,
-      "The story was deleted, but its uploaded image could not be removed.",
-    );
+    const warning = await deleteUnreferencedUploadThingImages([deletedStory.imageUrl]);
     return { success: true as const, warning };
   } catch (error) {
     console.error("Delete impact story failed:", error);

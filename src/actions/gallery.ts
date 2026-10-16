@@ -1,10 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-server";
+import {
+  deleteUnreferencedUploadThingImages,
+  lockUploadThingImageKeys,
+} from "@/lib/uploadthing-files";
 
 const galleryImageUrlSchema = z.string().min(1).max(2048).refine((value) => {
   if (value.startsWith("/") && !value.startsWith("//") && !value.includes("\\") && !value.includes("..")) {
@@ -88,23 +91,6 @@ function galleryActionErrorMessage(error: unknown, fallback: string): string {
   return error instanceof z.ZodError ? error.issues[0]?.message ?? fallback : fallback;
 }
 
-function uploadThingKey(imageUrl: string): string | null {
-  try {
-    const url = new URL(imageUrl);
-    const uploadThingHost =
-      url.hostname === "ufs.sh" ||
-      url.hostname.endsWith(".ufs.sh") ||
-      url.hostname === "utfs.io" ||
-      url.hostname.endsWith(".utfs.io");
-    if (url.protocol !== "https:" || !uploadThingHost || !url.pathname.startsWith("/f/")) {
-      return null;
-    }
-    return url.pathname.slice("/f/".length);
-  } catch {
-    return null;
-  }
-}
-
 export async function createGalleryItem(rawInput: unknown) {
   try {
     await requireAdmin();
@@ -118,16 +104,19 @@ export async function createGalleryItem(rawInput: unknown) {
       if (!project) return { success: false, error: "Selected project was not found." };
     }
 
-    const item = await prisma.galleryItem.create({
-      data: {
-        title: parsed.title,
-        category: parsed.category,
-        imageUrl: parsed.imageUrl,
-        description: parsed.description || null,
-        published: parsed.published,
-        projectId: parsed.projectId || null,
-      },
-      select: galleryItemSelect,
+    const item = await prisma.$transaction(async (transaction) => {
+      await lockUploadThingImageKeys(transaction, [parsed.imageUrl]);
+      return transaction.galleryItem.create({
+        data: {
+          title: parsed.title,
+          category: parsed.category,
+          imageUrl: parsed.imageUrl,
+          description: parsed.description || null,
+          published: parsed.published,
+          projectId: parsed.projectId || null,
+        },
+        select: galleryItemSelect,
+      });
     });
 
     revalidateGallery();
@@ -212,30 +201,14 @@ export async function deleteGalleryItem(id: string) {
     });
     if (!existing) return { success: false, error: "Gallery image was not found." };
 
-    await prisma.galleryItem.delete({ where: { id } });
+    const deletedItem = await prisma.galleryItem.delete({
+      where: { id },
+      select: { imageUrl: true },
+    });
     revalidateGallery();
 
-    const key = uploadThingKey(existing.imageUrl);
-    if (!key) return { success: true };
-
-    try {
-      const result = await new UTApi().deleteFiles(key);
-      if (!result.success) {
-        console.error(`UploadThing did not delete gallery image ${id}.`);
-        return {
-          success: true,
-          warning: "The gallery entry was deleted, but its stored image could not be removed.",
-        };
-      }
-    } catch (error) {
-      console.error(`Failed to delete stored gallery image ${id}:`, error);
-      return {
-        success: true,
-        warning: "The gallery entry was deleted, but its stored image could not be removed.",
-      };
-    }
-
-    return { success: true };
+    const warning = await deleteUnreferencedUploadThingImages([deletedItem.imageUrl]);
+    return { success: true, warning };
   } catch (error) {
     console.error("Delete gallery item failed:", error);
     return {

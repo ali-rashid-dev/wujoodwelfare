@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-server";
-import { deleteUnreferencedUploadThingImages } from "@/lib/uploadthing-files";
+import {
+  deleteUnreferencedUploadThingImages,
+  lockUploadThingImageKeys,
+} from "@/lib/uploadthing-files";
 import {
   programSchema,
   programStatusSchema,
@@ -132,15 +135,18 @@ export async function createProgram(rawInput: unknown) {
     const parsed = programSchema.parse(rawInput);
     const finalSlug = await ensureUniqueSlug(parsed.slug || parsed.title);
 
-    const program = await prisma.program.create({
-      data: {
-        title: parsed.title,
-        slug: finalSlug,
-        category: parsed.category,
-        description: parsed.description,
-        status: parsed.status,
-        imageUrl: parsed.imageUrl ? parsed.imageUrl.trim() : null,
-      },
+    const program = await prisma.$transaction(async (transaction) => {
+      await lockUploadThingImageKeys(transaction, parsed.imageUrl ? [parsed.imageUrl] : []);
+      return transaction.program.create({
+        data: {
+          title: parsed.title,
+          slug: finalSlug,
+          category: parsed.category,
+          description: parsed.description,
+          status: parsed.status,
+          imageUrl: parsed.imageUrl ? parsed.imageUrl.trim() : null,
+        },
+      });
     });
 
     revalidatePath("/admin/programs");
@@ -177,16 +183,19 @@ export async function updateProgram(id: string, rawInput: unknown) {
     const baseSlug = parsed.slug || parsed.title;
     const finalSlug = await ensureUniqueSlug(baseSlug, id);
 
-    const program = await prisma.program.update({
-      where: { id },
-      data: {
-        title: parsed.title,
-        slug: finalSlug,
-        category: parsed.category,
-        description: parsed.description,
-        status: parsed.status,
-        imageUrl: parsed.imageUrl ? parsed.imageUrl.trim() : null,
-      },
+    const program = await prisma.$transaction(async (transaction) => {
+      await lockUploadThingImageKeys(transaction, parsed.imageUrl ? [parsed.imageUrl] : []);
+      return transaction.program.update({
+        where: { id },
+        data: {
+          title: parsed.title,
+          slug: finalSlug,
+          category: parsed.category,
+          description: parsed.description,
+          status: parsed.status,
+          imageUrl: parsed.imageUrl ? parsed.imageUrl.trim() : null,
+        },
+      });
     });
 
     revalidatePath("/admin/programs");

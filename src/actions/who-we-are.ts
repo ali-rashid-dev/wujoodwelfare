@@ -6,6 +6,11 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-server";
 import { DEFAULT_WHO_WE_ARE } from "@/lib/who-we-are-defaults";
+import {
+  deleteUnreferencedUploadThingImages,
+  lockUploadThingImageKeys,
+  uploadThingKey,
+} from "@/lib/uploadthing-files";
 
 const imageUrlSchema = z.string().trim().min(1).max(2048).refine((value) => {
   if (
@@ -107,49 +112,11 @@ function errorMessage(error: unknown, fallback: string) {
   return error instanceof z.ZodError ? error.issues[0]?.message ?? fallback : fallback;
 }
 
-function uploadThingKey(imageUrl: string): string | null {
-  try {
-    const url = new URL(imageUrl);
-    const uploadThingHost =
-      url.hostname === "ufs.sh" ||
-      url.hostname.endsWith(".ufs.sh") ||
-      url.hostname === "utfs.io" ||
-      url.hostname.endsWith(".utfs.io");
-    if (url.protocol !== "https:" || !uploadThingHost || !url.pathname.startsWith("/f/")) {
-      return null;
-    }
-    return url.pathname.slice("/f/".length);
-  } catch {
-    return null;
-  }
-}
-
 async function deleteOldImage(imageUrl: string) {
-  const key = uploadThingKey(imageUrl);
-  if (!key) return undefined;
-  let current;
-  try {
-    current = await prisma.whoWeAre.findUnique({
-      where: { id: "main" },
-      select: { imageUrl: true },
-    });
-  } catch (error) {
-    console.error("Could not verify the previous Who We Are image before deletion:", error);
-    return "Content was saved, but the previous uploaded image could not be verified for safe removal.";
-  }
-  if (current && uploadThingKey(current.imageUrl) === key) return undefined;
-
-  try {
-    const result = await new UTApi().deleteFiles(key);
-    if (!result.success) {
-      console.error("UploadThing did not delete the previous Who We Are image.");
-      return "Content was saved, but the previous uploaded image could not be removed.";
-    }
-  } catch (error) {
-    console.error("Failed to delete previous Who We Are image:", error);
-    return "Content was saved, but the previous uploaded image could not be removed.";
-  }
-  return undefined;
+  return deleteUnreferencedUploadThingImages(
+    [imageUrl],
+    "Content was saved, but the previous uploaded image could not be removed.",
+  );
 }
 
 function isUniqueConstraintError(error: unknown): boolean {
@@ -166,6 +133,7 @@ export async function updateWhoWeAre(rawInput: unknown) {
     let saveResult;
     try {
       saveResult = await prisma.$transaction(async (transaction) => {
+        await lockUploadThingImageKeys(transaction, [data.imageUrl]);
         if (replacementKey) {
           const pendingUpload = await transaction.whoWeArePendingUpload.findFirst({
             where: { fileKey: replacementKey, uploadedBy: admin.id },
@@ -256,30 +224,38 @@ export async function discardWhoWeAreImageUpload(rawImageUrl: unknown) {
     const key = uploadThingKey(imageUrl);
     if (!key) return { success: true as const };
 
-    const publishedImage = await prisma.whoWeAre.findUnique({
-      where: { id: "main" },
-      select: { imageUrl: true },
-    });
-    if (publishedImage && uploadThingKey(publishedImage.imageUrl) === key) {
-      return {
-        success: false as const,
-        error: "The currently published Who We Are image cannot be discarded.",
-      };
-    }
-
-    const pendingUpload = await prisma.whoWeArePendingUpload.deleteMany({
-      where: { fileKey: key, uploadedBy: admin.id },
-    });
-    if (pendingUpload.count !== 1) {
-      return {
-        success: false as const,
-        error: "Only a pending upload from this Who We Are form can be discarded.",
-      };
-    }
-
     try {
-      const result = await new UTApi().deleteFiles(key);
-      if (!result.success) throw new Error("UploadThing did not delete the pending image.");
+      const discarded = await prisma.$transaction(async (transaction) => {
+        await lockUploadThingImageKeys(transaction, [imageUrl]);
+        const publishedImage = await transaction.whoWeAre.findUnique({
+          where: { id: "main" },
+          select: { imageUrl: true },
+        });
+        if (publishedImage && uploadThingKey(publishedImage.imageUrl) === key) {
+          return "published" as const;
+        }
+
+        const pendingUpload = await transaction.whoWeArePendingUpload.deleteMany({
+          where: { fileKey: key, uploadedBy: admin.id },
+        });
+        if (pendingUpload.count !== 1) return "not-pending" as const;
+
+        const result = await new UTApi().deleteFiles(key);
+        if (!result.success) throw new Error("UploadThing did not delete the pending image.");
+        return "deleted" as const;
+      });
+      if (discarded === "published") {
+        return {
+          success: false as const,
+          error: "The currently published Who We Are image cannot be discarded.",
+        };
+      }
+      if (discarded === "not-pending") {
+        return {
+          success: false as const,
+          error: "Only a pending upload from this Who We Are form can be discarded.",
+        };
+      }
       return { success: true as const };
     } catch (error) {
       console.error("Failed to delete a cancelled Who We Are image upload:", error);
