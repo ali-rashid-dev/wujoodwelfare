@@ -53,7 +53,7 @@ export async function deleteUnreferencedUploadThingImages(
 
   try {
     return await prisma.$transaction(async (transaction) => {
-      await lockUploadThingImageKeys(transaction, keys);
+      await lockUploadThingImageKeys(transaction, imageUrls);
       const [programs, projects, galleryItems, impactStories, whoWeAre] = await Promise.all([
         transaction.program.findMany({ select: { imageUrl: true } }),
         transaction.project.findMany({ select: { images: true } }),
