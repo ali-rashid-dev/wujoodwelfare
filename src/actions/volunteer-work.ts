@@ -97,16 +97,33 @@ export async function updateVolunteerProfile(
   }
 
   try {
-    await prisma.user.update({
-      where: { id: user.id },
+    const updated = await prisma.volunteerApplication.updateMany({
+      where: {
+        id: user.volunteerApplication.id,
+        status: "approved",
+        OR: [
+          { userId: user.id },
+          ...(user.volunteerApplication.userId === null && user.emailVerified
+            ? [{ userId: null, email: { equals: user.email, mode: "insensitive" as const } }]
+            : []),
+        ],
+      },
       data: {
         ...validation.data,
-        phone: validation.data.phone || null,
-        city: validation.data.city || null,
-        skills: validation.data.skills || null,
+        email: user.email,
+        phone: validation.data.phone,
+        city: validation.data.city,
+        skills: validation.data.skills,
+        userId: user.id,
       },
-      select: { id: true },
     });
+    if (updated.count !== 1) {
+      return {
+        success: false,
+        message: "Your approved volunteer profile could not be found.",
+        fieldErrors: {},
+      };
+    }
   } catch (error) {
     console.error("Volunteer profile update failed:", error);
     return {
@@ -118,5 +135,7 @@ export async function updateVolunteerProfile(
 
   revalidatePath("/volunteer/profile");
   revalidatePath("/volunteer/dashboard");
+  revalidatePath("/admin/approved-volunteers");
+  revalidatePath("/admin/volunteers");
   return { success: true, message: "Profile updated.", fieldErrors: {} };
 }

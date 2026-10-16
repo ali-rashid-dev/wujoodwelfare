@@ -26,11 +26,11 @@ export default async function VolunteerProfilePage() {
 
       <VolunteerProfileForm
         profile={{
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          city: user.city,
-          skills: user.skills,
+          name: user.volunteerApplication.name,
+          email: user.volunteerApplication.email,
+          phone: user.volunteerApplication.phone,
+          city: user.volunteerApplication.city,
+          skills: user.volunteerApplication.skills,
         }}
       />
     </div>

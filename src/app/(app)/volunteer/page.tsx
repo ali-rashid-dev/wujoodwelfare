@@ -1,6 +1,8 @@
-import { VolunteerApplicationForm } from "@/components/sections/VolunteerApplicationForm";
 import { Reveal } from "@/components/site/Reveal";
 import { PageHero } from "@/components/site/SiteLayout";
+import { getCurrentUser } from "@/lib/auth-server";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Check, HandHeart } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -17,7 +19,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function VolunteerPage() {
+export default async function VolunteerPage() {
+  const user = await getCurrentUser();
+  if (user) {
+    redirect(user.role === "admin" ? "/admin/dashboard" : "/volunteer/status");
+  }
+
   return (
     <>
       <PageHero
@@ -55,7 +62,27 @@ export default function VolunteerPage() {
         </Reveal>
 
         <Reveal delay={1} className="lg:col-span-3">
-          <VolunteerApplicationForm />
+          <div className="rounded-3xl border border-border bg-card p-8 shadow-blue md:p-10">
+            <h3 className="text-xl font-semibold">Apply to volunteer</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Sign in or create an account first. Your volunteer application form
+              will be available after you sign in.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                href="/sign-in"
+                className="inline-flex rounded-full gradient-gold px-6 py-3 text-sm font-semibold text-secondary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/sign-up"
+                className="inline-flex rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+              >
+                Create an account
+              </Link>
+            </div>
+          </div>
         </Reveal>
       </section>
     </>

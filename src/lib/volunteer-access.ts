@@ -17,9 +17,6 @@ export async function requireApprovedVolunteer() {
       image: true,
       role: true,
       banned: true,
-      phone: true,
-      city: true,
-      skills: true,
     },
   });
 
@@ -33,16 +30,29 @@ export async function requireApprovedVolunteer() {
       OR: [
         { userId: user.id },
         ...(user.emailVerified
-          ? [{ email: { equals: user.email, mode: "insensitive" as const } }]
+          ? [{ userId: null, email: { equals: user.email, mode: "insensitive" as const } }]
           : []),
       ],
     },
-    select: { id: true },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      userId: true,
+      name: true,
+      email: true,
+      phone: true,
+      city: true,
+      skills: true,
+    },
   });
 
   if (!approvedApplication) {
     throw new Error("Forbidden: Approved volunteer access required");
   }
 
-  return user;
+  return {
+    ...user,
+    name: approvedApplication.name,
+    volunteerApplication: approvedApplication,
+  };
 }

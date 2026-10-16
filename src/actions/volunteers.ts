@@ -38,20 +38,45 @@ const applicationFields: VolunteerApplicationField[] = [
   "statement_of_purpose",
 ];
 
-function getApplicationValues(formData: FormData) {
-  return Object.fromEntries(
-    applicationFields.map((field) => {
-      const value = formData.get(field);
-      return [field, typeof value === "string" ? value : ""];
-    }),
-  ) as Record<VolunteerApplicationField, string>;
+function getApplicationValues(formData: FormData, email: string) {
+  return {
+    ...Object.fromEntries(
+      applicationFields.map((field) => {
+        if (field === "email") return [field, email];
+        const value = formData.get(field);
+        return [field, typeof value === "string" ? value : ""];
+      }),
+    ),
+    email,
+  } as Record<VolunteerApplicationField, string>;
 }
 
 export async function submitVolunteerApplication(
   _previousState: VolunteerApplicationState,
   formData: FormData,
 ): Promise<VolunteerApplicationState> {
-  const fieldValues = getApplicationValues(formData);
+  const session = await getServerSession();
+  const email = session?.user.email?.trim() ?? "";
+  const fieldValues = getApplicationValues(formData, email);
+
+  if (!session?.user || !email) {
+    return {
+      status: "error",
+      message: "Sign in to your account before submitting a volunteer application.",
+      fieldErrors: {},
+      fieldValues,
+    };
+  }
+
+  if (!session.user.emailVerified) {
+    return {
+      status: "error",
+      message: "Verify your account email before submitting a volunteer application.",
+      fieldErrors: {},
+      fieldValues,
+    };
+  }
+
   const validation = volunteerApplicationSchema.safeParse(fieldValues);
 
   if (!validation.success) {
@@ -75,14 +100,6 @@ export async function submitVolunteerApplication(
     };
   }
 
-  const email = validation.data.email.trim().toLowerCase();
-  const session = await getServerSession();
-  const linkedUserId =
-    session?.user.emailVerified === true &&
-    session.user.email?.toLowerCase() === email
-      ? session.user.id
-      : null;
-
   try {
     const result = await prisma.$transaction(
       async (tx) => {
@@ -100,7 +117,7 @@ export async function submitVolunteerApplication(
 
         await tx.volunteerApplication.create({
           data: {
-            userId: linkedUserId,
+            userId: session.user.id,
             name: validation.data.name.trim(),
             fatherName: validation.data.father_name.trim(),
             email,
@@ -218,27 +235,37 @@ export async function getAdminVolunteerManagement() {
     },
   });
 
+  const approvedApplications = applications.filter(
+    (application) => application.status === "approved",
+  );
+  const approvedUserIds = [
+    ...new Set(
+      approvedApplications
+        .map((application) => application.userId)
+        .filter((userId): userId is string => userId !== null),
+    ),
+  ];
   const approvedEmails = [
     ...new Set(
-      applications
-        .filter((application) => application.status === "approved")
+      approvedApplications
+        .filter((application) => application.userId === null)
         .map((application) => application.email),
     ),
   ];
 
-  const users = approvedEmails.length
+  const users = approvedEmails.length || approvedUserIds.length
     ? await prisma.user.findMany({
-        where: {
-          email: { in: approvedEmails, mode: "insensitive" },
-        },
+        where: { OR: [
+          ...(approvedUserIds.length ? [{ id: { in: approvedUserIds } }] : []),
+          ...(approvedEmails.length
+            ? [{ email: { in: approvedEmails, mode: "insensitive" as const } }]
+            : []),
+        ] },
         select: {
           id: true,
           name: true,
           email: true,
           role: true,
-          phone: true,
-          city: true,
-          skills: true,
           banned: true,
           assignments: {
             orderBy: { createdAt: "desc" },
@@ -264,8 +291,9 @@ export async function getAdminVolunteerManagement() {
       account:
         users.find(
           (user) =>
-            user.id === application.userId ||
-            user.email.toLowerCase() === application.email.toLowerCase(),
+            (application.userId !== null && user.id === application.userId) ||
+            (application.userId === null &&
+              user.email.toLowerCase() === application.email.toLowerCase()),
         ) ?? null,
     }));
 
@@ -291,10 +319,6 @@ export async function updateVolunteerApplicationStatus(
           id: true,
           userId: true,
           email: true,
-          name: true,
-          phone: true,
-          city: true,
-          skills: true,
           status: true,
         },
       });
@@ -306,10 +330,9 @@ export async function updateVolunteerApplicationStatus(
       const user = await tx.user.findFirst({
         where: {
           emailVerified: true,
-          OR: [
-            ...(application.userId ? [{ id: application.userId }] : []),
-            { email: { equals: application.email, mode: "insensitive" } },
-          ],
+          ...(application.userId
+            ? { id: application.userId }
+            : { email: { equals: application.email, mode: "insensitive" as const } }),
         },
         select: { id: true, role: true },
       });
@@ -329,10 +352,6 @@ export async function updateVolunteerApplicationStatus(
           where: { id: user.id },
           data: {
             role: "volunteer",
-            name: application.name,
-            phone: application.phone,
-            city: application.city,
-            skills: application.skills,
           },
         });
       }
@@ -348,6 +367,7 @@ export async function updateVolunteerApplicationStatus(
     }
 
     revalidatePath("/admin/volunteers");
+    revalidatePath("/admin/approved-volunteers");
     revalidatePath("/volunteer/dashboard");
     revalidatePath("/volunteer/status");
     return {
@@ -385,7 +405,7 @@ export async function createVolunteerAssignment(
           status: "approved",
           OR: [
             { userId: volunteer.id },
-            { email: { equals: volunteer.email, mode: "insensitive" } },
+            { userId: null, email: { equals: volunteer.email, mode: "insensitive" } },
           ],
         },
         select: { id: true },
@@ -418,6 +438,7 @@ export async function createVolunteerAssignment(
   }
 
   revalidatePath("/admin/volunteers");
+  revalidatePath("/admin/approved-volunteers");
   revalidatePath("/volunteer/dashboard");
   return { success: true as const };
 }

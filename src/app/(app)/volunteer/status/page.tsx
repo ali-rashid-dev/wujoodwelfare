@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
+import { VolunteerApplicationForm } from "@/components/sections/VolunteerApplicationForm";
 
 export default async function VolunteerApplicationStatusPage() {
   const user = await getCurrentUser();
@@ -12,11 +12,26 @@ export default async function VolunteerApplicationStatusPage() {
     where: {
       OR: [
         { userId: user.id },
-        { email: { equals: user.email, mode: "insensitive" } },
+        ...(user.emailVerified
+          ? [{ userId: null, email: { equals: user.email, mode: "insensitive" as const } }]
+          : []),
       ],
     },
     orderBy: { createdAt: "desc" },
-    select: { status: true, userId: true },
+    select: {
+      status: true,
+      userId: true,
+      name: true,
+      fatherName: true,
+      email: true,
+      phone: true,
+      city: true,
+      qualification: true,
+      gender: true,
+      skills: true,
+      availability: true,
+      statementOfPurpose: true,
+    },
   });
 
   let role = user.role;
@@ -44,7 +59,7 @@ export default async function VolunteerApplicationStatusPage() {
       ? "Your application is under review"
       : application?.status === "rejected"
         ? "Your application was not approved"
-        : "Apply to become a volunteer";
+        : "Volunteers";
 
   const message = user.banned
     ? "Your account is currently inactive. Please contact the Wujood Welfare team for assistance."
@@ -53,6 +68,11 @@ export default async function VolunteerApplicationStatusPage() {
       : application?.status === "rejected"
         ? "Your application was not approved. You can submit a new application with updated information."
         : "Volunteer portal access is available only after an administrator approves your application.";
+
+  const canApply =
+    !user.banned &&
+    application?.status !== "pending" &&
+    user.emailVerified;
 
   return (
     <main className="container-x section-y">
@@ -66,15 +86,35 @@ export default async function VolunteerApplicationStatusPage() {
         <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
           {message}
         </p>
-        {!user.banned && application?.status !== "pending" && (
-          <Link
-            href="/volunteer"
-            className="mt-6 inline-flex rounded-full gradient-gold px-6 py-3 text-sm font-semibold text-secondary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
-          >
-            {application?.status === "rejected" ? "Submit a new application" : "View application"}
-          </Link>
-        )}
       </section>
+      {!user.banned &&
+        application?.status !== "pending" &&
+        (canApply ? (
+          <section className="mx-auto mt-8 max-w-3xl">
+            <VolunteerApplicationForm
+              email={user.email}
+              initialValues={
+                application
+                  ? {
+                      name: application.name,
+                      father_name: application.fatherName ?? "",
+                      phone: application.phone,
+                      city: application.city,
+                      qualification: application.qualification,
+                      gender: application.gender,
+                      skills: application.skills,
+                      availability: application.availability,
+                      statement_of_purpose: application.statementOfPurpose ?? "",
+                    }
+                  : undefined
+              }
+            />
+          </section>
+        ) : (
+          <p className="mx-auto mt-6 max-w-2xl text-sm text-destructive">
+            Verify your sign-in email before submitting a volunteer application.
+          </p>
+        ))}
     </main>
   );
 }

@@ -43,10 +43,13 @@ export default async function VolunteerLayout({
       status: "approved",
       OR: [
         { userId: user.id },
-        { email: { equals: user.email, mode: "insensitive" } },
+        ...(user.emailVerified
+          ? [{ userId: null, email: { equals: user.email, mode: "insensitive" as const } }]
+          : []),
       ],
     },
-    select: { id: true },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, name: true },
   });
 
   if (!approvedApplication) {
@@ -57,7 +60,7 @@ export default async function VolunteerLayout({
     <RoleProvider key={user.id} userId={user.id} role="volunteer">
       <SidebarProvider defaultOpen={true}>
         <div className="relative flex min-h-screen w-full bg-background text-foreground antialiased">
-          <AppSidebar user={user} role="volunteer" />
+          <AppSidebar user={{ ...user, name: approvedApplication.name }} role="volunteer" />
           <SidebarInset className="flex flex-1 flex-col min-w-0 bg-muted/15">
             <DashboardHeader role="volunteer" />
             <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">

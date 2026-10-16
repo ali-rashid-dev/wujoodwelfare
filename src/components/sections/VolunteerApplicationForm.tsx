@@ -2,7 +2,10 @@
 
 import { useActionState, useState } from "react";
 import { submitVolunteerApplication } from "@/actions/volunteers";
-import type { VolunteerApplicationState } from "@/actions/volunteers";
+import type {
+  VolunteerApplicationField,
+  VolunteerApplicationState,
+} from "@/actions/volunteers";
 import { volunteerApplicationSchema } from "@/validation";
 
 const initialState: VolunteerApplicationState = {
@@ -23,12 +26,23 @@ const initialState: VolunteerApplicationState = {
   },
 };
 
-export function VolunteerApplicationForm() {
+export function VolunteerApplicationForm({
+  email,
+  initialValues = {},
+}: {
+  email: string;
+  initialValues?: Partial<Record<VolunteerApplicationField, string>>;
+}) {
+  const initialFieldValues = {
+    ...initialState.fieldValues,
+    ...initialValues,
+    email,
+  };
   const [state, formAction, isPending] = useActionState(
     submitVolunteerApplication,
-    initialState,
+    { ...initialState, fieldValues: initialFieldValues },
   );
-  const [sop, setSop] = useState("");
+  const [sop, setSop] = useState(initialFieldValues.statement_of_purpose);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const wordCount = sop.trim().split(/\s+/).filter(Boolean).length;
@@ -73,8 +87,7 @@ export function VolunteerApplicationForm() {
     >
       <h3 className="text-xl font-semibold">Volunteer Application</h3>
       <p className="mt-1 text-sm text-muted-foreground">
-        Tell us about yourself. Once approved, sign in or create an account with
-        this email to access the volunteer portal.
+        Tell us about yourself. Your application email is linked to your sign-in account.
       </p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -97,6 +110,7 @@ export function VolunteerApplicationForm() {
           name="email"
           type="email"
           required
+          readOnly
           defaultValue={state.fieldValues.email}
           error={fieldErrors.email || state.fieldErrors.email}
         />
