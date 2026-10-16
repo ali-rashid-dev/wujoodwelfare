@@ -44,6 +44,7 @@ export async function updateVolunteerAssignment(rawInput: unknown) {
       where: {
         id: assignmentId,
         userId: user.id,
+        opportunityId: null,
         status: allowedPreviousStatuses[status],
       },
       data: {

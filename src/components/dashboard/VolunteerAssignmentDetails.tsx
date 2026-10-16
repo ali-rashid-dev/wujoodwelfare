@@ -7,15 +7,41 @@ import { format } from "date-fns";
 import { ArrowLeft, CalendarDays, Check, MapPin, Play, X } from "lucide-react";
 import { toast } from "sonner";
 import { updateVolunteerAssignment } from "@/actions/volunteer-work";
+import { updateOpportunityParticipation } from "@/actions/work-opportunities";
 import type { VolunteerAssignmentModel } from "@/generated/prisma/models/VolunteerAssignment";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type Assignment = Pick<
   VolunteerAssignmentModel,
-  "id" | "title" | "description" | "location" | "status" | "priority" | "deadline" | "createdAt" | "volunteerNotes"
->;
+  | "id"
+  | "title"
+  | "description"
+  | "location"
+  | "status"
+  | "priority"
+  | "deadline"
+  | "createdAt"
+  | "volunteerNotes"
+  | "opportunityId"
+> & {
+  opportunity: {
+    status: string;
+    date: Date | null;
+    startTime: string | null;
+    endTime: string | null;
+  } | null;
+};
 
 export function VolunteerAssignmentDetails({
   assignment,
@@ -25,19 +51,27 @@ export function VolunteerAssignmentDetails({
   const router = useRouter();
   const [completionNotes, setCompletionNotes] = useState("");
   const [pending, setPending] = useState(false);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
 
   async function updateStatus(status: "accepted" | "declined" | "in_progress" | "completed") {
     setPending(true);
     try {
-      const result = await updateVolunteerAssignment({
-        assignmentId: assignment.id,
-        status,
-        notes: completionNotes,
-      });
+      const result = assignment.opportunityId
+        ? await updateOpportunityParticipation(
+            assignment.id,
+            status === "declined" ? "declined" : status,
+            completionNotes,
+          )
+        : await updateVolunteerAssignment({
+            assignmentId: assignment.id,
+            status,
+            notes: completionNotes,
+          });
       if (!result.success) {
         toast.error(result.error);
         return;
       }
+      setWithdrawOpen(false);
       toast.success(
         status === "accepted"
           ? "Assignment accepted."
@@ -68,8 +102,13 @@ export function VolunteerAssignmentDetails({
       <article className="overflow-hidden rounded-3xl border border-border bg-card">
         <div className="border-b border-border bg-muted/30 p-6 sm:p-8">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline">{assignment.status.replaceAll("_", " ")}</Badge>
+            <Badge variant="outline">{statusLabel(assignment.status)}</Badge>
             <Badge variant="secondary">{assignment.priority} priority</Badge>
+            {assignment.opportunity && assignment.opportunity.status !== "open" && (
+              <Badge variant="outline" className="capitalize">
+                Opportunity {assignment.opportunity.status}
+              </Badge>
+            )}
           </div>
           <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">
             {assignment.title}
@@ -84,6 +123,11 @@ export function VolunteerAssignmentDetails({
               <span className="inline-flex items-center gap-1.5">
                 <CalendarDays className="h-4 w-4" />
                 Due {format(assignment.deadline, "PPP")}
+              </span>
+            )}
+            {assignment.opportunity?.date && assignment.opportunity.startTime && assignment.opportunity.endTime && (
+              <span>
+                {assignment.opportunity.startTime}–{assignment.opportunity.endTime}
               </span>
             )}
             <span>Assigned {format(assignment.createdAt, "PPP")}</span>
@@ -130,7 +174,17 @@ export function VolunteerAssignmentDetails({
           )}
 
           {assignment.status === "accepted" && (
-            <div className="flex justify-end border-t border-border pt-5">
+            <div className="flex flex-wrap justify-end gap-3 border-t border-border pt-5">
+              {assignment.opportunityId && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={pending}
+                  onClick={() => setWithdrawOpen(true)}
+                >
+                  <X /> Withdraw position
+                </Button>
+              )}
               <Button
                 type="button"
                 disabled={pending}
@@ -182,6 +236,34 @@ export function VolunteerAssignmentDetails({
           )}
         </div>
       </article>
+
+      <AlertDialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Withdraw from this position?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You can withdraw while your status is Accepted. Once you start
+              working, the position cannot be withdrawn.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={pending}>Keep position</AlertDialogCancel>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={pending}
+              onClick={() => updateStatus("declined")}
+            >
+              {pending ? "Withdrawing..." : "Withdraw"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
+}
+
+function statusLabel(status: string) {
+  if (status === "in_progress") return "Working";
+  return status.charAt(0).toUpperCase() + status.slice(1);
 }

@@ -36,6 +36,7 @@ import {
   Mail,
   HandHeart,
   UserRound,
+  BriefcaseBusiness,
   Home,
   LogOut,
   Heart,
@@ -79,6 +80,7 @@ const ADMIN_NAV = [
     items: [
       { title: "Applications", url: "/admin/volunteers", icon: Users, exact: false },
       { title: "Approved Volunteers", url: "/admin/approved-volunteers", icon: UserRound, exact: false },
+      { title: "Work Opportunities", url: "/admin/opportunities", icon: BriefcaseBusiness, exact: false },
       { title: "User Management", url: "/admin/users", icon: Users, exact: false },
       { title: "Contact Messages", url: "/admin/messages", icon: Mail, exact: false },
     ],
@@ -95,7 +97,8 @@ const VOLUNTEER_NAV = [
   {
     groupLabel: "My Work",
     items: [
-      { title: "My Assignments", url: "/volunteer/assignments", icon: HandHeart, exact: false },
+      { title: "My Work", url: "/volunteer/assignments", icon: HandHeart, exact: false },
+      { title: "Work Opportunities", url: "/volunteer/opportunities", icon: BriefcaseBusiness, exact: false },
       { title: "My Profile", url: "/volunteer/profile", icon: UserRound, exact: false },
     ],
   },

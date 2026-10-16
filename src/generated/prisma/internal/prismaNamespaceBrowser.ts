@@ -297,6 +297,8 @@ export const VolunteerOpportunityScalarFieldEnum = {
   description: 'description',
   location: 'location',
   date: 'date',
+  startTime: 'startTime',
+  endTime: 'endTime',
   timeCommitment: 'timeCommitment',
   spotsNeeded: 'spotsNeeded',
   spotsFilled: 'spotsFilled',

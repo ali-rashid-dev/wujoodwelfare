@@ -38,6 +38,15 @@ export default async function VolunteerAssignmentsPage({
       priority: true,
       deadline: true,
       createdAt: true,
+      opportunityId: true,
+      opportunity: {
+        select: {
+          status: true,
+          date: true,
+          startTime: true,
+          endTime: true,
+        },
+      },
     },
   });
 
@@ -45,9 +54,9 @@ export default async function VolunteerAssignmentsPage({
     <div className="space-y-6">
       <div>
         <p className="text-xs font-bold uppercase tracking-wider text-primary">Volunteer workspace</p>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Assignments</h1>
+        <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">My Work</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Review new requests, manage accepted work, and revisit completed assignments.
+          Track opportunities you accepted, manage assigned work, and review completed work.
         </p>
       </div>
       <VolunteerAssignments

@@ -57,14 +57,14 @@ export function VolunteerDashboardView({
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold">Recent assignments</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Your latest assigned work and deadlines.</p>
+            <h2 className="text-lg font-bold">Recent work</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Your latest work and deadlines.</p>
           </div>
           <Link
             href="/volunteer/assignments"
             className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
           >
-            All assignments <ArrowRight className="h-4 w-4" />
+            My Work <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
@@ -91,7 +91,11 @@ export function VolunteerDashboardView({
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
-                  <Badge variant="outline">{assignment.status.replaceAll("_", " ")}</Badge>
+                  <Badge variant="outline">
+                    {assignment.status === "in_progress"
+                      ? "Working"
+                      : assignment.status.replaceAll("_", " ")}
+                  </Badge>
                   {assignment.deadline && (
                     <span className="text-xs text-muted-foreground">
                       Due {format(assignment.deadline, "MMM d")}

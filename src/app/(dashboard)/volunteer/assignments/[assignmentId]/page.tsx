@@ -31,6 +31,15 @@ export default async function VolunteerAssignmentPage({
       deadline: true,
       createdAt: true,
       volunteerNotes: true,
+      opportunityId: true,
+      opportunity: {
+        select: {
+          status: true,
+          date: true,
+          startTime: true,
+          endTime: true,
+        },
+      },
     },
   });
 

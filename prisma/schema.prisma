@@ -229,10 +229,12 @@ model VolunteerOpportunity {
   description    String
   location       String
   date           DateTime?
+  startTime      String?               @db.VarChar(5)
+  endTime        String?               @db.VarChar(5)
   timeCommitment String
   spotsNeeded    Int                   @default(5)
   spotsFilled    Int                   @default(0)
-  status         String                @default("open") // open, closed
+  status         String                @default("open") // draft, open, closed, cancelled, completed
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt
   assignments    VolunteerAssignment[]
@@ -256,6 +258,8 @@ model VolunteerAssignment {
   progressLogs   ProgressLog[]
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt
+
+  @@unique([opportunityId, userId])
 
   @@map("volunteer_assignment")
 }

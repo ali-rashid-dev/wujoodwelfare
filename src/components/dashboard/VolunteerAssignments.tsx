@@ -10,7 +10,15 @@ import { Input } from "@/components/ui/input";
 
 type Assignment = Pick<
   VolunteerAssignmentModel,
-  "id" | "title" | "description" | "location" | "status" | "priority" | "deadline" | "createdAt"
+  | "id"
+  | "title"
+  | "description"
+  | "location"
+  | "status"
+  | "priority"
+  | "deadline"
+  | "createdAt"
+  | "opportunityId"
 >;
 
 type AssignmentView = "all" | "available" | "active" | "completed" | "rejected";
@@ -113,7 +121,9 @@ export function VolunteerAssignments({
             >
               <div className="flex items-start justify-between gap-3">
                 <h2 className="font-semibold group-hover:text-primary">{assignment.title}</h2>
-                <Badge variant="outline">{assignment.status.replaceAll("_", " ")}</Badge>
+                <Badge variant="outline">
+                  {assignment.status === "in_progress" ? "Working" : assignment.status.replaceAll("_", " ")}
+                </Badge>
               </div>
               <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
                 {assignment.description}
