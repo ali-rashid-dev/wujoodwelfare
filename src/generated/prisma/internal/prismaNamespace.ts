@@ -406,6 +406,7 @@ export const ModelName = {
   GalleryItem: 'GalleryItem',
   ImpactStory: 'ImpactStory',
   WhoWeAre: 'WhoWeAre',
+  WhoWeArePendingUpload: 'WhoWeArePendingUpload',
   WhoWeAreValue: 'WhoWeAreValue',
   ContactMessage: 'ContactMessage',
   ContactRateLimit: 'ContactRateLimit',
@@ -428,7 +429,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "program" | "project" | "galleryItem" | "impactStory" | "whoWeAre" | "whoWeAreValue" | "contactMessage" | "contactRateLimit" | "volunteerApplication" | "volunteerOpportunity" | "volunteerAssignment" | "progressLog"
+    modelProps: "user" | "session" | "account" | "verification" | "program" | "project" | "galleryItem" | "impactStory" | "whoWeAre" | "whoWeArePendingUpload" | "whoWeAreValue" | "contactMessage" | "contactRateLimit" | "volunteerApplication" | "volunteerOpportunity" | "volunteerAssignment" | "progressLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1095,6 +1096,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.WhoWeAreCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.WhoWeAreCountAggregateOutputType> | number
+        }
+      }
+    }
+    WhoWeArePendingUpload: {
+      payload: Prisma.$WhoWeArePendingUploadPayload<ExtArgs>
+      fields: Prisma.WhoWeArePendingUploadFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WhoWeArePendingUploadFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WhoWeArePendingUploadPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WhoWeArePendingUploadFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WhoWeArePendingUploadPayload>
+        }
+        findFirst: {
+          args: Prisma.WhoWeArePendingUploadFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WhoWeArePendingUploadPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WhoWeArePendingUploadFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WhoWeArePendingUploadPayload>
+        }
+        findMany: {
+          args: Prisma.WhoWeArePendingUploadFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WhoWeArePendingUploadPayload>[]
+        }
+        create: {
+          args: Prisma.WhoWeArePendingUploadCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WhoWeArePendingUploadPayload>
+        }
+        createMany: {
+          args: Prisma.WhoWeArePendingUploadCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WhoWeArePendingUploadCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WhoWeArePendingUploadPayload>[]
+        }
+        delete: {
+          args: Prisma.WhoWeArePendingUploadDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WhoWeArePendingUploadPayload>
+        }
+        update: {
+          args: Prisma.WhoWeArePendingUploadUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WhoWeArePendingUploadPayload>
+        }
+        deleteMany: {
+          args: Prisma.WhoWeArePendingUploadDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WhoWeArePendingUploadUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WhoWeArePendingUploadUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WhoWeArePendingUploadPayload>[]
+        }
+        upsert: {
+          args: Prisma.WhoWeArePendingUploadUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WhoWeArePendingUploadPayload>
+        }
+        aggregate: {
+          args: Prisma.WhoWeArePendingUploadAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWhoWeArePendingUpload>
+        }
+        groupBy: {
+          args: Prisma.WhoWeArePendingUploadGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WhoWeArePendingUploadGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WhoWeArePendingUploadCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WhoWeArePendingUploadCountAggregateOutputType> | number
         }
       }
     }
@@ -1797,6 +1872,15 @@ export const WhoWeAreScalarFieldEnum = {
 export type WhoWeAreScalarFieldEnum = (typeof WhoWeAreScalarFieldEnum)[keyof typeof WhoWeAreScalarFieldEnum]
 
 
+export const WhoWeArePendingUploadScalarFieldEnum = {
+  fileKey: 'fileKey',
+  uploadedBy: 'uploadedBy',
+  createdAt: 'createdAt'
+} as const
+
+export type WhoWeArePendingUploadScalarFieldEnum = (typeof WhoWeArePendingUploadScalarFieldEnum)[keyof typeof WhoWeArePendingUploadScalarFieldEnum]
+
+
 export const WhoWeAreValueScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -2182,6 +2266,7 @@ export type GlobalOmitConfig = {
   galleryItem?: Prisma.GalleryItemOmit
   impactStory?: Prisma.ImpactStoryOmit
   whoWeAre?: Prisma.WhoWeAreOmit
+  whoWeArePendingUpload?: Prisma.WhoWeArePendingUploadOmit
   whoWeAreValue?: Prisma.WhoWeAreValueOmit
   contactMessage?: Prisma.ContactMessageOmit
   contactRateLimit?: Prisma.ContactRateLimitOmit

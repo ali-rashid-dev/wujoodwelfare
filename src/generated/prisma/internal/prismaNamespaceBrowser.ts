@@ -60,6 +60,7 @@ export const ModelName = {
   GalleryItem: 'GalleryItem',
   ImpactStory: 'ImpactStory',
   WhoWeAre: 'WhoWeAre',
+  WhoWeArePendingUpload: 'WhoWeArePendingUpload',
   WhoWeAreValue: 'WhoWeAreValue',
   ContactMessage: 'ContactMessage',
   ContactRateLimit: 'ContactRateLimit',
@@ -225,6 +226,15 @@ export const WhoWeAreScalarFieldEnum = {
 } as const
 
 export type WhoWeAreScalarFieldEnum = (typeof WhoWeAreScalarFieldEnum)[keyof typeof WhoWeAreScalarFieldEnum]
+
+
+export const WhoWeArePendingUploadScalarFieldEnum = {
+  fileKey: 'fileKey',
+  uploadedBy: 'uploadedBy',
+  createdAt: 'createdAt'
+} as const
+
+export type WhoWeArePendingUploadScalarFieldEnum = (typeof WhoWeArePendingUploadScalarFieldEnum)[keyof typeof WhoWeArePendingUploadScalarFieldEnum]
 
 
 export const WhoWeAreValueScalarFieldEnum = {

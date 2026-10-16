@@ -161,6 +161,14 @@ model WhoWeAre {
   @@map("who_we_are")
 }
 
+model WhoWeArePendingUpload {
+  fileKey    String   @id
+  uploadedBy String
+  createdAt  DateTime @default(now())
+
+  @@map("who_we_are_pending_upload")
+}
+
 model WhoWeAreValue {
   id        String   @id @default(cuid())
   title     String

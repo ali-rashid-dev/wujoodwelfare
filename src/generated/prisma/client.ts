@@ -87,6 +87,11 @@ export type ImpactStory = Prisma.ImpactStoryModel
  */
 export type WhoWeAre = Prisma.WhoWeAreModel
 /**
+ * Model WhoWeArePendingUpload
+ *
+ */
+export type WhoWeArePendingUpload = Prisma.WhoWeArePendingUploadModel
+/**
  * Model WhoWeAreValue
  *
  */

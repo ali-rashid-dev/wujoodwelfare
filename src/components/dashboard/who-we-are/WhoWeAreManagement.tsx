@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
 import {
   Eye,
@@ -252,44 +252,87 @@ function WhoWeAreContentForm({
     String(initialContent.yearsExperience),
   );
   const [isSaving, setIsSaving] = useState(false);
+  const [isDiscarding, setIsDiscarding] = useState(false);
+  const isSavingRef = useRef(false);
+  const isDiscardingRef = useRef(false);
+  const pendingDiscards = useRef(0);
+  const uploadGeneration = useRef(0);
+  const operationQueue = useRef(Promise.resolve());
+
+  const withOperationLock = async <T,>(operation: () => Promise<T>) => {
+    let release!: () => void;
+    const previousOperation = operationQueue.current;
+    operationQueue.current = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await previousOperation;
+    try {
+      return await operation();
+    } finally {
+      release();
+    }
+  };
+
+  const discardUploadedImage = async (url: string) => {
+    pendingDiscards.current += 1;
+    isDiscardingRef.current = true;
+    setIsDiscarding(true);
+    try {
+      const result = await withOperationLock(() => discardWhoWeAreImageUpload(url));
+      if (!result.success) toast.warning(result.error);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not remove the uploaded image.");
+    } finally {
+      pendingDiscards.current -= 1;
+      isDiscardingRef.current = pendingDiscards.current > 0;
+      setIsDiscarding(isDiscardingRef.current);
+    }
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSavingRef.current || isDiscardingRef.current) return;
+    isSavingRef.current = true;
     setIsSaving(true);
     try {
-      const result = await updateWhoWeAre({
-        heading,
-        description,
-        imageUrl,
-        expectedImageUrl: savedImageUrl,
-        yearsExperience: Number(yearsExperience),
+      await withOperationLock(async () => {
+        const result = await updateWhoWeAre({
+          heading,
+          description,
+          imageUrl,
+          expectedImageUrl: savedImageUrl,
+          yearsExperience: Number(yearsExperience),
+        });
+        if (!result.success) {
+          toast.error(result.error);
+          return;
+        }
+        setSavedImageUrl(result.content.imageUrl);
+        setReplacementOriginalUrl(null);
+        toast.success("Who We Are content updated.");
+        if (result.warning) toast.warning(result.warning);
       });
-      if (!result.success) {
-        toast.error(result.error);
-        return;
-      }
-      setSavedImageUrl(result.content.imageUrl);
-      setReplacementOriginalUrl(null);
-      toast.success("Who We Are content updated.");
-      if (result.warning) toast.warning(result.warning);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not save Who We Are content.");
     } finally {
+      isSavingRef.current = false;
       setIsSaving(false);
     }
   };
 
   const cancelImageReplacement = async () => {
-    if (!replacementOriginalUrl) return;
+    if (!replacementOriginalUrl || isSavingRef.current || isDiscardingRef.current) return;
     const uploadedReplacementUrl = imageUrl;
+    uploadGeneration.current += 1;
     setImageUrl(replacementOriginalUrl);
     setReplacementOriginalUrl(null);
 
     if (uploadedReplacementUrl && uploadedReplacementUrl !== replacementOriginalUrl) {
-      const result = await discardWhoWeAreImageUpload(uploadedReplacementUrl);
-      if (!result.success) toast.warning(result.error);
+      await discardUploadedImage(uploadedReplacementUrl);
     }
   };
+
+  const currentUploadGeneration = uploadGeneration.current;
 
   return (
     <section className="rounded-2xl border border-border bg-card p-5 sm:p-7">
@@ -355,9 +398,16 @@ function WhoWeAreContentForm({
                   size="sm"
                   className="absolute bottom-3 right-3"
                   onClick={() => {
-                    setReplacementOriginalUrl(imageUrl);
+                    if (isSavingRef.current || isDiscardingRef.current) return;
+                    const supersededUrl = imageUrl;
+                    uploadGeneration.current += 1;
+                    setReplacementOriginalUrl((current) => current ?? savedImageUrl);
                     setImageUrl("");
+                    if (supersededUrl !== savedImageUrl) {
+                      void discardUploadedImage(supersededUrl);
+                    }
                   }}
+                  disabled={isSaving || isDiscarding}
                 >
                   Replace image
                 </Button>
@@ -368,31 +418,43 @@ function WhoWeAreContentForm({
                     size="sm"
                     className="absolute bottom-3 left-3"
                     onClick={() => void cancelImageReplacement()}
+                    disabled={isSaving || isDiscarding}
                   >
                     Cancel
                   </Button>
                 )}
               </div>
             ) : (
-              <UploadDropzone
-                endpoint="galleryImage"
-                onClientUploadComplete={(files) => {
-                  const url = files[0]?.ufsUrl;
-                  if (url) {
+              isDiscarding ? (
+                <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+                  Removing the previous replacement...
+                </p>
+              ) : (
+                <UploadDropzone
+                  endpoint="whoWeAreImage"
+                  onClientUploadComplete={(files) => {
+                    const url = files[0]?.ufsUrl;
+                    if (!url) return;
+                    if (uploadGeneration.current !== currentUploadGeneration) {
+                      void discardUploadedImage(url);
+                      return;
+                    }
                     setImageUrl(url);
                     toast.success("Image uploaded.");
-                  }
-                }}
-                onUploadError={(error) => {
-                  toast.error(error.message);
-                }}
-                config={{ mode: "auto" }}
-                appearance={{
-                  container: "border-border bg-muted/30",
-                  label: "text-foreground",
-                  button: "bg-primary text-primary-foreground",
-                }}
-              />
+                  }}
+                  onUploadError={(error) => {
+                    if (uploadGeneration.current === currentUploadGeneration) {
+                      toast.error(error.message);
+                    }
+                  }}
+                  config={{ mode: "auto" }}
+                  appearance={{
+                    container: "border-border bg-muted/30",
+                    label: "text-foreground",
+                    button: "bg-primary text-primary-foreground",
+                  }}
+                />
+              )
             )}
             {replacementOriginalUrl && !imageUrl && (
               <Button
@@ -400,6 +462,7 @@ function WhoWeAreContentForm({
                 variant="outline"
                 className="w-full"
                 onClick={() => void cancelImageReplacement()}
+                disabled={isSaving || isDiscarding}
               >
                 Cancel image replacement
               </Button>
@@ -408,8 +471,8 @@ function WhoWeAreContentForm({
         </div>
 
         <div className="flex justify-end border-t border-border pt-5">
-          <Button type="submit" disabled={isSaving || !imageUrl}>
-            {isSaving ? "Saving..." : "Save main content"}
+          <Button type="submit" disabled={isSaving || isDiscarding || !imageUrl}>
+            {isSaving ? "Saving..." : isDiscarding ? "Removing image..." : "Save main content"}
           </Button>
         </div>
       </form>

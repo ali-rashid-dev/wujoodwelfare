@@ -125,6 +125,18 @@ function uploadThingKey(imageUrl: string): string | null {
 async function deleteOldImage(imageUrl: string) {
   const key = uploadThingKey(imageUrl);
   if (!key) return undefined;
+  let current;
+  try {
+    current = await prisma.whoWeAre.findUnique({
+      where: { id: "main" },
+      select: { imageUrl: true },
+    });
+  } catch (error) {
+    console.error("Could not verify the previous Who We Are image before deletion:", error);
+    return "Content was saved, but the previous uploaded image could not be verified for safe removal.";
+  }
+  if (current && uploadThingKey(current.imageUrl) === key) return undefined;
+
   try {
     const result = await new UTApi().deleteFiles(key);
     if (!result.success) {
@@ -138,17 +150,82 @@ async function deleteOldImage(imageUrl: string) {
   return undefined;
 }
 
+function isUniqueConstraintError(error: unknown): boolean {
+  return typeof error === "object" && error !== null && "code" in error && error.code === "P2002";
+}
+
 export async function updateWhoWeAre(rawInput: unknown) {
   try {
-    await requireAdmin();
+    const admin = await requireAdmin();
     const parsed = updateWhoWeAreSchema.parse(rawInput);
     const { expectedImageUrl, ...data } = parsed;
-    const [content] = await prisma.whoWeAre.updateManyAndReturn({
-      where: { id: "main", imageUrl: expectedImageUrl },
-      data,
-      select: whoWeAreSelect,
-    });
-    if (!content) {
+    const replacementKey =
+      data.imageUrl !== expectedImageUrl ? uploadThingKey(data.imageUrl) : null;
+    let saveResult;
+    try {
+      saveResult = await prisma.$transaction(async (transaction) => {
+        if (replacementKey) {
+          const pendingUpload = await transaction.whoWeArePendingUpload.findFirst({
+            where: { fileKey: replacementKey, uploadedBy: admin.id },
+            select: { fileKey: true },
+          });
+          if (!pendingUpload) return { content: null, conflict: false, invalidUpload: true };
+        }
+
+        const [updatedContent] = await transaction.whoWeAre.updateManyAndReturn({
+          where: { id: "main", imageUrl: expectedImageUrl },
+          data,
+          select: whoWeAreSelect,
+        });
+        if (updatedContent) {
+          if (replacementKey) {
+            const deleted = await transaction.whoWeArePendingUpload.deleteMany({
+              where: { fileKey: replacementKey, uploadedBy: admin.id },
+            });
+            if (deleted.count !== 1) {
+              throw new Error("Pending Who We Are upload changed during save.");
+            }
+          }
+          return { content: updatedContent, conflict: false, invalidUpload: false };
+        }
+
+        const existingContent = await transaction.whoWeAre.findUnique({
+          where: { id: "main" },
+          select: { id: true },
+        });
+        if (existingContent) return { content: null, conflict: true, invalidUpload: false };
+
+        const createdContent = await transaction.whoWeAre.create({
+          data: { id: "main", ...data },
+          select: whoWeAreSelect,
+        });
+        if (replacementKey) {
+          const deleted = await transaction.whoWeArePendingUpload.deleteMany({
+            where: { fileKey: replacementKey, uploadedBy: admin.id },
+          });
+          if (deleted.count !== 1) {
+            throw new Error("Pending Who We Are upload changed during save.");
+          }
+        }
+        return { content: createdContent, conflict: false, invalidUpload: false };
+      });
+    } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        return {
+          success: false as const,
+          error: "Who We Are content changed since you opened it. Refresh and try again.",
+        };
+      }
+      throw error;
+    }
+
+    if (saveResult.invalidUpload) {
+      return {
+        success: false as const,
+        error: "Upload a replacement image through the Who We Are form before saving.",
+      };
+    }
+    if (!saveResult.content) {
       return {
         success: false as const,
         error: "Who We Are content changed since you opened it. Refresh and try again.",
@@ -160,7 +237,7 @@ export async function updateWhoWeAre(rawInput: unknown) {
       expectedImageUrl !== data.imageUrl
         ? await deleteOldImage(expectedImageUrl)
         : undefined;
-    return { success: true as const, content, warning };
+    return { success: true as const, content: saveResult.content, warning };
   } catch (error) {
     console.error("Update Who We Are content failed:", error);
     return {
@@ -172,20 +249,48 @@ export async function updateWhoWeAre(rawInput: unknown) {
 
 export async function discardWhoWeAreImageUpload(rawImageUrl: unknown) {
   try {
-    await requireAdmin();
+    const admin = await requireAdmin();
     const imageUrl = imageUrlSchema.parse(rawImageUrl);
     const key = uploadThingKey(imageUrl);
     if (!key) return { success: true as const };
 
-    const result = await new UTApi().deleteFiles(key);
-    if (!result.success) {
-      console.error("UploadThing did not delete a cancelled Who We Are image upload.");
+    const publishedImage = await prisma.whoWeAre.findUnique({
+      where: { id: "main" },
+      select: { imageUrl: true },
+    });
+    if (publishedImage && uploadThingKey(publishedImage.imageUrl) === key) {
+      return {
+        success: false as const,
+        error: "The currently published Who We Are image cannot be discarded.",
+      };
+    }
+
+    const pendingUpload = await prisma.whoWeArePendingUpload.deleteMany({
+      where: { fileKey: key, uploadedBy: admin.id },
+    });
+    if (pendingUpload.count !== 1) {
+      return {
+        success: false as const,
+        error: "Only a pending upload from this Who We Are form can be discarded.",
+      };
+    }
+
+    try {
+      const result = await new UTApi().deleteFiles(key);
+      if (!result.success) throw new Error("UploadThing did not delete the pending image.");
+      return { success: true as const };
+    } catch (error) {
+      console.error("Failed to delete a cancelled Who We Are image upload:", error);
+      await prisma.whoWeArePendingUpload.upsert({
+        where: { fileKey: key },
+        create: { fileKey: key, uploadedBy: admin.id },
+        update: { uploadedBy: admin.id },
+      });
       return {
         success: false as const,
         error: "The replacement was cancelled, but its uploaded image could not be removed.",
       };
     }
-    return { success: true as const };
   } catch (error) {
     console.error("Discard cancelled Who We Are image upload failed:", error);
     return {
