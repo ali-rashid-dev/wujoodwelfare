@@ -79,6 +79,7 @@ const ADMIN_NAV = [
     items: [
       { title: "Applications", url: "/admin/volunteers", icon: Users, exact: false },
       { title: "Approved Volunteers", url: "/admin/approved-volunteers", icon: UserRound, exact: false },
+      { title: "User Management", url: "/admin/users", icon: Users, exact: false },
       { title: "Contact Messages", url: "/admin/messages", icon: Mail, exact: false },
     ],
   },
