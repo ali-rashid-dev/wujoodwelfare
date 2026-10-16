@@ -165,6 +165,7 @@ function actionErrorMessage(error: unknown, fallback: string) {
     }
     if (error.code === "P2003") return "This category is in use and cannot be deleted.";
     if (error.code === "P2025") return "The requested team record was not found.";
+    if (error.code === "P2028") return "The database is taking longer than expected. Please retry.";
   }
   return fallback;
 }
@@ -192,7 +193,7 @@ export async function createTeamProfile(rawInput: unknown) {
         data: parsed,
         select: adminProfileSelect,
       });
-    });
+    }, { maxWait: 30_000, timeout: 30_000 });
     revalidateTeam();
     return { success: true as const, profile };
   } catch (error) {
@@ -235,7 +236,7 @@ export async function updateTeamProfile(id: string, rawInput: unknown) {
         data: parsed,
         select: adminProfileSelect,
       });
-    });
+    }, { maxWait: 30_000, timeout: 30_000 });
     revalidateTeam();
 
     const warning = existing.imageUrl === parsed.imageUrl

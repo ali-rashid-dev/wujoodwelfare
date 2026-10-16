@@ -29,7 +29,7 @@ export async function lockUploadThingImageKeys(
     ...new Set(imageUrls.map(uploadThingKey).filter((key): key is string => !!key)),
   ].sort();
   for (const key of keys) {
-    await transaction.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${key}, 0))`;
+    await transaction.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${key}, 0))::text AS locked`;
   }
 }
 
