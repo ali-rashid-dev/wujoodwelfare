@@ -102,3 +102,13 @@ export type VolunteerAssignment = Prisma.VolunteerAssignmentModel
  *
  */
 export type ProgressLog = Prisma.ProgressLogModel
+/**
+ * Model TeamCategory
+ *
+ */
+export type TeamCategory = Prisma.TeamCategoryModel
+/**
+ * Model TeamProfile
+ *
+ */
+export type TeamProfile = Prisma.TeamProfileModel

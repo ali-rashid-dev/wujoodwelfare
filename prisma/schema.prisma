@@ -24,6 +24,7 @@ model User {
   assignments           VolunteerAssignment[]
   progressLogs          ProgressLog[]
   volunteerApplications VolunteerApplication[]
+  teamProfile           TeamProfile?
 
   @@map("user")
 }
@@ -281,4 +282,51 @@ model ProgressLog {
 enum Role {
   admin
   volunteer
+}
+
+enum TeamSection {
+  founders
+  executive_leadership
+  coordinators
+  department_leads
+  team_members_volunteers
+}
+
+model TeamCategory {
+  id        String        @id @default(cuid())
+  name      String
+  section   TeamSection
+  sortOrder Int           @default(0)
+  profiles  TeamProfile[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@unique([section, name])
+  @@index([section, sortOrder, name])
+  @@map("team_category")
+}
+
+model TeamProfile {
+  id           String       @id @default(cuid())
+  userId       String?      @unique
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name         String
+  designation  String
+  categoryId   String
+  category     TeamCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  biography    String
+  imageUrl     String
+  department   String?
+  linkedinUrl  String?
+  instagramUrl String?
+  facebookUrl  String?
+  sortOrder    Int          @default(0)
+  featured     Boolean      @default(false)
+  published    Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([published, featured, sortOrder, createdAt])
+  @@index([categoryId, sortOrder])
+  @@map("team_profile")
 }

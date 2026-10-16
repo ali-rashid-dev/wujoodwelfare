@@ -79,6 +79,20 @@ export const ourFileRouter = {
       });
       return { url: file.ufsUrl };
     }),
+
+  teamProfileImage: f({
+    image: {
+      maxFileSize: "8MB",
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async () => {
+      const user = await getCurrentUser();
+      if (!user) throw new UploadThingError("Unauthorized");
+      if (user.role !== "admin") throw new UploadThingError("Forbidden: Admins only");
+      return { userId: user.id };
+    })
+    .onUploadComplete(async ({ file }) => ({ url: file.ufsUrl })),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

@@ -54,12 +54,13 @@ export async function deleteUnreferencedUploadThingImages(
   try {
     return await prisma.$transaction(async (transaction) => {
       await lockUploadThingImageKeys(transaction, imageUrls);
-      const [programs, projects, galleryItems, impactStories, whoWeAre] = await Promise.all([
+      const [programs, projects, galleryItems, impactStories, whoWeAre, teamProfiles] = await Promise.all([
         transaction.program.findMany({ select: { imageUrl: true } }),
         transaction.project.findMany({ select: { images: true } }),
         transaction.galleryItem.findMany({ select: { imageUrl: true } }),
         transaction.impactStory.findMany({ select: { imageUrl: true } }),
         transaction.whoWeAre.findMany({ select: { imageUrl: true } }),
+        transaction.teamProfile.findMany({ select: { imageUrl: true } }),
       ]);
       const referencedKeys = new Set(
         [
@@ -68,6 +69,7 @@ export async function deleteUnreferencedUploadThingImages(
           ...galleryItems.map((item) => item.imageUrl),
           ...impactStories.map((item) => item.imageUrl),
           ...whoWeAre.map((item) => item.imageUrl),
+          ...teamProfiles.map((item) => item.imageUrl),
         ]
           .map(uploadThingKey)
           .filter((key): key is string => !!key),

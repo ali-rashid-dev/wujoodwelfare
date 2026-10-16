@@ -235,6 +235,7 @@ export type UserWhereInput = {
   assignments?: Prisma.VolunteerAssignmentListRelationFilter
   progressLogs?: Prisma.ProgressLogListRelationFilter
   volunteerApplications?: Prisma.VolunteerApplicationListRelationFilter
+  teamProfile?: Prisma.XOR<Prisma.TeamProfileNullableScalarRelationFilter, Prisma.TeamProfileWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -254,6 +255,7 @@ export type UserOrderByWithRelationInput = {
   assignments?: Prisma.VolunteerAssignmentOrderByRelationAggregateInput
   progressLogs?: Prisma.ProgressLogOrderByRelationAggregateInput
   volunteerApplications?: Prisma.VolunteerApplicationOrderByRelationAggregateInput
+  teamProfile?: Prisma.TeamProfileOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -276,6 +278,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   assignments?: Prisma.VolunteerAssignmentListRelationFilter
   progressLogs?: Prisma.ProgressLogListRelationFilter
   volunteerApplications?: Prisma.VolunteerApplicationListRelationFilter
+  teamProfile?: Prisma.XOR<Prisma.TeamProfileNullableScalarRelationFilter, Prisma.TeamProfileWhereInput> | null
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -329,6 +332,7 @@ export type UserCreateInput = {
   assignments?: Prisma.VolunteerAssignmentCreateNestedManyWithoutUserInput
   progressLogs?: Prisma.ProgressLogCreateNestedManyWithoutUserInput
   volunteerApplications?: Prisma.VolunteerApplicationCreateNestedManyWithoutUserInput
+  teamProfile?: Prisma.TeamProfileCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -348,6 +352,7 @@ export type UserUncheckedCreateInput = {
   assignments?: Prisma.VolunteerAssignmentUncheckedCreateNestedManyWithoutUserInput
   progressLogs?: Prisma.ProgressLogUncheckedCreateNestedManyWithoutUserInput
   volunteerApplications?: Prisma.VolunteerApplicationUncheckedCreateNestedManyWithoutUserInput
+  teamProfile?: Prisma.TeamProfileUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -367,6 +372,7 @@ export type UserUpdateInput = {
   assignments?: Prisma.VolunteerAssignmentUpdateManyWithoutUserNestedInput
   progressLogs?: Prisma.ProgressLogUpdateManyWithoutUserNestedInput
   volunteerApplications?: Prisma.VolunteerApplicationUpdateManyWithoutUserNestedInput
+  teamProfile?: Prisma.TeamProfileUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -386,6 +392,7 @@ export type UserUncheckedUpdateInput = {
   assignments?: Prisma.VolunteerAssignmentUncheckedUpdateManyWithoutUserNestedInput
   progressLogs?: Prisma.ProgressLogUncheckedUpdateManyWithoutUserNestedInput
   volunteerApplications?: Prisma.VolunteerApplicationUncheckedUpdateManyWithoutUserNestedInput
+  teamProfile?: Prisma.TeamProfileUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -582,6 +589,22 @@ export type UserUpdateOneRequiredWithoutProgressLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProgressLogsInput, Prisma.UserUpdateWithoutProgressLogsInput>, Prisma.UserUncheckedUpdateWithoutProgressLogsInput>
 }
 
+export type UserCreateNestedOneWithoutTeamProfileInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTeamProfileInput, Prisma.UserUncheckedCreateWithoutTeamProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTeamProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutTeamProfileNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTeamProfileInput, Prisma.UserUncheckedCreateWithoutTeamProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTeamProfileInput
+  upsert?: Prisma.UserUpsertWithoutTeamProfileInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTeamProfileInput, Prisma.UserUpdateWithoutTeamProfileInput>, Prisma.UserUncheckedUpdateWithoutTeamProfileInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id: string
   name: string
@@ -598,6 +621,7 @@ export type UserCreateWithoutSessionsInput = {
   assignments?: Prisma.VolunteerAssignmentCreateNestedManyWithoutUserInput
   progressLogs?: Prisma.ProgressLogCreateNestedManyWithoutUserInput
   volunteerApplications?: Prisma.VolunteerApplicationCreateNestedManyWithoutUserInput
+  teamProfile?: Prisma.TeamProfileCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -616,6 +640,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   assignments?: Prisma.VolunteerAssignmentUncheckedCreateNestedManyWithoutUserInput
   progressLogs?: Prisma.ProgressLogUncheckedCreateNestedManyWithoutUserInput
   volunteerApplications?: Prisma.VolunteerApplicationUncheckedCreateNestedManyWithoutUserInput
+  teamProfile?: Prisma.TeamProfileUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -650,6 +675,7 @@ export type UserUpdateWithoutSessionsInput = {
   assignments?: Prisma.VolunteerAssignmentUpdateManyWithoutUserNestedInput
   progressLogs?: Prisma.ProgressLogUpdateManyWithoutUserNestedInput
   volunteerApplications?: Prisma.VolunteerApplicationUpdateManyWithoutUserNestedInput
+  teamProfile?: Prisma.TeamProfileUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -668,6 +694,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   assignments?: Prisma.VolunteerAssignmentUncheckedUpdateManyWithoutUserNestedInput
   progressLogs?: Prisma.ProgressLogUncheckedUpdateManyWithoutUserNestedInput
   volunteerApplications?: Prisma.VolunteerApplicationUncheckedUpdateManyWithoutUserNestedInput
+  teamProfile?: Prisma.TeamProfileUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAccountsInput = {
@@ -686,6 +713,7 @@ export type UserCreateWithoutAccountsInput = {
   assignments?: Prisma.VolunteerAssignmentCreateNestedManyWithoutUserInput
   progressLogs?: Prisma.ProgressLogCreateNestedManyWithoutUserInput
   volunteerApplications?: Prisma.VolunteerApplicationCreateNestedManyWithoutUserInput
+  teamProfile?: Prisma.TeamProfileCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -704,6 +732,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   assignments?: Prisma.VolunteerAssignmentUncheckedCreateNestedManyWithoutUserInput
   progressLogs?: Prisma.ProgressLogUncheckedCreateNestedManyWithoutUserInput
   volunteerApplications?: Prisma.VolunteerApplicationUncheckedCreateNestedManyWithoutUserInput
+  teamProfile?: Prisma.TeamProfileUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -738,6 +767,7 @@ export type UserUpdateWithoutAccountsInput = {
   assignments?: Prisma.VolunteerAssignmentUpdateManyWithoutUserNestedInput
   progressLogs?: Prisma.ProgressLogUpdateManyWithoutUserNestedInput
   volunteerApplications?: Prisma.VolunteerApplicationUpdateManyWithoutUserNestedInput
+  teamProfile?: Prisma.TeamProfileUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -756,6 +786,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   assignments?: Prisma.VolunteerAssignmentUncheckedUpdateManyWithoutUserNestedInput
   progressLogs?: Prisma.ProgressLogUncheckedUpdateManyWithoutUserNestedInput
   volunteerApplications?: Prisma.VolunteerApplicationUncheckedUpdateManyWithoutUserNestedInput
+  teamProfile?: Prisma.TeamProfileUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVolunteerApplicationsInput = {
@@ -774,6 +805,7 @@ export type UserCreateWithoutVolunteerApplicationsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   assignments?: Prisma.VolunteerAssignmentCreateNestedManyWithoutUserInput
   progressLogs?: Prisma.ProgressLogCreateNestedManyWithoutUserInput
+  teamProfile?: Prisma.TeamProfileCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVolunteerApplicationsInput = {
@@ -792,6 +824,7 @@ export type UserUncheckedCreateWithoutVolunteerApplicationsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.VolunteerAssignmentUncheckedCreateNestedManyWithoutUserInput
   progressLogs?: Prisma.ProgressLogUncheckedCreateNestedManyWithoutUserInput
+  teamProfile?: Prisma.TeamProfileUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVolunteerApplicationsInput = {
@@ -826,6 +859,7 @@ export type UserUpdateWithoutVolunteerApplicationsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   assignments?: Prisma.VolunteerAssignmentUpdateManyWithoutUserNestedInput
   progressLogs?: Prisma.ProgressLogUpdateManyWithoutUserNestedInput
+  teamProfile?: Prisma.TeamProfileUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVolunteerApplicationsInput = {
@@ -844,6 +878,7 @@ export type UserUncheckedUpdateWithoutVolunteerApplicationsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.VolunteerAssignmentUncheckedUpdateManyWithoutUserNestedInput
   progressLogs?: Prisma.ProgressLogUncheckedUpdateManyWithoutUserNestedInput
+  teamProfile?: Prisma.TeamProfileUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAssignmentsInput = {
@@ -862,6 +897,7 @@ export type UserCreateWithoutAssignmentsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   progressLogs?: Prisma.ProgressLogCreateNestedManyWithoutUserInput
   volunteerApplications?: Prisma.VolunteerApplicationCreateNestedManyWithoutUserInput
+  teamProfile?: Prisma.TeamProfileCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignmentsInput = {
@@ -880,6 +916,7 @@ export type UserUncheckedCreateWithoutAssignmentsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   progressLogs?: Prisma.ProgressLogUncheckedCreateNestedManyWithoutUserInput
   volunteerApplications?: Prisma.VolunteerApplicationUncheckedCreateNestedManyWithoutUserInput
+  teamProfile?: Prisma.TeamProfileUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignmentsInput = {
@@ -914,6 +951,7 @@ export type UserUpdateWithoutAssignmentsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   progressLogs?: Prisma.ProgressLogUpdateManyWithoutUserNestedInput
   volunteerApplications?: Prisma.VolunteerApplicationUpdateManyWithoutUserNestedInput
+  teamProfile?: Prisma.TeamProfileUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignmentsInput = {
@@ -932,6 +970,7 @@ export type UserUncheckedUpdateWithoutAssignmentsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   progressLogs?: Prisma.ProgressLogUncheckedUpdateManyWithoutUserNestedInput
   volunteerApplications?: Prisma.VolunteerApplicationUncheckedUpdateManyWithoutUserNestedInput
+  teamProfile?: Prisma.TeamProfileUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProgressLogsInput = {
@@ -950,6 +989,7 @@ export type UserCreateWithoutProgressLogsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   assignments?: Prisma.VolunteerAssignmentCreateNestedManyWithoutUserInput
   volunteerApplications?: Prisma.VolunteerApplicationCreateNestedManyWithoutUserInput
+  teamProfile?: Prisma.TeamProfileCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProgressLogsInput = {
@@ -968,6 +1008,7 @@ export type UserUncheckedCreateWithoutProgressLogsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.VolunteerAssignmentUncheckedCreateNestedManyWithoutUserInput
   volunteerApplications?: Prisma.VolunteerApplicationUncheckedCreateNestedManyWithoutUserInput
+  teamProfile?: Prisma.TeamProfileUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProgressLogsInput = {
@@ -1002,6 +1043,7 @@ export type UserUpdateWithoutProgressLogsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   assignments?: Prisma.VolunteerAssignmentUpdateManyWithoutUserNestedInput
   volunteerApplications?: Prisma.VolunteerApplicationUpdateManyWithoutUserNestedInput
+  teamProfile?: Prisma.TeamProfileUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProgressLogsInput = {
@@ -1019,6 +1061,99 @@ export type UserUncheckedUpdateWithoutProgressLogsInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.VolunteerAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  volunteerApplications?: Prisma.VolunteerApplicationUncheckedUpdateManyWithoutUserNestedInput
+  teamProfile?: Prisma.TeamProfileUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutTeamProfileInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
+  role?: $Enums.Role
+  banned?: boolean | null
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  assignments?: Prisma.VolunteerAssignmentCreateNestedManyWithoutUserInput
+  progressLogs?: Prisma.ProgressLogCreateNestedManyWithoutUserInput
+  volunteerApplications?: Prisma.VolunteerApplicationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutTeamProfileInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
+  role?: $Enums.Role
+  banned?: boolean | null
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  assignments?: Prisma.VolunteerAssignmentUncheckedCreateNestedManyWithoutUserInput
+  progressLogs?: Prisma.ProgressLogUncheckedCreateNestedManyWithoutUserInput
+  volunteerApplications?: Prisma.VolunteerApplicationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutTeamProfileInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutTeamProfileInput, Prisma.UserUncheckedCreateWithoutTeamProfileInput>
+}
+
+export type UserUpsertWithoutTeamProfileInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTeamProfileInput, Prisma.UserUncheckedUpdateWithoutTeamProfileInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTeamProfileInput, Prisma.UserUncheckedCreateWithoutTeamProfileInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutTeamProfileInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTeamProfileInput, Prisma.UserUncheckedUpdateWithoutTeamProfileInput>
+}
+
+export type UserUpdateWithoutTeamProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  assignments?: Prisma.VolunteerAssignmentUpdateManyWithoutUserNestedInput
+  progressLogs?: Prisma.ProgressLogUpdateManyWithoutUserNestedInput
+  volunteerApplications?: Prisma.VolunteerApplicationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutTeamProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  assignments?: Prisma.VolunteerAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  progressLogs?: Prisma.ProgressLogUncheckedUpdateManyWithoutUserNestedInput
   volunteerApplications?: Prisma.VolunteerApplicationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1106,6 +1241,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
   progressLogs?: boolean | Prisma.User$progressLogsArgs<ExtArgs>
   volunteerApplications?: boolean | Prisma.User$volunteerApplicationsArgs<ExtArgs>
+  teamProfile?: boolean | Prisma.User$teamProfileArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1158,6 +1294,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
   progressLogs?: boolean | Prisma.User$progressLogsArgs<ExtArgs>
   volunteerApplications?: boolean | Prisma.User$volunteerApplicationsArgs<ExtArgs>
+  teamProfile?: boolean | Prisma.User$teamProfileArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1171,6 +1308,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     assignments: Prisma.$VolunteerAssignmentPayload<ExtArgs>[]
     progressLogs: Prisma.$ProgressLogPayload<ExtArgs>[]
     volunteerApplications: Prisma.$VolunteerApplicationPayload<ExtArgs>[]
+    teamProfile: Prisma.$TeamProfilePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1583,6 +1721,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   assignments<T extends Prisma.User$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VolunteerAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   progressLogs<T extends Prisma.User$progressLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$progressLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProgressLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   volunteerApplications<T extends Prisma.User$volunteerApplicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$volunteerApplicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VolunteerApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  teamProfile<T extends Prisma.User$teamProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$teamProfileArgs<ExtArgs>>): Prisma.Prisma__TeamProfileClient<runtime.Types.Result.GetResult<Prisma.$TeamProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2133,6 +2272,25 @@ export type User$volunteerApplicationsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.VolunteerApplicationScalarFieldEnum | Prisma.VolunteerApplicationScalarFieldEnum[]
+}
+
+/**
+ * User.teamProfile
+ */
+export type User$teamProfileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TeamProfile
+   */
+  select?: Prisma.TeamProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TeamProfile
+   */
+  omit?: Prisma.TeamProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TeamProfileInclude<ExtArgs> | null
+  where?: Prisma.TeamProfileWhereInput
 }
 
 /**

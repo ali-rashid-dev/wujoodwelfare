@@ -73,6 +73,7 @@ const ADMIN_NAV = [
       { title: "Gallery", url: "/admin/gallery", icon: ImageIcon, exact: false },
       { title: "Impact Stories", url: "/admin/stories", icon: Quote, exact: false },
       { title: "Who We Are", url: "/admin/who-we-are", icon: Info, exact: false },
+      { title: "Team Management", url: "/admin/team", icon: Users, exact: false },
     ],
   },
   {

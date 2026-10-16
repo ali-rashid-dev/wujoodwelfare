@@ -13,6 +13,7 @@ const links = [
   { to: "/programs", label: "Programs" },
   { to: "/projects", label: "Projects" },
   { to: "/gallery", label: "Gallery" },
+  { to: "/our-team", label: "Our Team" },
   { to: "/volunteer", label: "Volunteer" },
   { to: "/contact", label: "Contact" },
 ] as const;
@@ -61,7 +62,7 @@ export function Navbar() {
           </span>
         </Link>
 
-        <ul className="hidden lg:flex items-center gap-1">
+        <ul className="hidden xl:flex items-center gap-1">
           {links.map((l) => {
             const active = path === l.to;
             return (
@@ -109,7 +110,7 @@ export function Navbar() {
           <button
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
-            className="lg:hidden grid h-10 w-10 place-items-center rounded-full border border-border bg-card"
+            className="xl:hidden grid h-10 w-10 place-items-center rounded-full border border-border bg-card"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
