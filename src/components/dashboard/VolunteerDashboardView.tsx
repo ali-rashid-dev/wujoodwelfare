@@ -7,6 +7,7 @@ import {
   Clock3,
   HandHeart,
   UserRound,
+  CheckCircle2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { VolunteerAssignmentModel } from "@/generated/prisma/models/VolunteerAssignment";
@@ -19,16 +20,17 @@ type Assignment = Pick<
 export function VolunteerDashboardView({
   assignments,
   volunteerName,
+  stats,
 }: {
   assignments: Assignment[];
   volunteerName: string;
+  stats: {
+    pendingResponses: number;
+    acceptedAssignments: number;
+    currentWork: number;
+    completedAssignments: number;
+  };
 }) {
-  const pending = assignments.filter((item) => item.status === "pending").length;
-  const active = assignments.filter((item) =>
-    ["accepted", "in_progress"].includes(item.status),
-  ).length;
-  const completed = assignments.filter((item) => item.status === "completed").length;
-
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       <div className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-linear-to-r from-emerald-500/15 via-emerald-500/5 to-transparent p-6 sm:p-8">
@@ -45,10 +47,11 @@ export function VolunteerDashboardView({
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <SummaryCard label="Awaiting response" value={pending} icon={Clock3} href="/volunteer/assignments?view=available" />
-        <SummaryCard label="In progress" value={active} icon={BriefcaseBusiness} href="/volunteer/assignments?view=active" />
-        <SummaryCard label="Completed" value={completed} icon={Check} href="/volunteer/assignments?view=completed" />
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <SummaryCard label="Pending responses" value={stats.pendingResponses} icon={Clock3} href="/volunteer/assignments?view=available" />
+        <SummaryCard label="Accepted assignments" value={stats.acceptedAssignments} icon={CheckCircle2} href="/volunteer/assignments?view=active" />
+        <SummaryCard label="Current work" value={stats.currentWork} icon={BriefcaseBusiness} href="/volunteer/assignments?view=active" />
+        <SummaryCard label="Completed assignments" value={stats.completedAssignments} icon={Check} href="/volunteer/assignments?view=completed" />
       </div>
 
       <section className="space-y-4">

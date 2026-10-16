@@ -11,9 +11,75 @@ import {
   Mail,
   ArrowRight,
   TrendingUp,
+  BadgeCheck,
+  Clock3,
+  BriefcaseBusiness,
+  Check,
 } from "lucide-react";
 
-export function AdminDashboardView() {
+export type AdminDashboardStats = {
+  approvedVolunteers: number;
+  pendingApplications: number;
+  activePrograms: number;
+  activeProjects: number;
+  assignmentsInProgress: number;
+  completedAssignments: number;
+  unresolvedMessages: number;
+};
+
+export function AdminDashboardView({ stats }: { stats: AdminDashboardStats }) {
+  const overviewStats = [
+    {
+      label: "Approved volunteers",
+      value: stats.approvedVolunteers,
+      icon: BadgeCheck,
+      href: "/admin/approved-volunteers",
+      color: "text-emerald-600 dark:text-emerald-400",
+    },
+    {
+      label: "Pending applications",
+      value: stats.pendingApplications,
+      icon: Clock3,
+      href: "/admin/volunteers",
+      color: "text-amber-600 dark:text-amber-400",
+    },
+    {
+      label: "Active programs",
+      value: stats.activePrograms,
+      icon: Calendar,
+      href: "/admin/programs",
+      color: "text-primary",
+    },
+    {
+      label: "Active projects",
+      value: stats.activeProjects,
+      icon: Layers,
+      href: "/admin/projects",
+      color: "text-blue-600 dark:text-blue-400",
+    },
+    {
+      label: "Assignments in progress",
+      value: stats.assignmentsInProgress,
+      icon: BriefcaseBusiness,
+      href: "/admin/approved-volunteers",
+      color: "text-purple-600 dark:text-purple-400",
+    },
+    {
+      label: "Completed assignments",
+      value: stats.completedAssignments,
+      icon: Check,
+      href: "/admin/approved-volunteers",
+      color: "text-emerald-600 dark:text-emerald-400",
+    },
+    {
+      label: "Unresolved messages",
+      value: stats.unresolvedMessages,
+      icon: Mail,
+      href: "/admin/messages",
+      color: "text-orange-600 dark:text-orange-400",
+    },
+  ];
+
   const adminLinks = [
     {
       href: "/admin/programs",
@@ -73,13 +139,45 @@ export function AdminDashboardView() {
         </p>
       </div>
 
+      <section aria-labelledby="overview-heading">
+        <div className="mb-4">
+          <h2
+            id="overview-heading"
+            className="text-sm font-bold text-muted-foreground uppercase tracking-wider"
+          >
+            Overview
+          </h2>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {overviewStats.map(({ label, value, icon: Icon, href, color }) => (
+            <Link
+              key={label}
+              href={href}
+              className="rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/40 sm:p-5"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-xs font-medium leading-relaxed text-muted-foreground sm:text-sm">
+                  {label}
+                </span>
+                <Icon className={`h-4 w-4 shrink-0 ${color}`} />
+              </div>
+              <p className="mt-3 text-2xl font-bold tabular-nums sm:text-3xl">
+                {value}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Management Sections */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
             Management Modules
           </h2>
-          <span className="text-xs text-muted-foreground">5 Modules Available</span>
+          <span className="text-xs text-muted-foreground">
+            {adminLinks.length} Modules Available
+          </span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {adminLinks.map(({ href, icon: Icon, label, desc, color, accent }) => (
