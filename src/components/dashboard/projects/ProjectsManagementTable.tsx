@@ -38,6 +38,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { ProjectFormDialog } from "./ProjectFormDialog";
 import {
   deleteProject,
@@ -363,194 +371,183 @@ export function ProjectsManagementTable({
             </div>
           </div>
         ) : (
-          <div className="space-y-3">
-            {paginatedProjects.map((p) => {
-              const imgs = parseImages(p.images);
-              const coverImg = imgs[0] || null;
-              const statusCfg =
-                STATUS_CONFIG[p.status as ProjectStatus] || STATUS_CONFIG.planned;
-              const StatusIcon = statusCfg.icon;
+          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
+            <Table className="min-w-[900px]">
+              <TableHeader className="bg-muted/40">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="w-[24%] px-4">Project</TableHead>
+                  <TableHead className="w-[18%]">Program / location</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Schedule</TableHead>
+                  <TableHead>Visibility</TableHead>
+                  <TableHead>Updated</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedProjects.map((p) => {
+                  const coverImg = parseImages(p.images)[0] || null;
+                  const statusCfg =
+                    STATUS_CONFIG[p.status as ProjectStatus] || STATUS_CONFIG.planned;
+                  const StatusIcon = statusCfg.icon;
 
-              return (
-                <article
-                  key={p.id}
-                  className="min-w-0 rounded-2xl border border-border bg-card p-4 shadow-xs transition-colors hover:border-primary/30 sm:p-5"
-                >
-                  <div className="flex min-w-0 items-start gap-3 sm:gap-4">
-                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-border bg-muted sm:h-14 sm:w-14">
-                      {coverImg ? (
-                        <Image
-                          src={coverImg}
-                          alt={p.title}
-                          fill
-                          className="object-cover"
-                          sizes="56px"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-primary/5 text-primary">
-                          <Layers className="h-5 w-5" />
+                  return (
+                    <TableRow key={p.id}>
+                      <TableCell className="whitespace-normal px-4">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
+                            {coverImg ? (
+                              <Image
+                                src={coverImg}
+                                alt={p.title}
+                                fill
+                                className="object-cover"
+                                sizes="48px"
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center bg-primary/5 text-primary">
+                                <Layers className="h-5 w-5" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="break-words text-sm font-bold text-foreground">
+                              {p.title}
+                            </p>
+                            <p className="truncate font-mono text-xs text-muted-foreground">
+                              /{p.slug}
+                            </p>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="break-words text-sm font-bold text-foreground sm:text-base">
-                        {p.title}
-                      </h3>
-                      <p className="truncate font-mono text-xs text-muted-foreground">
-                        /{p.slug}
-                      </p>
-                      {p.location && (
-                        <p className="mt-1 flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
-                          <MapPin className="h-3 w-3 shrink-0" />
-                          <span className="truncate">{p.location}</span>
-                        </p>
-                      )}
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className={`shrink-0 gap-1 px-2 py-0.5 text-[11px] font-bold ${statusCfg.className}`}
-                    >
-                      <StatusIcon className="h-3 w-3" />
-                      {statusCfg.label}
-                    </Badge>
-                  </div>
-
-                  <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-4 border-y border-border py-4 sm:grid-cols-4 sm:gap-x-5">
-                    <div className="min-w-0">
-                      <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                        Program
-                      </dt>
-                      <dd className="mt-1 min-w-0">
-                        {p.program ? (
-                          <Badge
-                            variant="secondary"
-                            className="block max-w-full truncate rounded-lg px-2.5 py-0.5 text-xs font-medium"
-                            title={p.program.title}
-                          >
-                            {p.program.title}
-                          </Badge>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
-                        )}
-                      </dd>
-                    </div>
-                    <div className="min-w-0">
-                      <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                        Schedule
-                      </dt>
-                      <dd className="mt-1 space-y-1 text-xs text-muted-foreground">
-                        {p.startDate || p.endDate ? (
-                          <>
-                            {p.startDate && (
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3 shrink-0" />
-                                <span className="truncate">{formatDate(p.startDate)}</span>
-                              </div>
-                            )}
-                            {p.endDate && (
-                              <div className="truncate">
-                                {p.startDate ? "→ " : ""}
-                                {formatDate(p.endDate)}
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <span>—</span>
-                        )}
-                      </dd>
-                    </div>
-                    <div className="min-w-0">
-                      <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                        Visibility
-                      </dt>
-                      <dd className="mt-1 flex items-center gap-1.5 text-xs">
-                        {p.published ? (
-                          <>
-                            <Globe className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                            <span className="font-medium text-emerald-700 dark:text-emerald-400">
-                              Published
+                      </TableCell>
+                      <TableCell className="max-w-48 whitespace-normal">
+                        <div className="space-y-1.5">
+                          {p.program ? (
+                            <Badge
+                              variant="secondary"
+                              className="block max-w-full truncate rounded-lg px-2.5 py-0.5 text-xs font-medium"
+                              title={p.program.title}
+                            >
+                              {p.program.title}
+                            </Badge>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">No program</span>
+                          )}
+                          {p.location && (
+                            <span className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
+                              <MapPin className="h-3 w-3 shrink-0" />
+                              <span className="truncate">{p.location}</span>
                             </span>
-                          </>
-                        ) : (
-                          <>
-                            <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
-                            <span className="text-muted-foreground">Unpublished</span>
-                          </>
-                        )}
-                      </dd>
-                    </div>
-                    <div className="min-w-0">
-                      <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                        Updated
-                      </dt>
-                      <dd className="mt-1 truncate text-xs text-muted-foreground">
-                        {formatDate(p.updatedAt || p.createdAt)}
-                      </dd>
-                    </div>
-                  </dl>
-
-                  <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
-                    <Button
-                      variant={p.published ? "outline" : "default"}
-                      size="sm"
-                      onClick={() => handleTogglePublish(p)}
-                      disabled={isPending}
-                      className={`h-9 gap-1.5 rounded-lg text-xs font-semibold ${
-                        p.published
-                          ? "text-muted-foreground hover:border-destructive/40 hover:text-destructive"
-                          : "bg-emerald-600 text-white hover:bg-emerald-700"
-                      }`}
-                    >
-                      {p.published ? (
-                        <>
-                          <EyeOff className="h-3.5 w-3.5" />
-                          Unpublish
-                        </>
-                      ) : (
-                        <>
-                          <Globe className="h-3.5 w-3.5" />
-                          Publish
-                        </>
-                      )}
-                    </Button>
-                    <div className="ml-auto flex items-center gap-1">
-                      {p.published && (
-                        <Link
-                          href={`/projects/${p.slug}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label={`View ${p.title} on public site`}
-                          title="View on public site"
-                          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={`gap-1 px-2 py-0.5 text-[11px] font-bold ${statusCfg.className}`}
                         >
-                          <ExternalLink className="h-4 w-4" />
-                        </Link>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(p)}
-                        aria-label={`Edit ${p.title}`}
-                        title="Edit project"
-                        className="h-9 w-9 rounded-lg p-0 text-muted-foreground hover:bg-primary/10 hover:text-primary"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeletePrompt(p)}
-                        aria-label={`Delete ${p.title}`}
-                        title="Delete project"
-                        className="h-9 w-9 rounded-lg p-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+                          <StatusIcon className="h-3 w-3" />
+                          {statusCfg.label}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1 text-xs text-muted-foreground">
+                          {p.startDate ? (
+                            <span className="flex items-center gap-1.5">
+                              <Calendar className="h-3 w-3 shrink-0" />
+                              {formatDate(p.startDate)}
+                            </span>
+                          ) : (
+                            <span>—</span>
+                          )}
+                          {p.endDate && (
+                            <span className="block pl-[18px]">
+                              {p.startDate ? "→ " : ""}
+                              {formatDate(p.endDate)}
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="flex items-center gap-1.5 text-xs">
+                          {p.published ? (
+                            <>
+                              <Globe className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                              <span className="font-medium text-emerald-700 dark:text-emerald-400">
+                                Published
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                              <span className="text-muted-foreground">Unpublished</span>
+                            </>
+                          )}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {formatDate(p.updatedAt || p.createdAt)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant={p.published ? "outline" : "default"}
+                            size="sm"
+                            onClick={() => handleTogglePublish(p)}
+                            disabled={isPending}
+                            aria-label={p.published ? `Unpublish ${p.title}` : `Publish ${p.title}`}
+                            title={p.published ? "Unpublish project" : "Publish project"}
+                            className={`h-9 w-9 rounded-lg p-0 ${
+                              p.published
+                                ? "text-muted-foreground hover:border-destructive/40 hover:text-destructive"
+                                : "bg-emerald-600 text-white hover:bg-emerald-700"
+                            }`}
+                          >
+                            {p.published ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Globe className="h-4 w-4" />
+                            )}
+                          </Button>
+                          {p.published && (
+                            <Link
+                              href={`/projects/${p.slug}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              aria-label={`View ${p.title} on public site`}
+                              title="View on public site"
+                              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Link>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEdit(p)}
+                            aria-label={`Edit ${p.title}`}
+                            title="Edit project"
+                            className="h-9 w-9 rounded-lg p-0 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeletePrompt(p)}
+                            aria-label={`Delete ${p.title}`}
+                            title="Delete project"
+                            className="h-9 w-9 rounded-lg p-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </div>
         )}
         <ListPagination
