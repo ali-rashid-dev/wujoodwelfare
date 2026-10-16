@@ -101,7 +101,7 @@ export function ImpactStoriesManagement({
     setStories((current) =>
       editingStory
         ? current.map((existing) => (existing.id === story.id ? story : existing))
-        : [story, ...current],
+        : [...current, story],
     );
     if (!editingStory) resetPage();
     setFormOpen(false);
