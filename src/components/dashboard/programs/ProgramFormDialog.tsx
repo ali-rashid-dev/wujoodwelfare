@@ -75,7 +75,7 @@ export function ProgramFormDialog({
       setCategory("Food");
       setDescription("");
       setStatus("published");
-      setImageUrl("/gallery-food.jpg");
+      setImageUrl("");
       setAutoSlug(true);
     }
   }, [program, open]);

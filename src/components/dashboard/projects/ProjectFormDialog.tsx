@@ -28,7 +28,6 @@ import {
   Loader2,
   Sparkles,
   Image as ImageIcon,
-  Plus,
   X,
   Globe,
   EyeOff,
@@ -50,15 +49,6 @@ const STATUS_LABELS: Record<ProjectStatus, string> = {
   completed: "Completed",
   archived: "Archived",
 };
-
-const PRESET_IMAGES = [
-  { label: "Food Distribution", url: "/gallery-food.jpg" },
-  { label: "Medical Care", url: "/gallery-medical.jpg" },
-  { label: "Education Support", url: "/gallery-education.jpg" },
-  { label: "Warm Clothes", url: "/gallery-clothes.jpg" },
-  { label: "Community & Awareness", url: "/gallery-community.jpg" },
-  { label: "Disaster Relief Volunteers", url: "/gallery-volunteers.jpg" },
-];
 
 function slugify(text: string) {
   return text
@@ -133,7 +123,7 @@ export function ProjectFormDialog({
       setTitle("");
       setSlug("");
       setDescription("");
-      setImages([PRESET_IMAGES[0].url]);
+      setImages([]);
       setStatus("planned");
       setPublished(false);
       setStartDate("");
@@ -481,47 +471,6 @@ export function ProjectFormDialog({
               />
             </div>
 
-            {/* Preset images */}
-            <div>
-              <p className="text-[11px] font-medium text-muted-foreground mb-1.5">
-                Or pick from library:
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {PRESET_IMAGES.map((preset) => {
-                  const selected = images.includes(preset.url);
-                  return (
-                    <button
-                      key={preset.url}
-                      type="button"
-                      onClick={() =>
-                        selected ? removeImage(preset.url) : addImage(preset.url)
-                      }
-                      className={`flex items-center gap-2 p-1.5 rounded-lg border text-left transition-all text-[11px] ${
-                        selected
-                          ? "border-primary bg-primary/10 text-primary font-semibold ring-1 ring-primary"
-                          : "border-border bg-card hover:bg-muted/70 text-foreground"
-                      }`}
-                    >
-                      <div className="relative h-8 w-8 rounded-md overflow-hidden shrink-0 bg-muted">
-                        <Image
-                          src={preset.url}
-                          alt={preset.label}
-                          fill
-                          className="object-cover"
-                          sizes="32px"
-                        />
-                      </div>
-                      <span className="truncate">{preset.label}</span>
-                      {selected && (
-                        <span className="ml-auto shrink-0 h-3.5 w-3.5 rounded-full bg-primary flex items-center justify-center">
-                          <span className="text-[8px] text-primary-foreground font-bold">✓</span>
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0 pt-2">
