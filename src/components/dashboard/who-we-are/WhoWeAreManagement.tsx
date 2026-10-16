@@ -131,12 +131,13 @@ export function WhoWeAreManagement({
             </p>
           </div>
           <Button
+            disabled={values.length >= 3}
             onClick={() => {
               openCreate();
             }}
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add card
+            {values.length >= 3 ? "Maximum of 3 cards" : "Add card"}
           </Button>
         </div>
 

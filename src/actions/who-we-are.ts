@@ -64,6 +64,8 @@ const valueSelect = {
   sortOrder: true,
 } as const;
 
+const MAX_WHO_WE_ARE_VALUES = 3;
+
 export async function getPublicWhoWeAre() {
   const [content, values] = await Promise.all([
     prisma.whoWeAre.findUnique({ where: { id: "main" }, select: whoWeAreSelect }),
@@ -304,12 +306,25 @@ export async function createWhoWeAreValue(rawInput: unknown) {
   try {
     await requireAdmin();
     const parsed = valueSchema.parse(rawInput);
-    const value = await prisma.whoWeAreValue.create({
-      data: parsed,
-      select: valueSelect,
+    const result = await prisma.$transaction(async (transaction) => {
+      await transaction.$queryRaw`SELECT pg_advisory_xact_lock(8675309)`;
+      const count = await transaction.whoWeAreValue.count();
+      if (count >= MAX_WHO_WE_ARE_VALUES) return null;
+
+      return transaction.whoWeAreValue.create({
+        data: parsed,
+        select: valueSelect,
+      });
     });
+    if (!result) {
+      return {
+        success: false as const,
+        error: "You can add up to three Who We Are value cards.",
+      };
+    }
+
     revalidateWhoWeAre();
-    return { success: true as const, value };
+    return { success: true as const, value: result };
   } catch (error) {
     console.error("Create Who We Are value failed:", error);
     return {
