@@ -125,7 +125,7 @@ export function VolunteerAssignmentDetails({
                 Due {format(assignment.deadline, "PPP")}
               </span>
             )}
-            {assignment.opportunity?.date && assignment.opportunity.startTime && assignment.opportunity.endTime && (
+            {assignment.opportunity?.startTime && assignment.opportunity.endTime && (
               <span>
                 {assignment.opportunity.startTime}–{assignment.opportunity.endTime}
               </span>

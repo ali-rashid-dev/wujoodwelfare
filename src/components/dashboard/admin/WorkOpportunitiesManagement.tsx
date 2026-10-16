@@ -2,7 +2,6 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { format } from "date-fns";
 import {
   BriefcaseBusiness,
   CalendarDays,
@@ -55,6 +54,22 @@ const statusStyles: Record<string, string> = {
   cancelled: "border-destructive/30 bg-destructive/10 text-destructive",
   completed: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300",
 };
+
+function formatOpportunityDate(date: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+function opportunityDateInputValue(date: Date) {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 export function WorkOpportunitiesManagement({
   opportunities,
@@ -217,7 +232,7 @@ export function WorkOpportunitiesManagement({
                     {opportunity.date && (
                       <span className="inline-flex items-center gap-1.5">
                         <CalendarDays className="h-3.5 w-3.5" />
-                        {format(opportunity.date, "MMM d, yyyy")}
+                        {formatOpportunityDate(opportunity.date)}
                       </span>
                     )}
                     <span className="inline-flex items-center gap-1.5">
@@ -385,7 +400,7 @@ export function WorkOpportunitiesManagement({
                 name="date"
                 type="date"
                 required
-                defaultValue={editTarget?.date ? format(editTarget.date, "yyyy-MM-dd") : undefined}
+                defaultValue={editTarget?.date ? opportunityDateInputValue(editTarget.date) : undefined}
               />
               <FormField label="Start time" name="startTime" type="time" required defaultValue={editTarget?.startTime ?? undefined} />
               <FormField label="End time" name="endTime" type="time" required defaultValue={editTarget?.endTime ?? undefined} />
@@ -395,7 +410,7 @@ export function WorkOpportunitiesManagement({
               name="spotsNeeded"
               type="number"
               required
-              min={editTarget?.acceptedCount ?? 1}
+              min={Math.max(editTarget?.acceptedCount ?? 0, 1)}
               max={1000}
               defaultValue={String(editTarget?.spotsNeeded ?? 5)}
             />
