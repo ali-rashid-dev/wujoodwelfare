@@ -47,7 +47,7 @@ export function VolunteerDashboardView({
 
       <div className="grid gap-4 sm:grid-cols-3">
         <SummaryCard label="Awaiting response" value={pending} icon={Clock3} href="/volunteer/assignments?view=available" />
-        <SummaryCard label="In progress" value={active} icon={BriefcaseBusiness} href="/volunteer/assignments" />
+        <SummaryCard label="In progress" value={active} icon={BriefcaseBusiness} href="/volunteer/assignments?view=active" />
         <SummaryCard label="Completed" value={completed} icon={Check} href="/volunteer/assignments?view=completed" />
       </div>
 

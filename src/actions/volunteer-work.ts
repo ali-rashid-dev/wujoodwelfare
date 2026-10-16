@@ -99,7 +99,12 @@ export async function updateVolunteerProfile(
   try {
     await prisma.user.update({
       where: { id: user.id },
-      data: validation.data,
+      data: {
+        ...validation.data,
+        phone: validation.data.phone || null,
+        city: validation.data.city || null,
+        skills: validation.data.skills || null,
+      },
       select: { id: true },
     });
   } catch (error) {

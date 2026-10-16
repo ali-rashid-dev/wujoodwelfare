@@ -50,7 +50,11 @@ export default async function VolunteerAssignmentsPage({
           Review new requests, manage accepted work, and revisit completed assignments.
         </p>
       </div>
-      <VolunteerAssignments assignments={assignments} initialView={initialView} />
+      <VolunteerAssignments
+        key={initialView}
+        assignments={assignments}
+        initialView={initialView}
+      />
     </div>
   );
 }
