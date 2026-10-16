@@ -6,8 +6,8 @@ import { getPublishedTeamProfiles } from "@/actions/team";
 import { TEAM_SECTIONS, TEAM_SECTION_LABELS } from "@/lib/team";
 
 export const metadata: Metadata = {
-  title: "Our Team",
-  description: "Meet the people who contribute to Wujood Welfare.",
+  title: "Our Leadership",
+  description: "Meet the people who lead and contribute to Wujood Welfare.",
   alternates: {
     canonical: "/our-team",
   },
@@ -25,7 +25,7 @@ export default async function OurTeamPage() {
             Wujood Welfare
           </p>
           <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-            Our Team
+            Our Leadership
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             The people working together to support our communities.
@@ -37,7 +37,7 @@ export default async function OurTeamPage() {
         {profiles.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border px-6 py-16 text-center">
             <Users className="mx-auto h-10 w-10 text-muted-foreground" />
-            <h2 className="mt-4 text-xl font-semibold">Team profiles coming soon</h2>
+            <h2 className="mt-4 text-xl font-semibold">Leadership profiles coming soon</h2>
             <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
               Our team profiles will appear here once they are published.
             </p>
@@ -71,66 +71,79 @@ export default async function OurTeamPage() {
                     {sectionProfiles.length} {sectionProfiles.length === 1 ? "profile" : "profiles"}
                   </span>
                 </div>
-                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                  {sectionProfiles.map((profile) => (
-                    <article
-                      key={profile.id}
-                      className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow hover:shadow-lg"
-                    >
-                      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                        <Image
-                          src={profile.imageUrl}
-                          alt={profile.name}
-                          fill
-                          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                        />
-                        {profile.featured && (
-                          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-background/90 px-3 py-1 text-xs font-semibold text-primary shadow-sm">
-                            <Star className="h-3.5 w-3.5 fill-current" />
-                            Featured
-                          </span>
-                        )}
-                      </div>
-                      <div className="space-y-3 p-5">
-                        <div>
-                          <h3 className="text-lg font-semibold">{profile.name}</h3>
-                          <p className="mt-0.5 text-sm font-medium text-primary">
-                            {profile.designation}
-                          </p>
-                          {profile.department && (
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              {profile.department}
+                <div className="space-y-6 sm:space-y-8">
+                  {sectionProfiles.map((profile, index) => {
+                    const imageOnRight = index % 2 === 0;
+                    return (
+                      <article
+                        key={profile.id}
+                        className="grid overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow hover:shadow-lg lg:grid-cols-2"
+                      >
+                        <div
+                          className={`relative order-1 min-h-64 overflow-hidden bg-muted sm:min-h-80 lg:min-h-[28rem] ${
+                            imageOnRight ? "lg:order-2" : "lg:order-1"
+                          }`}
+                        >
+                          <Image
+                            src={profile.imageUrl}
+                            alt={profile.name}
+                            fill
+                            sizes="(min-width: 1024px) 50vw, 100vw"
+                            className="object-cover transition-transform duration-500 hover:scale-[1.03]"
+                          />
+                          {profile.featured && (
+                            <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-background/90 px-3 py-1 text-xs font-semibold text-primary shadow-sm">
+                              <Star className="h-3.5 w-3.5 fill-current" />
+                              Featured
+                            </span>
+                          )}
+                        </div>
+                        <div
+                          className={`order-2 flex flex-col justify-center space-y-5 p-6 sm:p-8 lg:p-10 ${
+                            imageOnRight ? "lg:order-1" : "lg:order-2"
+                          }`}
+                        >
+                          <div>
+                            <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                              {profile.name}
+                            </h3>
+                            <p className="mt-2 text-base font-semibold text-primary">
+                              {profile.designation}
                             </p>
-                          )}
+                            {profile.department && (
+                              <p className="mt-1 text-sm font-medium text-muted-foreground">
+                                {profile.department}
+                              </p>
+                            )}
+                          </div>
+                          <p className="whitespace-pre-line text-sm leading-7 text-muted-foreground sm:text-base">
+                            {profile.biography}
+                          </p>
+                          <div className="flex flex-wrap gap-x-4 gap-y-2 border-t border-border pt-4">
+                            {[
+                              ["LinkedIn", profile.linkedinUrl],
+                              ["Instagram", profile.instagramUrl],
+                              ["Facebook", profile.facebookUrl],
+                            ].map(([label, url]) =>
+                              url ? (
+                                <a
+                                  key={label}
+                                  href={url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  aria-label={`${profile.name} on ${label}`}
+                                  className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                                >
+                                  {label}
+                                  <ExternalLink className="h-3.5 w-3.5" />
+                                </a>
+                              ) : null,
+                            )}
+                          </div>
                         </div>
-                        <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-                          {profile.biography}
-                        </p>
-                        <div className="flex flex-wrap gap-x-4 gap-y-2 border-t border-border pt-3">
-                          {[
-                            ["LinkedIn", profile.linkedinUrl],
-                            ["Instagram", profile.instagramUrl],
-                            ["Facebook", profile.facebookUrl],
-                          ].map(([label, url]) =>
-                            url ? (
-                              <a
-                                key={label}
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                aria-label={`${profile.name} on ${label}`}
-                                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-                              >
-                                {label}
-                                <ExternalLink className="h-3.5 w-3.5" />
-                              </a>
-                            ) : null,
-                          )}
-                        </div>
-                      </div>
-                    </article>
-                  ))}
+                      </article>
+                    );
+                  })}
                 </div>
               </section>
             );
