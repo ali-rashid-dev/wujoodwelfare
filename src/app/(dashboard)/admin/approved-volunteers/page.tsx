@@ -4,8 +4,8 @@ import { getAdminVolunteerManagement } from "@/actions/volunteers";
 import { ApprovedVolunteersManagement } from "@/components/dashboard/ApprovedVolunteersManagement";
 
 export const metadata: Metadata = {
-  title: "Approved Volunteers",
-  description: "Review approved volunteer accounts and manage their assignments.",
+  title: "Approved Volunteer Management",
+  description: "Manage approved volunteer profiles, account access, and assignments.",
 };
 
 export default async function AdminApprovedVolunteersPage() {
@@ -19,10 +19,10 @@ export default async function AdminApprovedVolunteersPage() {
           Administrative Console
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-          Approved Volunteers
+          Approved Volunteer Management
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Review volunteer account access, track assignments, and assign new work.
+          Review approved profiles, control volunteer portal access, and manage assignments.
         </p>
       </div>
 

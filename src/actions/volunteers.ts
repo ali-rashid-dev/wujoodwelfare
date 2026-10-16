@@ -267,6 +267,7 @@ export async function getAdminVolunteerManagement() {
           email: true,
           role: true,
           banned: true,
+          banExpires: true,
           assignments: {
             orderBy: { createdAt: "desc" },
             select: {
@@ -394,7 +395,11 @@ export async function createVolunteerAssignment(
     where: {
       id: validation.data.userId,
       role: "volunteer",
-      OR: [{ banned: false }, { banned: null }],
+      OR: [
+        { banned: false },
+        { banned: null },
+        { banned: true, banExpires: { lte: new Date() } },
+      ],
     },
     select: { id: true, email: true },
   });
