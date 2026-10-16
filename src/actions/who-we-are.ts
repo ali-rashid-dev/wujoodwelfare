@@ -37,6 +37,10 @@ const whoWeAreSchema = z.object({
   yearsExperience: z.number().int().min(1).max(200),
 });
 
+const updateWhoWeAreSchema = whoWeAreSchema.extend({
+  expectedImageUrl: imageUrlSchema,
+});
+
 const valueSchema = z.object({
   title: z.string().trim().min(1, "Title is required.").max(80),
   text: z.string().trim().min(1, "Description is required.").max(600),
@@ -137,22 +141,24 @@ async function deleteOldImage(imageUrl: string) {
 export async function updateWhoWeAre(rawInput: unknown) {
   try {
     await requireAdmin();
-    const parsed = whoWeAreSchema.parse(rawInput);
-    const existing = await prisma.whoWeAre.findUnique({
-      where: { id: "main" },
-      select: { imageUrl: true },
-    });
-    const content = await prisma.whoWeAre.upsert({
-      where: { id: "main" },
-      create: { id: "main", ...parsed },
-      update: parsed,
+    const parsed = updateWhoWeAreSchema.parse(rawInput);
+    const { expectedImageUrl, ...data } = parsed;
+    const [content] = await prisma.whoWeAre.updateManyAndReturn({
+      where: { id: "main", imageUrl: expectedImageUrl },
+      data,
       select: whoWeAreSelect,
     });
+    if (!content) {
+      return {
+        success: false as const,
+        error: "Who We Are content changed since you opened it. Refresh and try again.",
+      };
+    }
     revalidateWhoWeAre();
 
     const warning =
-      existing && existing.imageUrl !== parsed.imageUrl
-        ? await deleteOldImage(existing.imageUrl)
+      expectedImageUrl !== data.imageUrl
+        ? await deleteOldImage(expectedImageUrl)
         : undefined;
     return { success: true as const, content, warning };
   } catch (error) {
@@ -160,6 +166,31 @@ export async function updateWhoWeAre(rawInput: unknown) {
     return {
       success: false as const,
       error: errorMessage(error, "Failed to save Who We Are content."),
+    };
+  }
+}
+
+export async function discardWhoWeAreImageUpload(rawImageUrl: unknown) {
+  try {
+    await requireAdmin();
+    const imageUrl = imageUrlSchema.parse(rawImageUrl);
+    const key = uploadThingKey(imageUrl);
+    if (!key) return { success: true as const };
+
+    const result = await new UTApi().deleteFiles(key);
+    if (!result.success) {
+      console.error("UploadThing did not delete a cancelled Who We Are image upload.");
+      return {
+        success: false as const,
+        error: "The replacement was cancelled, but its uploaded image could not be removed.",
+      };
+    }
+    return { success: true as const };
+  } catch (error) {
+    console.error("Discard cancelled Who We Are image upload failed:", error);
+    return {
+      success: false as const,
+      error: errorMessage(error, "Could not remove the cancelled image upload."),
     };
   }
 }

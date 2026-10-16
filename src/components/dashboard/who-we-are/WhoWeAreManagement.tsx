@@ -18,6 +18,7 @@ import type { LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 import {
   createWhoWeAreValue,
+  discardWhoWeAreImageUpload,
   deleteWhoWeAreValue,
   updateWhoWeAre,
   updateWhoWeAreValue,
@@ -245,6 +246,8 @@ function WhoWeAreContentForm({
   const [heading, setHeading] = useState(initialContent.heading);
   const [description, setDescription] = useState(initialContent.description);
   const [imageUrl, setImageUrl] = useState(initialContent.imageUrl);
+  const [savedImageUrl, setSavedImageUrl] = useState(initialContent.imageUrl);
+  const [replacementOriginalUrl, setReplacementOriginalUrl] = useState<string | null>(null);
   const [yearsExperience, setYearsExperience] = useState(
     String(initialContent.yearsExperience),
   );
@@ -258,18 +261,33 @@ function WhoWeAreContentForm({
         heading,
         description,
         imageUrl,
+        expectedImageUrl: savedImageUrl,
         yearsExperience: Number(yearsExperience),
       });
       if (!result.success) {
         toast.error(result.error);
         return;
       }
+      setSavedImageUrl(result.content.imageUrl);
+      setReplacementOriginalUrl(null);
       toast.success("Who We Are content updated.");
       if (result.warning) toast.warning(result.warning);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not save Who We Are content.");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const cancelImageReplacement = async () => {
+    if (!replacementOriginalUrl) return;
+    const uploadedReplacementUrl = imageUrl;
+    setImageUrl(replacementOriginalUrl);
+    setReplacementOriginalUrl(null);
+
+    if (uploadedReplacementUrl && uploadedReplacementUrl !== replacementOriginalUrl) {
+      const result = await discardWhoWeAreImageUpload(uploadedReplacementUrl);
+      if (!result.success) toast.warning(result.error);
     }
   };
 
@@ -336,10 +354,24 @@ function WhoWeAreContentForm({
                   variant="secondary"
                   size="sm"
                   className="absolute bottom-3 right-3"
-                  onClick={() => setImageUrl("")}
+                  onClick={() => {
+                    setReplacementOriginalUrl(imageUrl);
+                    setImageUrl("");
+                  }}
                 >
                   Replace image
                 </Button>
+                {replacementOriginalUrl && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="absolute bottom-3 left-3"
+                    onClick={() => void cancelImageReplacement()}
+                  >
+                    Cancel
+                  </Button>
+                )}
               </div>
             ) : (
               <UploadDropzone
@@ -361,6 +393,16 @@ function WhoWeAreContentForm({
                   button: "bg-primary text-primary-foreground",
                 }}
               />
+            )}
+            {replacementOriginalUrl && !imageUrl && (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => void cancelImageReplacement()}
+              >
+                Cancel image replacement
+              </Button>
             )}
           </div>
         </div>
