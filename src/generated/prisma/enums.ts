@@ -30,9 +30,8 @@ export type Role = (typeof Role)[keyof typeof Role]
 export const TeamSection = {
   founders: 'founders',
   executive_leadership: 'executive_leadership',
-  coordinators: 'coordinators',
-  department_leads: 'department_leads',
-  team_members_volunteers: 'team_members_volunteers'
+  leadership: 'leadership',
+  department_leads: 'department_leads'
 } as const
 
 export type TeamSection = (typeof TeamSection)[keyof typeof TeamSection]

@@ -287,9 +287,8 @@ enum Role {
 enum TeamSection {
   founders
   executive_leadership
-  coordinators
+  leadership
   department_leads
-  team_members_volunteers
 }
 
 model TeamCategory {
