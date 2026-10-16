@@ -77,7 +77,8 @@ const ADMIN_NAV = [
   {
     groupLabel: "People",
     items: [
-      { title: "Volunteers", url: "/admin/volunteers", icon: Users, exact: false },
+      { title: "Applications", url: "/admin/volunteers", icon: Users, exact: false },
+      { title: "Approved Volunteers", url: "/admin/approved-volunteers", icon: UserRound, exact: false },
       { title: "Contact Messages", url: "/admin/messages", icon: Mail, exact: false },
     ],
   },
