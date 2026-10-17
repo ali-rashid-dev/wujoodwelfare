@@ -17,6 +17,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -111,6 +112,7 @@ export function AppSidebar({ user, role: propRole }: AppSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const roleContext = useRole();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const activeRole = propRole || roleContext.role || "volunteer";
   const isAdmin = activeRole === "admin";
@@ -124,19 +126,26 @@ export function AppSidebar({ user, role: propRole }: AppSidebarProps) {
 
   const isActive = (url: string, exact: boolean) =>
     exact ? pathname === url : pathname.startsWith(url);
+  const closeMobileSidebar = () => {
+    if (isMobile) setOpenMobile(false);
+  };
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       {/* Brand Header */}
       <SidebarHeader className="border-b border-sidebar-border px-4 py-3.5">
-        <Link href={homeUrl} className="flex items-center gap-3 group">
+        <Link
+          href={homeUrl}
+          onClick={closeMobileSidebar}
+          className="flex items-center gap-3 group"
+        >
           <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-border bg-secondary transition-transform duration-150 group-hover:scale-[1.02]">
             <Image
               src="/logo.jpg"
               alt="Wujood Welfare"
               width={150}
               height={150}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
             />
           </div>
           <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
@@ -168,33 +177,41 @@ export function AppSidebar({ user, role: propRole }: AppSidebarProps) {
       </SidebarHeader>
 
       {/* Navigation */}
-      <SidebarContent className="px-2 py-3 space-y-4">
+      <SidebarContent className="overflow-x-hidden px-2 py-3 space-y-4">
         {navGroups.map((group) => (
           <SidebarGroup key={group.groupLabel} className="py-1">
             <SidebarGroupLabel className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/80 px-2 mb-1 group-data-[collapsible=icon]:hidden">
               {group.groupLabel}
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="gap-1">
                 {group.items.map((item) => {
                   const Icon = item.icon;
                   const active = isActive(item.url, item.exact);
                   return (
                     <SidebarMenuItem key={item.url}>
                       <SidebarMenuButton
-                        render={<Link href={item.url} />}
+                        render={
+                          <Link
+                            href={item.url}
+                            aria-current={active ? "page" : undefined}
+                            onClick={closeMobileSidebar}
+                          />
+                        }
                         isActive={active}
                         tooltip={item.title}
-                        className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold transition-[background-color,color,border-color] duration-150 ${
+                        className={`relative h-10 gap-3 rounded-lg px-3 text-[13px] font-semibold transition-[background-color,color,border-color] duration-150 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group-data-[collapsible=icon]:justify-center ${
                           active
-                            ? "bg-primary/10 text-primary border-l-2 border-primary"
+                            ? "bg-primary/10 text-primary before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-r-full before:bg-primary"
                             : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
                         }`}
                       >
                         <Icon
-                          className={`h-4 w-4 shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`}
+                          className={`!size-5 shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`}
                         />
-                        <span className="truncate">{item.title}</span>
+                        <span className="min-w-0 truncate group-data-[collapsible=icon]:hidden">
+                          {item.title}
+                        </span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   );
@@ -207,16 +224,16 @@ export function AppSidebar({ user, role: propRole }: AppSidebarProps) {
         {/* Public Site Link */}
         <SidebarGroup className="mt-auto pt-2 border-t border-sidebar-border">
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-1">
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  render={<Link href="/" />}
+                  render={<Link href="/" onClick={closeMobileSidebar} />}
                   tooltip="Return to Public Site"
-                  className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent/50 rounded-lg transition-colors"
+                  className="h-10 gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group-data-[collapsible=icon]:justify-center"
                 >
-                  <Home className="h-4 w-4" />
+                  <Home className="!size-5 shrink-0" />
                   <span className="group-data-[collapsible=icon]:hidden">Public Website</span>
-                  <ExternalLink className="h-3.5 w-3.5 ml-auto opacity-60 group-data-[collapsible=icon]:hidden" />
+                  <ExternalLink className="!size-5 ml-auto shrink-0 opacity-60 group-data-[collapsible=icon]:hidden" />
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -225,7 +242,7 @@ export function AppSidebar({ user, role: propRole }: AppSidebarProps) {
       </SidebarContent>
 
       {/* User Profile Footer */}
-      <SidebarFooter className="border-t border-sidebar-border p-2">
+      <SidebarFooter className="border-t border-sidebar-border p-2 group-data-[collapsible=icon]:px-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
@@ -233,7 +250,7 @@ export function AppSidebar({ user, role: propRole }: AppSidebarProps) {
                 render={
                   <SidebarMenuButton
                     size="lg"
-                    className="data-[state=open]:bg-sidebar-accent rounded-xl"
+                    className="rounded-xl data-[state=open]:bg-sidebar-accent group-data-[collapsible=icon]:h-10! group-data-[collapsible=icon]:justify-center"
                   >
                     <Avatar className="h-8 w-8 rounded-lg border border-border">
                       {user?.image && <AvatarImage src={user.image} alt={user.name || ""} />}

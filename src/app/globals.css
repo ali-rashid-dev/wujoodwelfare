@@ -34,6 +34,12 @@
   --color-ring: var(--ring);
   --color-cream: var(--cream);
   --color-success: var(--success);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -76,6 +82,13 @@
   --border: #e8e3d9;
   --input: #d8d2c6;
   --ring: #174a83;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #252923;
+  --sidebar-accent: #f0ede5;
+  --sidebar-accent-foreground: #252923;
+  --sidebar-border: #e8e3d9;
+  --sidebar-ring: #174a83;
 }
 
 .dark {
@@ -101,6 +114,13 @@
   --border: #464b42;
   --input: #555a50;
   --ring: #86b5e8;
+
+  --sidebar: #292e28;
+  --sidebar-foreground: #f8f5ec;
+  --sidebar-accent: #343a33;
+  --sidebar-accent-foreground: #f8f5ec;
+  --sidebar-border: #464b42;
+  --sidebar-ring: #86b5e8;
 }
 
 @layer base {
