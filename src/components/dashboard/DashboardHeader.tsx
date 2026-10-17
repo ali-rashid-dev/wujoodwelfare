@@ -60,12 +60,6 @@ export function DashboardHeader({ role: propRole }: DashboardHeaderProps) {
 
   return (
     <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4">
-      <a
-        href="#dashboard-content"
-        className="sr-only rounded-lg bg-card px-4 py-2 font-semibold text-foreground focus:not-sr-only focus:absolute focus:left-4 focus:top-2 focus:z-50 focus:ring-2 focus:ring-ring"
-      >
-        Skip to main content
-      </a>
       {/* ── Left: Trigger + Breadcrumbs ─────────────── */}
       <div className="flex items-center gap-3 min-w-0">
         <SidebarTrigger className="h-9 w-9 text-muted-foreground hover:text-foreground" />

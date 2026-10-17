@@ -34,6 +34,12 @@ export default async function AdminLayout({
     <RoleProvider key={user.id} userId={user.id} role="admin">
       <SidebarProvider defaultOpen={true}>
         <div className="relative flex min-h-screen w-full bg-background text-foreground antialiased">
+          <a
+            href="#dashboard-content"
+            className="sr-only rounded-lg bg-card px-4 py-2 font-semibold text-foreground shadow-md focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:ring-2 focus:ring-ring"
+          >
+            Skip to main content
+          </a>
           <AppSidebar user={user} role="admin" />
           <SidebarInset className="flex flex-1 flex-col min-w-0 bg-muted/15">
             <DashboardHeader role="admin" />
