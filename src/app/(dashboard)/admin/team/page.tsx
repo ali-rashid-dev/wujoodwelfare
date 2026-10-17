@@ -5,7 +5,7 @@ import { TeamManagement } from "@/components/dashboard/team/TeamManagement";
 
 export const metadata: Metadata = {
   title: "Team Management",
-  description: "Manage public team profiles and categories.",
+  description: "Manage team profiles and choose which appear in Top Leadership.",
 };
 
 export default async function AdminTeamPage() {
@@ -22,8 +22,8 @@ export default async function AdminTeamPage() {
           Team Management
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Manage the public team directory. Team membership does not grant application access
-          or change account roles.
+          Manage team profiles and choose which members appear in Top Leadership. Team membership
+          does not grant application access or change account roles.
         </p>
       </div>
 

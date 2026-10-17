@@ -249,23 +249,6 @@ export type FloatWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedFloatFilter<$PrismaModel>
 }
 
-export type EnumTeamSectionFilter<$PrismaModel = never> = {
-  equals?: $Enums.TeamSection | Prisma.EnumTeamSectionFieldRefInput<$PrismaModel>
-  in?: $Enums.TeamSection[] | Prisma.ListEnumTeamSectionFieldRefInput<$PrismaModel>
-  notIn?: $Enums.TeamSection[] | Prisma.ListEnumTeamSectionFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumTeamSectionFilter<$PrismaModel> | $Enums.TeamSection
-}
-
-export type EnumTeamSectionWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.TeamSection | Prisma.EnumTeamSectionFieldRefInput<$PrismaModel>
-  in?: $Enums.TeamSection[] | Prisma.ListEnumTeamSectionFieldRefInput<$PrismaModel>
-  notIn?: $Enums.TeamSection[] | Prisma.ListEnumTeamSectionFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumTeamSectionWithAggregatesFilter<$PrismaModel> | $Enums.TeamSection
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumTeamSectionFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumTeamSectionFilter<$PrismaModel>
-}
-
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -501,23 +484,6 @@ export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedFloatFilter<$PrismaModel>
   _min?: Prisma.NestedFloatFilter<$PrismaModel>
   _max?: Prisma.NestedFloatFilter<$PrismaModel>
-}
-
-export type NestedEnumTeamSectionFilter<$PrismaModel = never> = {
-  equals?: $Enums.TeamSection | Prisma.EnumTeamSectionFieldRefInput<$PrismaModel>
-  in?: $Enums.TeamSection[] | Prisma.ListEnumTeamSectionFieldRefInput<$PrismaModel>
-  notIn?: $Enums.TeamSection[] | Prisma.ListEnumTeamSectionFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumTeamSectionFilter<$PrismaModel> | $Enums.TeamSection
-}
-
-export type NestedEnumTeamSectionWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.TeamSection | Prisma.EnumTeamSectionFieldRefInput<$PrismaModel>
-  in?: $Enums.TeamSection[] | Prisma.ListEnumTeamSectionFieldRefInput<$PrismaModel>
-  notIn?: $Enums.TeamSection[] | Prisma.ListEnumTeamSectionFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumTeamSectionWithAggregatesFilter<$PrismaModel> | $Enums.TeamSection
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumTeamSectionFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumTeamSectionFilter<$PrismaModel>
 }
 
 

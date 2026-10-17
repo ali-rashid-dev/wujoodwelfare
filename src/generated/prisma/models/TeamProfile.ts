@@ -39,7 +39,7 @@ export type TeamProfileMinAggregateOutputType = {
   userId: string | null
   name: string | null
   designation: string | null
-  categoryId: string | null
+  isTopLeadership: boolean | null
   biography: string | null
   imageUrl: string | null
   department: string | null
@@ -58,7 +58,7 @@ export type TeamProfileMaxAggregateOutputType = {
   userId: string | null
   name: string | null
   designation: string | null
-  categoryId: string | null
+  isTopLeadership: boolean | null
   biography: string | null
   imageUrl: string | null
   department: string | null
@@ -77,7 +77,7 @@ export type TeamProfileCountAggregateOutputType = {
   userId: number
   name: number
   designation: number
-  categoryId: number
+  isTopLeadership: number
   biography: number
   imageUrl: number
   department: number
@@ -106,7 +106,7 @@ export type TeamProfileMinAggregateInputType = {
   userId?: true
   name?: true
   designation?: true
-  categoryId?: true
+  isTopLeadership?: true
   biography?: true
   imageUrl?: true
   department?: true
@@ -125,7 +125,7 @@ export type TeamProfileMaxAggregateInputType = {
   userId?: true
   name?: true
   designation?: true
-  categoryId?: true
+  isTopLeadership?: true
   biography?: true
   imageUrl?: true
   department?: true
@@ -144,7 +144,7 @@ export type TeamProfileCountAggregateInputType = {
   userId?: true
   name?: true
   designation?: true
-  categoryId?: true
+  isTopLeadership?: true
   biography?: true
   imageUrl?: true
   department?: true
@@ -250,7 +250,7 @@ export type TeamProfileGroupByOutputType = {
   userId: string | null
   name: string
   designation: string
-  categoryId: string
+  isTopLeadership: boolean
   biography: string
   imageUrl: string
   department: string | null
@@ -292,7 +292,7 @@ export type TeamProfileWhereInput = {
   userId?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
   name?: Prisma.StringFilter<"TeamProfile"> | string
   designation?: Prisma.StringFilter<"TeamProfile"> | string
-  categoryId?: Prisma.StringFilter<"TeamProfile"> | string
+  isTopLeadership?: Prisma.BoolFilter<"TeamProfile"> | boolean
   biography?: Prisma.StringFilter<"TeamProfile"> | string
   imageUrl?: Prisma.StringFilter<"TeamProfile"> | string
   department?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
@@ -305,7 +305,6 @@ export type TeamProfileWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"TeamProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TeamProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  category?: Prisma.XOR<Prisma.TeamCategoryScalarRelationFilter, Prisma.TeamCategoryWhereInput>
 }
 
 export type TeamProfileOrderByWithRelationInput = {
@@ -313,7 +312,7 @@ export type TeamProfileOrderByWithRelationInput = {
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
   designation?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
+  isTopLeadership?: Prisma.SortOrder
   biography?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   department?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -326,7 +325,6 @@ export type TeamProfileOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
-  category?: Prisma.TeamCategoryOrderByWithRelationInput
 }
 
 export type TeamProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -337,7 +335,7 @@ export type TeamProfileWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.TeamProfileWhereInput | Prisma.TeamProfileWhereInput[]
   name?: Prisma.StringFilter<"TeamProfile"> | string
   designation?: Prisma.StringFilter<"TeamProfile"> | string
-  categoryId?: Prisma.StringFilter<"TeamProfile"> | string
+  isTopLeadership?: Prisma.BoolFilter<"TeamProfile"> | boolean
   biography?: Prisma.StringFilter<"TeamProfile"> | string
   imageUrl?: Prisma.StringFilter<"TeamProfile"> | string
   department?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
@@ -350,7 +348,6 @@ export type TeamProfileWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"TeamProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TeamProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  category?: Prisma.XOR<Prisma.TeamCategoryScalarRelationFilter, Prisma.TeamCategoryWhereInput>
 }, "id" | "userId">
 
 export type TeamProfileOrderByWithAggregationInput = {
@@ -358,7 +355,7 @@ export type TeamProfileOrderByWithAggregationInput = {
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
   designation?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
+  isTopLeadership?: Prisma.SortOrder
   biography?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   department?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -385,7 +382,7 @@ export type TeamProfileScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringNullableWithAggregatesFilter<"TeamProfile"> | string | null
   name?: Prisma.StringWithAggregatesFilter<"TeamProfile"> | string
   designation?: Prisma.StringWithAggregatesFilter<"TeamProfile"> | string
-  categoryId?: Prisma.StringWithAggregatesFilter<"TeamProfile"> | string
+  isTopLeadership?: Prisma.BoolWithAggregatesFilter<"TeamProfile"> | boolean
   biography?: Prisma.StringWithAggregatesFilter<"TeamProfile"> | string
   imageUrl?: Prisma.StringWithAggregatesFilter<"TeamProfile"> | string
   department?: Prisma.StringNullableWithAggregatesFilter<"TeamProfile"> | string | null
@@ -403,6 +400,7 @@ export type TeamProfileCreateInput = {
   id?: string
   name: string
   designation: string
+  isTopLeadership?: boolean
   biography: string
   imageUrl: string
   department?: string | null
@@ -415,7 +413,6 @@ export type TeamProfileCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user?: Prisma.UserCreateNestedOneWithoutTeamProfileInput
-  category: Prisma.TeamCategoryCreateNestedOneWithoutProfilesInput
 }
 
 export type TeamProfileUncheckedCreateInput = {
@@ -423,7 +420,7 @@ export type TeamProfileUncheckedCreateInput = {
   userId?: string | null
   name: string
   designation: string
-  categoryId: string
+  isTopLeadership?: boolean
   biography: string
   imageUrl: string
   department?: string | null
@@ -441,6 +438,7 @@ export type TeamProfileUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   designation?: Prisma.StringFieldUpdateOperationsInput | string
+  isTopLeadership?: Prisma.BoolFieldUpdateOperationsInput | boolean
   biography?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -453,7 +451,6 @@ export type TeamProfileUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneWithoutTeamProfileNestedInput
-  category?: Prisma.TeamCategoryUpdateOneRequiredWithoutProfilesNestedInput
 }
 
 export type TeamProfileUncheckedUpdateInput = {
@@ -461,7 +458,7 @@ export type TeamProfileUncheckedUpdateInput = {
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   designation?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  isTopLeadership?: Prisma.BoolFieldUpdateOperationsInput | boolean
   biography?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -480,7 +477,7 @@ export type TeamProfileCreateManyInput = {
   userId?: string | null
   name: string
   designation: string
-  categoryId: string
+  isTopLeadership?: boolean
   biography: string
   imageUrl: string
   department?: string | null
@@ -498,6 +495,7 @@ export type TeamProfileUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   designation?: Prisma.StringFieldUpdateOperationsInput | string
+  isTopLeadership?: Prisma.BoolFieldUpdateOperationsInput | boolean
   biography?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -516,7 +514,7 @@ export type TeamProfileUncheckedUpdateManyInput = {
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   designation?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  isTopLeadership?: Prisma.BoolFieldUpdateOperationsInput | boolean
   biography?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -535,22 +533,12 @@ export type TeamProfileNullableScalarRelationFilter = {
   isNot?: Prisma.TeamProfileWhereInput | null
 }
 
-export type TeamProfileListRelationFilter = {
-  every?: Prisma.TeamProfileWhereInput
-  some?: Prisma.TeamProfileWhereInput
-  none?: Prisma.TeamProfileWhereInput
-}
-
-export type TeamProfileOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
-}
-
 export type TeamProfileCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   designation?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
+  isTopLeadership?: Prisma.SortOrder
   biography?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   department?: Prisma.SortOrder
@@ -573,7 +561,7 @@ export type TeamProfileMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   designation?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
+  isTopLeadership?: Prisma.SortOrder
   biography?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   department?: Prisma.SortOrder
@@ -592,7 +580,7 @@ export type TeamProfileMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   designation?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
+  isTopLeadership?: Prisma.SortOrder
   biography?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   department?: Prisma.SortOrder
@@ -642,52 +630,11 @@ export type TeamProfileUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TeamProfileUpdateToOneWithWhereWithoutUserInput, Prisma.TeamProfileUpdateWithoutUserInput>, Prisma.TeamProfileUncheckedUpdateWithoutUserInput>
 }
 
-export type TeamProfileCreateNestedManyWithoutCategoryInput = {
-  create?: Prisma.XOR<Prisma.TeamProfileCreateWithoutCategoryInput, Prisma.TeamProfileUncheckedCreateWithoutCategoryInput> | Prisma.TeamProfileCreateWithoutCategoryInput[] | Prisma.TeamProfileUncheckedCreateWithoutCategoryInput[]
-  connectOrCreate?: Prisma.TeamProfileCreateOrConnectWithoutCategoryInput | Prisma.TeamProfileCreateOrConnectWithoutCategoryInput[]
-  createMany?: Prisma.TeamProfileCreateManyCategoryInputEnvelope
-  connect?: Prisma.TeamProfileWhereUniqueInput | Prisma.TeamProfileWhereUniqueInput[]
-}
-
-export type TeamProfileUncheckedCreateNestedManyWithoutCategoryInput = {
-  create?: Prisma.XOR<Prisma.TeamProfileCreateWithoutCategoryInput, Prisma.TeamProfileUncheckedCreateWithoutCategoryInput> | Prisma.TeamProfileCreateWithoutCategoryInput[] | Prisma.TeamProfileUncheckedCreateWithoutCategoryInput[]
-  connectOrCreate?: Prisma.TeamProfileCreateOrConnectWithoutCategoryInput | Prisma.TeamProfileCreateOrConnectWithoutCategoryInput[]
-  createMany?: Prisma.TeamProfileCreateManyCategoryInputEnvelope
-  connect?: Prisma.TeamProfileWhereUniqueInput | Prisma.TeamProfileWhereUniqueInput[]
-}
-
-export type TeamProfileUpdateManyWithoutCategoryNestedInput = {
-  create?: Prisma.XOR<Prisma.TeamProfileCreateWithoutCategoryInput, Prisma.TeamProfileUncheckedCreateWithoutCategoryInput> | Prisma.TeamProfileCreateWithoutCategoryInput[] | Prisma.TeamProfileUncheckedCreateWithoutCategoryInput[]
-  connectOrCreate?: Prisma.TeamProfileCreateOrConnectWithoutCategoryInput | Prisma.TeamProfileCreateOrConnectWithoutCategoryInput[]
-  upsert?: Prisma.TeamProfileUpsertWithWhereUniqueWithoutCategoryInput | Prisma.TeamProfileUpsertWithWhereUniqueWithoutCategoryInput[]
-  createMany?: Prisma.TeamProfileCreateManyCategoryInputEnvelope
-  set?: Prisma.TeamProfileWhereUniqueInput | Prisma.TeamProfileWhereUniqueInput[]
-  disconnect?: Prisma.TeamProfileWhereUniqueInput | Prisma.TeamProfileWhereUniqueInput[]
-  delete?: Prisma.TeamProfileWhereUniqueInput | Prisma.TeamProfileWhereUniqueInput[]
-  connect?: Prisma.TeamProfileWhereUniqueInput | Prisma.TeamProfileWhereUniqueInput[]
-  update?: Prisma.TeamProfileUpdateWithWhereUniqueWithoutCategoryInput | Prisma.TeamProfileUpdateWithWhereUniqueWithoutCategoryInput[]
-  updateMany?: Prisma.TeamProfileUpdateManyWithWhereWithoutCategoryInput | Prisma.TeamProfileUpdateManyWithWhereWithoutCategoryInput[]
-  deleteMany?: Prisma.TeamProfileScalarWhereInput | Prisma.TeamProfileScalarWhereInput[]
-}
-
-export type TeamProfileUncheckedUpdateManyWithoutCategoryNestedInput = {
-  create?: Prisma.XOR<Prisma.TeamProfileCreateWithoutCategoryInput, Prisma.TeamProfileUncheckedCreateWithoutCategoryInput> | Prisma.TeamProfileCreateWithoutCategoryInput[] | Prisma.TeamProfileUncheckedCreateWithoutCategoryInput[]
-  connectOrCreate?: Prisma.TeamProfileCreateOrConnectWithoutCategoryInput | Prisma.TeamProfileCreateOrConnectWithoutCategoryInput[]
-  upsert?: Prisma.TeamProfileUpsertWithWhereUniqueWithoutCategoryInput | Prisma.TeamProfileUpsertWithWhereUniqueWithoutCategoryInput[]
-  createMany?: Prisma.TeamProfileCreateManyCategoryInputEnvelope
-  set?: Prisma.TeamProfileWhereUniqueInput | Prisma.TeamProfileWhereUniqueInput[]
-  disconnect?: Prisma.TeamProfileWhereUniqueInput | Prisma.TeamProfileWhereUniqueInput[]
-  delete?: Prisma.TeamProfileWhereUniqueInput | Prisma.TeamProfileWhereUniqueInput[]
-  connect?: Prisma.TeamProfileWhereUniqueInput | Prisma.TeamProfileWhereUniqueInput[]
-  update?: Prisma.TeamProfileUpdateWithWhereUniqueWithoutCategoryInput | Prisma.TeamProfileUpdateWithWhereUniqueWithoutCategoryInput[]
-  updateMany?: Prisma.TeamProfileUpdateManyWithWhereWithoutCategoryInput | Prisma.TeamProfileUpdateManyWithWhereWithoutCategoryInput[]
-  deleteMany?: Prisma.TeamProfileScalarWhereInput | Prisma.TeamProfileScalarWhereInput[]
-}
-
 export type TeamProfileCreateWithoutUserInput = {
   id?: string
   name: string
   designation: string
+  isTopLeadership?: boolean
   biography: string
   imageUrl: string
   department?: string | null
@@ -699,14 +646,13 @@ export type TeamProfileCreateWithoutUserInput = {
   published?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  category: Prisma.TeamCategoryCreateNestedOneWithoutProfilesInput
 }
 
 export type TeamProfileUncheckedCreateWithoutUserInput = {
   id?: string
   name: string
   designation: string
-  categoryId: string
+  isTopLeadership?: boolean
   biography: string
   imageUrl: string
   department?: string | null
@@ -740,6 +686,7 @@ export type TeamProfileUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   designation?: Prisma.StringFieldUpdateOperationsInput | string
+  isTopLeadership?: Prisma.BoolFieldUpdateOperationsInput | boolean
   biography?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -751,170 +698,13 @@ export type TeamProfileUpdateWithoutUserInput = {
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  category?: Prisma.TeamCategoryUpdateOneRequiredWithoutProfilesNestedInput
 }
 
 export type TeamProfileUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   designation?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
-  biography?: Prisma.StringFieldUpdateOperationsInput | string
-  imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  linkedinUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  facebookUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  published?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type TeamProfileCreateWithoutCategoryInput = {
-  id?: string
-  name: string
-  designation: string
-  biography: string
-  imageUrl: string
-  department?: string | null
-  linkedinUrl?: string | null
-  instagramUrl?: string | null
-  facebookUrl?: string | null
-  sortOrder?: number
-  featured?: boolean
-  published?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user?: Prisma.UserCreateNestedOneWithoutTeamProfileInput
-}
-
-export type TeamProfileUncheckedCreateWithoutCategoryInput = {
-  id?: string
-  userId?: string | null
-  name: string
-  designation: string
-  biography: string
-  imageUrl: string
-  department?: string | null
-  linkedinUrl?: string | null
-  instagramUrl?: string | null
-  facebookUrl?: string | null
-  sortOrder?: number
-  featured?: boolean
-  published?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type TeamProfileCreateOrConnectWithoutCategoryInput = {
-  where: Prisma.TeamProfileWhereUniqueInput
-  create: Prisma.XOR<Prisma.TeamProfileCreateWithoutCategoryInput, Prisma.TeamProfileUncheckedCreateWithoutCategoryInput>
-}
-
-export type TeamProfileCreateManyCategoryInputEnvelope = {
-  data: Prisma.TeamProfileCreateManyCategoryInput | Prisma.TeamProfileCreateManyCategoryInput[]
-  skipDuplicates?: boolean
-}
-
-export type TeamProfileUpsertWithWhereUniqueWithoutCategoryInput = {
-  where: Prisma.TeamProfileWhereUniqueInput
-  update: Prisma.XOR<Prisma.TeamProfileUpdateWithoutCategoryInput, Prisma.TeamProfileUncheckedUpdateWithoutCategoryInput>
-  create: Prisma.XOR<Prisma.TeamProfileCreateWithoutCategoryInput, Prisma.TeamProfileUncheckedCreateWithoutCategoryInput>
-}
-
-export type TeamProfileUpdateWithWhereUniqueWithoutCategoryInput = {
-  where: Prisma.TeamProfileWhereUniqueInput
-  data: Prisma.XOR<Prisma.TeamProfileUpdateWithoutCategoryInput, Prisma.TeamProfileUncheckedUpdateWithoutCategoryInput>
-}
-
-export type TeamProfileUpdateManyWithWhereWithoutCategoryInput = {
-  where: Prisma.TeamProfileScalarWhereInput
-  data: Prisma.XOR<Prisma.TeamProfileUpdateManyMutationInput, Prisma.TeamProfileUncheckedUpdateManyWithoutCategoryInput>
-}
-
-export type TeamProfileScalarWhereInput = {
-  AND?: Prisma.TeamProfileScalarWhereInput | Prisma.TeamProfileScalarWhereInput[]
-  OR?: Prisma.TeamProfileScalarWhereInput[]
-  NOT?: Prisma.TeamProfileScalarWhereInput | Prisma.TeamProfileScalarWhereInput[]
-  id?: Prisma.StringFilter<"TeamProfile"> | string
-  userId?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
-  name?: Prisma.StringFilter<"TeamProfile"> | string
-  designation?: Prisma.StringFilter<"TeamProfile"> | string
-  categoryId?: Prisma.StringFilter<"TeamProfile"> | string
-  biography?: Prisma.StringFilter<"TeamProfile"> | string
-  imageUrl?: Prisma.StringFilter<"TeamProfile"> | string
-  department?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
-  linkedinUrl?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
-  instagramUrl?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
-  facebookUrl?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
-  sortOrder?: Prisma.IntFilter<"TeamProfile"> | number
-  featured?: Prisma.BoolFilter<"TeamProfile"> | boolean
-  published?: Prisma.BoolFilter<"TeamProfile"> | boolean
-  createdAt?: Prisma.DateTimeFilter<"TeamProfile"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"TeamProfile"> | Date | string
-}
-
-export type TeamProfileCreateManyCategoryInput = {
-  id?: string
-  userId?: string | null
-  name: string
-  designation: string
-  biography: string
-  imageUrl: string
-  department?: string | null
-  linkedinUrl?: string | null
-  instagramUrl?: string | null
-  facebookUrl?: string | null
-  sortOrder?: number
-  featured?: boolean
-  published?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type TeamProfileUpdateWithoutCategoryInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  designation?: Prisma.StringFieldUpdateOperationsInput | string
-  biography?: Prisma.StringFieldUpdateOperationsInput | string
-  imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  linkedinUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  facebookUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  published?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneWithoutTeamProfileNestedInput
-}
-
-export type TeamProfileUncheckedUpdateWithoutCategoryInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  designation?: Prisma.StringFieldUpdateOperationsInput | string
-  biography?: Prisma.StringFieldUpdateOperationsInput | string
-  imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  linkedinUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  facebookUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  published?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type TeamProfileUncheckedUpdateManyWithoutCategoryInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  designation?: Prisma.StringFieldUpdateOperationsInput | string
+  isTopLeadership?: Prisma.BoolFieldUpdateOperationsInput | boolean
   biography?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -935,7 +725,7 @@ export type TeamProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   userId?: boolean
   name?: boolean
   designation?: boolean
-  categoryId?: boolean
+  isTopLeadership?: boolean
   biography?: boolean
   imageUrl?: boolean
   department?: boolean
@@ -948,7 +738,6 @@ export type TeamProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.TeamProfile$userArgs<ExtArgs>
-  category?: boolean | Prisma.TeamCategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["teamProfile"]>
 
 export type TeamProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -956,7 +745,7 @@ export type TeamProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   userId?: boolean
   name?: boolean
   designation?: boolean
-  categoryId?: boolean
+  isTopLeadership?: boolean
   biography?: boolean
   imageUrl?: boolean
   department?: boolean
@@ -969,7 +758,6 @@ export type TeamProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.TeamProfile$userArgs<ExtArgs>
-  category?: boolean | Prisma.TeamCategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["teamProfile"]>
 
 export type TeamProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -977,7 +765,7 @@ export type TeamProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   userId?: boolean
   name?: boolean
   designation?: boolean
-  categoryId?: boolean
+  isTopLeadership?: boolean
   biography?: boolean
   imageUrl?: boolean
   department?: boolean
@@ -990,7 +778,6 @@ export type TeamProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.TeamProfile$userArgs<ExtArgs>
-  category?: boolean | Prisma.TeamCategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["teamProfile"]>
 
 export type TeamProfileSelectScalar = {
@@ -998,7 +785,7 @@ export type TeamProfileSelectScalar = {
   userId?: boolean
   name?: boolean
   designation?: boolean
-  categoryId?: boolean
+  isTopLeadership?: boolean
   biography?: boolean
   imageUrl?: boolean
   department?: boolean
@@ -1012,32 +799,28 @@ export type TeamProfileSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TeamProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "designation" | "categoryId" | "biography" | "imageUrl" | "department" | "linkedinUrl" | "instagramUrl" | "facebookUrl" | "sortOrder" | "featured" | "published" | "createdAt" | "updatedAt", ExtArgs["result"]["teamProfile"]>
+export type TeamProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "designation" | "isTopLeadership" | "biography" | "imageUrl" | "department" | "linkedinUrl" | "instagramUrl" | "facebookUrl" | "sortOrder" | "featured" | "published" | "createdAt" | "updatedAt", ExtArgs["result"]["teamProfile"]>
 export type TeamProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.TeamProfile$userArgs<ExtArgs>
-  category?: boolean | Prisma.TeamCategoryDefaultArgs<ExtArgs>
 }
 export type TeamProfileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.TeamProfile$userArgs<ExtArgs>
-  category?: boolean | Prisma.TeamCategoryDefaultArgs<ExtArgs>
 }
 export type TeamProfileIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.TeamProfile$userArgs<ExtArgs>
-  category?: boolean | Prisma.TeamCategoryDefaultArgs<ExtArgs>
 }
 
 export type $TeamProfilePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "TeamProfile"
   objects: {
     user: Prisma.$UserPayload<ExtArgs> | null
-    category: Prisma.$TeamCategoryPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string | null
     name: string
     designation: string
-    categoryId: string
+    isTopLeadership: boolean
     biography: string
     imageUrl: string
     department: string | null
@@ -1444,7 +1227,6 @@ readonly fields: TeamProfileFieldRefs;
 export interface Prisma__TeamProfileClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.TeamProfile$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeamProfile$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  category<T extends Prisma.TeamCategoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeamCategoryDefaultArgs<ExtArgs>>): Prisma.Prisma__TeamCategoryClient<runtime.Types.Result.GetResult<Prisma.$TeamCategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1478,7 +1260,7 @@ export interface TeamProfileFieldRefs {
   readonly userId: Prisma.FieldRef<"TeamProfile", 'String'>
   readonly name: Prisma.FieldRef<"TeamProfile", 'String'>
   readonly designation: Prisma.FieldRef<"TeamProfile", 'String'>
-  readonly categoryId: Prisma.FieldRef<"TeamProfile", 'String'>
+  readonly isTopLeadership: Prisma.FieldRef<"TeamProfile", 'Boolean'>
   readonly biography: Prisma.FieldRef<"TeamProfile", 'String'>
   readonly imageUrl: Prisma.FieldRef<"TeamProfile", 'String'>
   readonly department: Prisma.FieldRef<"TeamProfile", 'String'>

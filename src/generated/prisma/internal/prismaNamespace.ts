@@ -414,7 +414,6 @@ export const ModelName = {
   VolunteerOpportunity: 'VolunteerOpportunity',
   VolunteerAssignment: 'VolunteerAssignment',
   ProgressLog: 'ProgressLog',
-  TeamCategory: 'TeamCategory',
   TeamProfile: 'TeamProfile'
 } as const
 
@@ -431,7 +430,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "program" | "project" | "galleryItem" | "impactStory" | "whoWeAre" | "whoWeArePendingUpload" | "whoWeAreValue" | "contactMessage" | "contactRateLimit" | "volunteerApplication" | "volunteerOpportunity" | "volunteerAssignment" | "progressLog" | "teamCategory" | "teamProfile"
+    modelProps: "user" | "session" | "account" | "verification" | "program" | "project" | "galleryItem" | "impactStory" | "whoWeAre" | "whoWeArePendingUpload" | "whoWeAreValue" | "contactMessage" | "contactRateLimit" | "volunteerApplication" | "volunteerOpportunity" | "volunteerAssignment" | "progressLog" | "teamProfile"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1693,80 +1692,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    TeamCategory: {
-      payload: Prisma.$TeamCategoryPayload<ExtArgs>
-      fields: Prisma.TeamCategoryFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.TeamCategoryFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamCategoryPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.TeamCategoryFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamCategoryPayload>
-        }
-        findFirst: {
-          args: Prisma.TeamCategoryFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamCategoryPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.TeamCategoryFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamCategoryPayload>
-        }
-        findMany: {
-          args: Prisma.TeamCategoryFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamCategoryPayload>[]
-        }
-        create: {
-          args: Prisma.TeamCategoryCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamCategoryPayload>
-        }
-        createMany: {
-          args: Prisma.TeamCategoryCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.TeamCategoryCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamCategoryPayload>[]
-        }
-        delete: {
-          args: Prisma.TeamCategoryDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamCategoryPayload>
-        }
-        update: {
-          args: Prisma.TeamCategoryUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamCategoryPayload>
-        }
-        deleteMany: {
-          args: Prisma.TeamCategoryDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.TeamCategoryUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.TeamCategoryUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamCategoryPayload>[]
-        }
-        upsert: {
-          args: Prisma.TeamCategoryUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamCategoryPayload>
-        }
-        aggregate: {
-          args: Prisma.TeamCategoryAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateTeamCategory>
-        }
-        groupBy: {
-          args: Prisma.TeamCategoryGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.TeamCategoryGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.TeamCategoryCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.TeamCategoryCountAggregateOutputType> | number
-        }
-      }
-    }
     TeamProfile: {
       payload: Prisma.$TeamProfilePayload<ExtArgs>
       fields: Prisma.TeamProfileFieldRefs
@@ -2135,24 +2060,12 @@ export const ProgressLogScalarFieldEnum = {
 export type ProgressLogScalarFieldEnum = (typeof ProgressLogScalarFieldEnum)[keyof typeof ProgressLogScalarFieldEnum]
 
 
-export const TeamCategoryScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  section: 'section',
-  sortOrder: 'sortOrder',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type TeamCategoryScalarFieldEnum = (typeof TeamCategoryScalarFieldEnum)[keyof typeof TeamCategoryScalarFieldEnum]
-
-
 export const TeamProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   name: 'name',
   designation: 'designation',
-  categoryId: 'categoryId',
+  isTopLeadership: 'isTopLeadership',
   biography: 'biography',
   imageUrl: 'imageUrl',
   department: 'department',
@@ -2287,20 +2200,6 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-
-
-
-/**
- * Reference to a field of type 'TeamSection'
- */
-export type EnumTeamSectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TeamSection'>
-
-
-
-/**
- * Reference to a field of type 'TeamSection[]'
- */
-export type ListEnumTeamSectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TeamSection[]'>
 
 
 /**
@@ -2471,7 +2370,6 @@ export type GlobalOmitConfig = {
   volunteerOpportunity?: Prisma.VolunteerOpportunityOmit
   volunteerAssignment?: Prisma.VolunteerAssignmentOmit
   progressLog?: Prisma.ProgressLogOmit
-  teamCategory?: Prisma.TeamCategoryOmit
   teamProfile?: Prisma.TeamProfileOmit
 }
 

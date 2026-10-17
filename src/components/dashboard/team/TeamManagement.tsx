@@ -14,16 +14,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import {
-  createTeamCategory,
   createTeamProfile,
-  deleteTeamCategory,
   deleteTeamProfile,
   toggleTeamProfilePublish,
-  updateTeamCategory,
   updateTeamProfile,
   type getAdminTeamManagementData,
 } from "@/actions/team";
-import { TEAM_SECTIONS, TEAM_SECTION_LABELS, type TeamSection } from "@/lib/team";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -53,7 +49,6 @@ import {
 
 type TeamManagementData = Awaited<ReturnType<typeof getAdminTeamManagementData>>;
 type TeamProfileRecord = TeamManagementData["profiles"][number];
-type TeamCategoryRecord = TeamManagementData["categories"][number];
 type VisibilityFilter = "all" | "published" | "drafts";
 
 export function TeamManagement({
@@ -62,16 +57,13 @@ export function TeamManagement({
   initialData: TeamManagementData;
 }) {
   const [profiles, setProfiles] = useState(initialData.profiles);
-  const [categories, setCategories] = useState(initialData.categories);
   const [users] = useState(initialData.users);
   const [query, setQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
   const [visibilityFilter, setVisibilityFilter] = useState<VisibilityFilter>("all");
   const [formOpen, setFormOpen] = useState(false);
   const [editingProfile, setEditingProfile] = useState<TeamProfileRecord | null>(null);
   const [viewingProfile, setViewingProfile] = useState<TeamProfileRecord | null>(null);
   const [deletingProfile, setDeletingProfile] = useState<TeamProfileRecord | null>(null);
-  const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPending, startTransition] = useTransition();
   const pageSize = 12;
@@ -79,20 +71,18 @@ export function TeamManagement({
   const filteredProfiles = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase();
     return profiles.filter((profile) => {
-      const matchesCategory =
-        categoryFilter === "all" || profile.category.id === categoryFilter;
       const matchesVisibility =
         visibilityFilter === "all" ||
         (visibilityFilter === "published" && profile.published) ||
         (visibilityFilter === "drafts" && !profile.published);
       const matchesQuery =
         !normalizedQuery ||
-        `${profile.name} ${profile.designation} ${profile.biography} ${profile.department ?? ""} ${profile.category.name}`
+        `${profile.name} ${profile.designation} ${profile.biography} ${profile.department ?? ""}`
           .toLocaleLowerCase()
           .includes(normalizedQuery);
-      return matchesCategory && matchesVisibility && matchesQuery;
+      return matchesVisibility && matchesQuery;
     });
-  }, [categoryFilter, profiles, query, visibilityFilter]);
+  }, [profiles, query, visibilityFilter]);
   const {
     currentPage,
     pageCount,
@@ -164,24 +154,6 @@ export function TeamManagement({
     }
   };
 
-  const handleCategoryChange = (category: TeamCategoryRecord, deletedId?: string) => {
-    if (deletedId && categoryFilter === deletedId) setCategoryFilter("all");
-    setCategories((current) =>
-      deletedId
-        ? current.filter((item) => item.id !== deletedId)
-        : current.some((item) => item.id === category.id)
-          ? current.map((item) => (item.id === category.id ? category : item))
-          : [...current, category],
-    );
-    if (!deletedId) {
-      setProfiles((current) =>
-        current.map((profile) =>
-          profile.category.id === category.id ? { ...profile, category } : profile,
-        ),
-      );
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -215,22 +187,6 @@ export function TeamManagement({
               />
             </div>
             <select
-              aria-label="Filter team profiles by category"
-              value={categoryFilter}
-              onChange={(event) => {
-                setCategoryFilter(event.target.value);
-                resetPage();
-              }}
-              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-            >
-              <option value="all">All categories</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {TEAM_SECTION_LABELS[category.section]} / {category.name}
-                </option>
-              ))}
-            </select>
-            <select
               aria-label="Filter team profiles by publication status"
               value={visibilityFilter}
               onChange={(event) => {
@@ -245,9 +201,6 @@ export function TeamManagement({
             </select>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setCategoriesOpen(true)}>
-              Manage categories
-            </Button>
             <Button onClick={openCreate} className="shrink-0">
               <Plus className="mr-2 h-4 w-4" />
               Add team member
@@ -288,7 +241,7 @@ export function TeamManagement({
                   <p className="font-semibold">{profile.name}</p>
                   <p className="text-sm text-muted-foreground">{profile.designation}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {TEAM_SECTION_LABELS[profile.category.section]} / {profile.category.name}
+                    {profile.isTopLeadership ? "Top leadership" : "Other team member"}
                     {profile.department ? ` · ${profile.department}` : ""}
                   </p>
                   <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
@@ -354,7 +307,6 @@ export function TeamManagement({
           open={formOpen}
           onOpenChange={setFormOpen}
           profile={editingProfile}
-          categories={categories}
           users={users}
           onSaved={handleSaved}
         />
@@ -363,13 +315,6 @@ export function TeamManagement({
       <TeamProfileDetails
         profile={viewingProfile}
         onOpenChange={(open) => !open && setViewingProfile(null)}
-      />
-
-      <TeamCategoryManager
-        open={categoriesOpen}
-        onOpenChange={setCategoriesOpen}
-        categories={categories}
-        onCategoryChange={handleCategoryChange}
       />
 
       <AlertDialog
@@ -425,21 +370,19 @@ function TeamProfileDialog({
   open,
   onOpenChange,
   profile,
-  categories,
   users,
   onSaved,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   profile: TeamProfileRecord | null;
-  categories: TeamCategoryRecord[];
   users: TeamManagementData["users"];
   onSaved: (profile: TeamProfileRecord, warning?: string) => void;
 }) {
   const [name, setName] = useState(profile?.name ?? "");
   const [userId, setUserId] = useState(profile?.userId ?? "");
   const [designation, setDesignation] = useState(profile?.designation ?? "");
-  const [categoryId, setCategoryId] = useState(profile?.category.id ?? categories[0]?.id ?? "");
+  const [isTopLeadership, setIsTopLeadership] = useState(profile?.isTopLeadership ?? true);
   const [biography, setBiography] = useState(profile?.biography ?? "");
   const [imageUrl, setImageUrl] = useState(profile?.imageUrl ?? "");
   const [department, setDepartment] = useState(profile?.department ?? "");
@@ -457,10 +400,6 @@ function TeamProfileDialog({
       toast.error("Upload a profile image before saving.");
       return;
     }
-    if (!categoryId) {
-      toast.error("Create or choose a category before saving.");
-      return;
-    }
 
     setIsSaving(true);
     try {
@@ -468,7 +407,7 @@ function TeamProfileDialog({
         name,
         userId,
         designation,
-        categoryId,
+        isTopLeadership,
         biography,
         imageUrl,
         department,
@@ -590,32 +529,14 @@ function TeamProfileDialog({
             </p>
           </Field>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Category" id="team-profile-category">
-              <select
-                id="team-profile-category"
-                value={categoryId}
-                onChange={(event) => setCategoryId(event.target.value)}
-                required
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="" disabled>Select a category</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {TEAM_SECTION_LABELS[category.section]} / {category.name}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field label="Department (optional)" id="team-profile-department">
-              <Input
-                id="team-profile-department"
-                value={department}
-                onChange={(event) => setDepartment(event.target.value)}
-                maxLength={120}
-              />
-            </Field>
-          </div>
+          <Field label="Department (optional)" id="team-profile-department">
+            <Input
+              id="team-profile-department"
+              value={department}
+              onChange={(event) => setDepartment(event.target.value)}
+              maxLength={120}
+            />
+          </Field>
 
           <Field label="Short biography" id="team-profile-biography">
             <Textarea
@@ -662,7 +583,7 @@ function TeamProfileDialog({
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Field label="Display order" id="team-profile-sort-order">
               <Input
                 id="team-profile-sort-order"
@@ -674,6 +595,12 @@ function TeamProfileDialog({
                 required
               />
             </Field>
+            <CheckboxField
+              id="team-profile-top-leadership"
+              label="Show in Top Leadership"
+              checked={isTopLeadership}
+              onChange={setIsTopLeadership}
+            />
             <CheckboxField
               id="team-profile-featured"
               label="Featured profile"
@@ -692,7 +619,7 @@ function TeamProfileDialog({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSaving || categories.length === 0}>
+            <Button type="submit" disabled={isSaving}>
               {isSaving ? "Saving..." : profile ? "Save changes" : "Create profile"}
             </Button>
           </DialogFooter>
@@ -716,7 +643,7 @@ function TeamProfileDetails({
           <DialogHeader>
             <DialogTitle>{profile.name}</DialogTitle>
             <DialogDescription>
-              {profile.designation} · {TEAM_SECTION_LABELS[profile.category.section]}
+              {profile.designation}
             </DialogDescription>
           </DialogHeader>
           <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted">
@@ -724,7 +651,7 @@ function TeamProfileDetails({
           </div>
           <p className="whitespace-pre-wrap text-sm leading-relaxed">{profile.biography}</p>
           <p className="text-sm text-muted-foreground">
-            {profile.category.name}
+            {profile.isTopLeadership ? "Top leadership" : "Other team member"}
             {profile.department ? ` · ${profile.department}` : ""}
             {` · Display order ${profile.sortOrder}`}
           </p>
@@ -738,209 +665,6 @@ function TeamProfileDetails({
         </DialogContent>
       )}
     </Dialog>
-  );
-}
-
-function TeamCategoryManager({
-  open,
-  onOpenChange,
-  categories,
-  onCategoryChange,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  categories: TeamCategoryRecord[];
-  onCategoryChange: (category: TeamCategoryRecord, deletedId?: string) => void;
-}) {
-  const [editingCategory, setEditingCategory] = useState<TeamCategoryRecord | null>(null);
-  const [name, setName] = useState("");
-  const [section, setSection] = useState<TeamSection>("founders");
-  const [sortOrder, setSortOrder] = useState("0");
-  const [deletingCategory, setDeletingCategory] = useState<TeamCategoryRecord | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const resetForm = () => {
-    setEditingCategory(null);
-    setName("");
-    setSection("founders");
-    setSortOrder("0");
-  };
-
-  const editCategory = (category: TeamCategoryRecord) => {
-    setEditingCategory(category);
-    setName(category.name);
-    setSection(category.section);
-    setSortOrder(String(category.sortOrder));
-  };
-
-  const saveCategory = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsSaving(true);
-    try {
-      const payload = { name, section, sortOrder: Number(sortOrder) };
-      const result = editingCategory
-        ? await updateTeamCategory(editingCategory.id, payload)
-        : await createTeamCategory(payload);
-      if (!result.success) {
-        toast.error(result.error);
-        return;
-      }
-      onCategoryChange(result.category);
-      toast.success(editingCategory ? "Category updated." : "Category created.");
-      resetForm();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not save category.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const removeCategory = async () => {
-    if (!deletingCategory) return;
-    setIsDeleting(true);
-    try {
-      const result = await deleteTeamCategory(deletingCategory.id);
-      if (!result.success) {
-        toast.error(result.error);
-        return;
-      }
-      onCategoryChange(deletingCategory, deletingCategory.id);
-      if (editingCategory?.id === deletingCategory.id) resetForm();
-      setDeletingCategory(null);
-      toast.success("Category deleted.");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not delete category.");
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  return (
-    <>
-      <Dialog
-        open={open}
-        onOpenChange={(nextOpen) => {
-          if (!nextOpen) resetForm();
-          onOpenChange(nextOpen);
-        }}
-      >
-        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Manage team categories</DialogTitle>
-            <DialogDescription>
-              Categories sit within the five public team sections. Categories with profiles
-              assigned cannot be deleted.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-2">
-            {categories.map((category) => (
-              <div
-                key={category.id}
-                className="flex flex-col gap-2 rounded-lg border border-border p-3 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div className="min-w-0">
-                  <p className="font-medium">{category.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {TEAM_SECTION_LABELS[category.section]} · order {category.sortOrder}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => editCategory(category)}>
-                    <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                    Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => setDeletingCategory(category)}
-                  >
-                    <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <form onSubmit={saveCategory} className="space-y-4 border-t border-border pt-4">
-            <h3 className="font-semibold">{editingCategory ? "Edit category" : "Add category"}</h3>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <Field label="Category name" id="team-category-name">
-                <Input
-                  id="team-category-name"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  maxLength={120}
-                  required
-                />
-              </Field>
-              <Field label="Public section" id="team-category-section">
-                <select
-                  id="team-category-section"
-                  value={section}
-                  onChange={(event) => setSection(event.target.value as TeamSection)}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                >
-                  {TEAM_SECTIONS.map((item) => (
-                    <option key={item} value={item}>{TEAM_SECTION_LABELS[item]}</option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="Category order" id="team-category-sort">
-                <Input
-                  id="team-category-sort"
-                  type="number"
-                  min={0}
-                  max={1_000_000}
-                  value={sortOrder}
-                  onChange={(event) => setSortOrder(event.target.value)}
-                  required
-                />
-              </Field>
-            </div>
-            <DialogFooter>
-              {editingCategory && (
-                <Button type="button" variant="outline" onClick={resetForm}>
-                  Cancel edit
-                </Button>
-              )}
-              <Button type="submit" disabled={isSaving}>
-                {isSaving ? "Saving..." : editingCategory ? "Save category" : "Add category"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog
-        open={!!deletingCategory}
-        onOpenChange={(nextOpen) => !nextOpen && setDeletingCategory(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete this category?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Delete &quot;{deletingCategory?.name}&quot;? Categories that still have profiles
-              assigned cannot be deleted.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={isDeleting}
-              onClick={(event) => {
-                event.preventDefault();
-                void removeCategory();
-              }}
-            >
-              {isDeleting ? "Deleting..." : "Delete category"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
   );
 }
 

@@ -68,7 +68,6 @@ export const ModelName = {
   VolunteerOpportunity: 'VolunteerOpportunity',
   VolunteerAssignment: 'VolunteerAssignment',
   ProgressLog: 'ProgressLog',
-  TeamCategory: 'TeamCategory',
   TeamProfile: 'TeamProfile'
 } as const
 
@@ -343,24 +342,12 @@ export const ProgressLogScalarFieldEnum = {
 export type ProgressLogScalarFieldEnum = (typeof ProgressLogScalarFieldEnum)[keyof typeof ProgressLogScalarFieldEnum]
 
 
-export const TeamCategoryScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  section: 'section',
-  sortOrder: 'sortOrder',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type TeamCategoryScalarFieldEnum = (typeof TeamCategoryScalarFieldEnum)[keyof typeof TeamCategoryScalarFieldEnum]
-
-
 export const TeamProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   name: 'name',
   designation: 'designation',
-  categoryId: 'categoryId',
+  isTopLeadership: 'isTopLeadership',
   biography: 'biography',
   imageUrl: 'imageUrl',
   department: 'department',
