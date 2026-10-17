@@ -30,7 +30,7 @@ export default async function VolunteerPage() {
       <PageHero
         eyebrow="Volunteer"
         title="Become the reason someone smiles today."
-        subtitle="Give a few hours. Change a life. Join 100+ volunteers across Pakistan."
+        subtitle="Give a few hours to support food, healthcare, education, and relief efforts in Faisalabad."
       />
 
       <section className="section-y container-x grid lg:grid-cols-5 gap-10">
@@ -62,7 +62,7 @@ export default async function VolunteerPage() {
         </Reveal>
 
         <Reveal delay={1} className="lg:col-span-3">
-          <div className="rounded-3xl border border-border bg-card p-8 shadow-blue md:p-10">
+          <div className="rounded-xl border border-border bg-card p-8 md:p-10">
             <h3 className="text-xl font-semibold">Apply to volunteer</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               Sign in or create an account first. Your volunteer application form
@@ -71,13 +71,13 @@ export default async function VolunteerPage() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/sign-in"
-                className="inline-flex rounded-full gradient-gold px-6 py-3 text-sm font-semibold text-secondary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
+                className="inline-flex min-h-11 items-center rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 Sign in
               </Link>
               <Link
                 href="/sign-up"
-                className="inline-flex rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+                className="inline-flex min-h-11 items-center rounded-lg border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 Create an account
               </Link>

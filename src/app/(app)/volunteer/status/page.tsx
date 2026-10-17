@@ -75,7 +75,7 @@ export default async function VolunteerApplicationStatusPage() {
     user.emailVerified;
 
   return (
-    <main className="container-x section-y">
+    <div className="container-x section-y">
       <section className="mx-auto max-w-2xl rounded-3xl border border-border bg-card p-8 shadow-blue md:p-10">
         <p className="text-xs font-bold uppercase tracking-wider text-primary">
           Volunteer application
@@ -115,6 +115,6 @@ export default async function VolunteerApplicationStatusPage() {
             Verify your sign-in email before submitting a volunteer application.
           </p>
         ))}
-    </main>
+    </div>
   );
 }

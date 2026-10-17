@@ -76,7 +76,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="w-full bg-card border border-border rounded-2xl p-8 shadow-xl">
+    <div className="w-full rounded-xl border border-border bg-card p-8">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-foreground">Welcome Back</h2>
             <p className="text-sm text-muted-foreground mt-1">
@@ -85,7 +85,7 @@ export default function SignInPage() {
           </div>
 
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-center gap-3">
+            <div role="alert" className="mb-6 flex items-center gap-3 rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
               <AlertCircle className="h-5 w-5 shrink-0" />
               <span>{error}</span>
             </div>
@@ -95,7 +95,7 @@ export default function SignInPage() {
             type="button"
             onClick={handleGoogleSignIn}
             disabled={googleLoading || loading}
-            className="w-full flex items-center justify-center gap-3 rounded-xl border border-input bg-background px-5 py-3 text-sm font-semibold text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground transition disabled:opacity-50 mb-6"
+            className="mb-6 flex min-h-11 w-full items-center justify-center gap-3 rounded-lg border border-input bg-background px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
           >
             {googleLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -116,28 +116,34 @@ export default function SignInPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label htmlFor="sign-in-email" className="mb-2 block text-sm font-medium text-foreground">
                 Email Address
+                <span aria-hidden="true" className="text-destructive"> *</span>
               </label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-muted-foreground" />
                 <input
+                  id="sign-in-email"
                   name="email"
                   type="email"
                   placeholder="name@example.com"
+                  autoComplete="email"
                   required
-                  className="w-full rounded-xl border border-input bg-background pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition"
+                  aria-invalid={Boolean(fieldErrors.email)}
+                  aria-describedby={fieldErrors.email ? "sign-in-email-error" : undefined}
+                  className="min-h-11 w-full rounded-lg border border-input bg-background py-2.5 pl-10 pr-4 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring aria-invalid:border-destructive"
                 />
               </div>
               {fieldErrors.email && (
-                <p className="mt-1 text-xs text-destructive">{fieldErrors.email}</p>
+                <p id="sign-in-email-error" className="mt-1 text-xs text-destructive">{fieldErrors.email}</p>
               )}
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-foreground">
+                <label htmlFor="sign-in-password" className="block text-sm font-medium text-foreground">
                   Password
+                  <span aria-hidden="true" className="text-destructive"> *</span>
                 </label>
                 <Link
                   href="/forgot-password"
@@ -149,22 +155,26 @@ export default function SignInPage() {
               <div className="relative">
                 <Lock className="absolute left-3.5 top-3.5 h-4 w-4 text-muted-foreground" />
                 <input
+                  id="sign-in-password"
                   name="password"
                   type="password"
                   placeholder="••••••••"
+                  autoComplete="current-password"
                   required
-                  className="w-full rounded-xl border border-input bg-background pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition"
+                  aria-invalid={Boolean(fieldErrors.password)}
+                  aria-describedby={fieldErrors.password ? "sign-in-password-error" : undefined}
+                  className="min-h-11 w-full rounded-lg border border-input bg-background py-2.5 pl-10 pr-4 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring aria-invalid:border-destructive"
                 />
               </div>
               {fieldErrors.password && (
-                <p className="mt-1 text-xs text-destructive">{fieldErrors.password}</p>
+                <p id="sign-in-password-error" className="mt-1 text-xs text-destructive">{fieldErrors.password}</p>
               )}
             </div>
 
             <button
               type="submit"
               disabled={loading || googleLoading}
-              className="w-full flex items-center justify-center gap-2 rounded-xl gradient-blue px-5 py-3 text-sm font-semibold text-primary-foreground shadow-blue transition-transform hover:-translate-y-0.5 disabled:opacity-50"
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
             >
               {loading ? (
                 <>

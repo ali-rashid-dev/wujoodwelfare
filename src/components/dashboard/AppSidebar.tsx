@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "@/lib/auth-client";
 import { useRole } from "@/context/RoleContext";
@@ -39,7 +40,6 @@ import {
   BriefcaseBusiness,
   Home,
   LogOut,
-  Heart,
   Quote,
   Info,
   ChevronsUpDown,
@@ -130,8 +130,14 @@ export function AppSidebar({ user, role: propRole }: AppSidebarProps) {
       {/* Brand Header */}
       <SidebarHeader className="border-b border-sidebar-border px-4 py-3.5">
         <Link href={homeUrl} className="flex items-center gap-3 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold shadow-md group-hover:scale-105 transition-transform">
-            <Heart className="h-5 w-5 fill-current" />
+          <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-border bg-secondary transition-transform duration-150 group-hover:scale-[1.02]">
+            <Image
+              src="/logo.jpg"
+              alt="Wujood Welfare"
+              width={150}
+              height={150}
+              className="h-full w-full object-cover"
+            />
           </div>
           <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
             <div className="flex items-center gap-1.5">

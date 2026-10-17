@@ -17,7 +17,7 @@ export default async function OurTeamPage() {
   const profiles = await getPublishedTeamProfiles();
 
   return (
-    <main>
+    <div>
       <section className="relative overflow-hidden border-b border-primary/10 bg-linear-to-br from-primary/10 via-background to-secondary/10 pt-28 sm:pt-36">
         <div className="container-x mx-auto max-w-7xl pb-14 sm:pb-20">
           <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-primary">
@@ -130,6 +130,6 @@ export default async function OurTeamPage() {
           </section>
         )}
       </div>
-    </main>
+    </div>
   );
 }

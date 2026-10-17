@@ -37,7 +37,7 @@ export default async function AdminLayout({
           <AppSidebar user={user} role="admin" />
           <SidebarInset className="flex flex-1 flex-col min-w-0 bg-muted/15">
             <DashboardHeader role="admin" />
-            <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+            <main id="dashboard-content" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6 lg:p-8">
               {children}
             </main>
           </SidebarInset>

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 import {
   ShieldCheck,
   Calendar,
@@ -25,6 +26,14 @@ export type AdminDashboardStats = {
   assignmentsInProgress: number;
   completedAssignments: number;
   unresolvedMessages: number;
+  pendingApplicationItems: { id: string; name: string; createdAt: Date }[];
+  newMessages: {
+    id: string;
+    name: string;
+    subject: string;
+    status: string;
+    createdAt: Date;
+  }[];
 };
 
 export function AdminDashboardView({ stats }: { stats: AdminDashboardStats }) {
@@ -34,14 +43,14 @@ export function AdminDashboardView({ stats }: { stats: AdminDashboardStats }) {
       value: stats.approvedVolunteers,
       icon: BadgeCheck,
       href: "/admin/approved-volunteers",
-      color: "text-emerald-600 dark:text-emerald-400",
+      color: "text-success",
     },
     {
       label: "Pending applications",
       value: stats.pendingApplications,
       icon: Clock3,
       href: "/admin/volunteers",
-      color: "text-amber-600 dark:text-amber-400",
+      color: "text-foreground",
     },
     {
       label: "Active programs",
@@ -55,28 +64,28 @@ export function AdminDashboardView({ stats }: { stats: AdminDashboardStats }) {
       value: stats.activeProjects,
       icon: Layers,
       href: "/admin/projects",
-      color: "text-blue-600 dark:text-blue-400",
+      color: "text-primary",
     },
     {
       label: "Assignments in progress",
       value: stats.assignmentsInProgress,
       icon: BriefcaseBusiness,
       href: "/admin/approved-volunteers",
-      color: "text-purple-600 dark:text-purple-400",
+      color: "text-primary",
     },
     {
       label: "Completed assignments",
       value: stats.completedAssignments,
       icon: Check,
       href: "/admin/approved-volunteers",
-      color: "text-emerald-600 dark:text-emerald-400",
+      color: "text-success",
     },
     {
       label: "Unresolved messages",
       value: stats.unresolvedMessages,
       icon: Mail,
       href: "/admin/messages",
-      color: "text-orange-600 dark:text-orange-400",
+      color: "text-destructive",
     },
   ];
 
@@ -85,7 +94,7 @@ export function AdminDashboardView({ stats }: { stats: AdminDashboardStats }) {
       href: "/admin/programs",
       icon: Calendar,
       label: "Programs",
-      desc: "Manage welfare programs, community initiatives, and beneficiary quotas.",
+      desc: "Manage public program information and settings.",
       color: "text-primary bg-primary/10",
       accent: "hover:border-primary/50",
     },
@@ -93,41 +102,40 @@ export function AdminDashboardView({ stats }: { stats: AdminDashboardStats }) {
       href: "/admin/projects",
       icon: Layers,
       label: "Projects",
-      desc: "Track field project execution, milestones, and fundraising goals.",
-      color: "text-blue-600 dark:text-blue-400 bg-blue-500/10",
+      desc: "Manage project details and publication status.",
+      color: "text-primary bg-primary/10",
       accent: "hover:border-blue-500/50",
     },
     {
       href: "/admin/gallery",
       icon: ImageIcon,
       label: "Gallery",
-      desc: "Upload and curate impact photographs showcased on the public website.",
-      color: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10",
+      desc: "Upload and curate photographs for the public website.",
+      color: "text-success bg-success/10",
       accent: "hover:border-emerald-500/50",
     },
     {
       href: "/admin/volunteers",
       icon: Users,
       label: "Volunteers",
-      desc: "Review incoming applications, assign tasks, and monitor active workers.",
-      color: "text-amber-600 dark:text-amber-400 bg-amber-500/10",
+      desc: "Review volunteer applications and manage volunteer records.",
+      color: "text-foreground bg-secondary/40",
       accent: "hover:border-amber-500/50",
     },
     {
       href: "/admin/messages",
       icon: Mail,
       label: "Contact Messages",
-      desc: "Read, track, and reply to community inquiries and donor questions.",
-      color: "text-purple-600 dark:text-purple-400 bg-purple-500/10",
+      desc: "Review and respond to messages sent through the contact form.",
+      color: "text-primary bg-primary/10",
       accent: "hover:border-purple-500/50",
     },
   ];
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
-      {/* Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-linear-to-r from-primary/15 via-primary/5 to-transparent p-6 sm:p-8">
-        <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-3">
+    <div className="space-y-8">
+      <div className="rounded-xl border border-border bg-card p-6 sm:p-8">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-md bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
           <ShieldCheck className="h-3.5 w-3.5" />
           Admin Management Portal
         </div>
@@ -135,7 +143,7 @@ export function AdminDashboardView({ stats }: { stats: AdminDashboardStats }) {
           Admin Dashboard
         </h1>
         <p className="mt-2 text-sm text-muted-foreground max-w-2xl leading-relaxed">
-          Welcome to the Wujood Welfare administrative console. Manage programs, active field projects, media galleries, volunteer duties, and public inquiries.
+          Review current activity and manage public content and volunteer workflows.
         </p>
       </div>
 
@@ -153,7 +161,7 @@ export function AdminDashboardView({ stats }: { stats: AdminDashboardStats }) {
             <Link
               key={label}
               href={href}
-              className="rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/40 sm:p-5"
+              className="rounded-lg border border-border bg-card p-4 transition-[border-color,box-shadow,transform] duration-150 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-sm sm:p-5"
             >
               <div className="flex items-start justify-between gap-2">
                 <span className="text-xs font-medium leading-relaxed text-muted-foreground sm:text-sm">
@@ -169,7 +177,78 @@ export function AdminDashboardView({ stats }: { stats: AdminDashboardStats }) {
         </div>
       </section>
 
-      {/* Management Sections */}
+      <section aria-labelledby="work-queue-heading" className="space-y-4">
+        <div>
+          <h2 id="work-queue-heading" className="text-lg font-bold tracking-tight">
+            Work queue
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Recent applications and new messages that may need attention.
+          </p>
+        </div>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="overflow-hidden rounded-lg border border-border bg-card">
+            <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+              <h3 className="font-semibold">Pending applications</h3>
+              <Link href="/admin/volunteers" className="text-sm font-semibold text-primary hover:underline">
+                Review
+              </Link>
+            </div>
+            {stats.pendingApplicationItems.length === 0 ? (
+              <p className="px-4 py-6 text-sm text-muted-foreground">
+                No pending applications.
+              </p>
+            ) : (
+              <ul className="divide-y divide-border">
+                {stats.pendingApplicationItems.map((application) => (
+                  <li
+                    key={application.id}
+                    className="flex items-center justify-between gap-3 px-4 py-3"
+                  >
+                    <span className="truncate text-sm font-medium">{application.name}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      {formatDistanceToNow(application.createdAt, { addSuffix: true })}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div className="overflow-hidden rounded-lg border border-border bg-card">
+            <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+              <h3 className="font-semibold">New contact messages</h3>
+              <Link href="/admin/messages" className="text-sm font-semibold text-primary hover:underline">
+                View messages
+              </Link>
+            </div>
+            {stats.newMessages.length === 0 ? (
+              <p className="px-4 py-6 text-sm text-muted-foreground">
+                No new messages.
+              </p>
+            ) : (
+              <ul className="divide-y divide-border">
+                {stats.newMessages.map((message) => (
+                  <li
+                    key={message.id}
+                    className="flex items-center justify-between gap-3 px-4 py-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{message.subject}</p>
+                      <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                        From {message.name}
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      {formatDistanceToNow(message.createdAt, { addSuffix: true })}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </section>
+
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
@@ -184,10 +263,10 @@ export function AdminDashboardView({ stats }: { stats: AdminDashboardStats }) {
             <Link
               key={href}
               href={href}
-              className={`group flex flex-col justify-between p-5 rounded-2xl border border-border bg-card shadow-xs transition-all hover:shadow-md hover:-translate-y-0.5 ${accent}`}
+              className={`group flex flex-col justify-between rounded-lg border border-border bg-card p-5 shadow-xs transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md ${accent}`}
             >
               <div className="flex items-start gap-3.5">
-                <div className={`h-11 w-11 rounded-xl flex items-center justify-center shrink-0 ${color}`}>
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${color}`}>
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -207,8 +286,7 @@ export function AdminDashboardView({ stats }: { stats: AdminDashboardStats }) {
         </div>
       </div>
 
-      {/* Admin Notice / Quick Summary */}
-      <div className="rounded-2xl border border-border bg-muted/30 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col items-start justify-between gap-4 rounded-lg border border-border bg-card p-5 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 text-primary">
             <TrendingUp className="h-4 w-4" />

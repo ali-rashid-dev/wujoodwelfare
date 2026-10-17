@@ -16,6 +16,8 @@ export default async function AdminDashboardPage() {
     assignmentsInProgress,
     completedAssignments,
     unresolvedMessages,
+    pendingApplicationItems,
+    newMessages,
   ] = await Promise.all([
     prisma.user.count({
       where: {
@@ -35,6 +37,18 @@ export default async function AdminDashboardPage() {
     prisma.contactMessage.count({
       where: { status: { in: ["new", "in_progress"] } },
     }),
+    prisma.volunteerApplication.findMany({
+      where: { status: "pending" },
+      orderBy: { createdAt: "desc" },
+      take: 4,
+      select: { id: true, name: true, createdAt: true },
+    }),
+    prisma.contactMessage.findMany({
+      where: { status: "new" },
+      orderBy: { createdAt: "desc" },
+      take: 4,
+      select: { id: true, name: true, subject: true, status: true, createdAt: true },
+    }),
   ]);
 
   return (
@@ -47,6 +61,8 @@ export default async function AdminDashboardPage() {
         assignmentsInProgress,
         completedAssignments,
         unresolvedMessages,
+        pendingApplicationItems,
+        newMessages,
       }}
     />
   );

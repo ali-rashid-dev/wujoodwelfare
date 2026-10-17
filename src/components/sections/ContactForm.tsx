@@ -29,7 +29,7 @@ export function ContactForm() {
     <form
       ref={formRef}
       action={formAction}
-      className="rounded-3xl border border-border bg-card p-8 shadow-blue md:p-10"
+      className="rounded-xl border border-border bg-card p-8 md:p-10"
     >
       <h2 className="text-xl font-semibold">Send us a message</h2>
       <p className="mt-2 text-sm text-muted-foreground">
@@ -57,6 +57,7 @@ export function ContactForm() {
           <div key={name} className={name === "phone" || name === "subject" ? "md:col-span-2" : ""}>
             <label htmlFor={`contact-${name}`} className="text-sm font-medium">
               {label}
+              {name !== "phone" && <span aria-hidden="true" className="text-destructive"> *</span>}
             </label>
             <input
               id={`contact-${name}`}
@@ -79,7 +80,7 @@ export function ContactForm() {
 
         <div className="md:col-span-2">
           <label htmlFor="contact-message" className="text-sm font-medium">
-            Message
+            Message<span aria-hidden="true" className="text-destructive"> *</span>
           </label>
           <textarea
             id="contact-message"
@@ -113,7 +114,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="mt-6 inline-flex items-center gap-2 rounded-full gradient-gold px-7 py-3 text-sm font-semibold text-secondary-foreground shadow-gold transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending ? "Sending…" : "Send Message"}
       </button>

@@ -36,11 +36,18 @@ export function DashboardHeader({ role: propRole }: DashboardHeaderProps) {
     const crumbs: { label: string; href: string; isCurrent: boolean }[] = [];
 
     let accumulatedPath = "";
+    const labels: Record<string, string> = {
+      admin: "Admin",
+      volunteer: "Volunteer",
+      dashboard: "Dashboard",
+      "approved-volunteers": "Approved Volunteers",
+      "my-work": "My Work",
+    };
     parts.forEach((seg, i) => {
       accumulatedPath += `/${seg}`;
       const isCurrent = i === parts.length - 1;
       crumbs.push({
-        label: seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, " "),
+        label: labels[seg] ?? seg.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "),
         href: i === 0 ? rootHref : accumulatedPath,
         isCurrent,
       });
@@ -52,7 +59,13 @@ export function DashboardHeader({ role: propRole }: DashboardHeaderProps) {
   const breadcrumbs = getBreadcrumbs();
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border bg-background/95 px-4 backdrop-blur">
+    <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4">
+      <a
+        href="#dashboard-content"
+        className="sr-only rounded-lg bg-card px-4 py-2 font-semibold text-foreground focus:not-sr-only focus:absolute focus:left-4 focus:top-2 focus:z-50 focus:ring-2 focus:ring-ring"
+      >
+        Skip to main content
+      </a>
       {/* ── Left: Trigger + Breadcrumbs ─────────────── */}
       <div className="flex items-center gap-3 min-w-0">
         <SidebarTrigger className="h-9 w-9 text-muted-foreground hover:text-foreground" />
@@ -101,4 +114,3 @@ export function DashboardHeader({ role: propRole }: DashboardHeaderProps) {
     </header>
   );
 }
-

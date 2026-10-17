@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
-import { Noto_Nastaliq_Urdu, Poppins } from "next/font/google";
+import { Inter, Manrope, Noto_Nastaliq_Urdu } from "next/font/google";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const poppins = Poppins({
-  variable: "--font-poppins",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
 });
 
 const urdu = Noto_Nastaliq_Urdu({
@@ -31,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${urdu.variable} h-full antialiased`}
+      className={`${inter.variable} ${manrope.variable} ${urdu.variable} h-full antialiased`}
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col">
         <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
@@ -41,4 +45,3 @@ export default function RootLayout({
     </html>
   );
 }
-

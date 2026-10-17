@@ -1,7 +1,5 @@
 import { PageHero } from "@/components/site/SiteLayout";
 import { Programs } from "@/components/sections/Programs";
-import { Campaign } from "@/components/sections/Campaign";
-import { Impact } from "@/components/sections/Impact";
 import { getPublishedPrograms } from "@/actions/programs";
 import type { Metadata } from "next";
 
