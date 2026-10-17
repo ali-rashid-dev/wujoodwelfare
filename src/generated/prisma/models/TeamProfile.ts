@@ -39,7 +39,6 @@ export type TeamProfileMinAggregateOutputType = {
   userId: string | null
   name: string | null
   designation: string | null
-  isTopLeadership: boolean | null
   biography: string | null
   imageUrl: string | null
   department: string | null
@@ -47,7 +46,6 @@ export type TeamProfileMinAggregateOutputType = {
   instagramUrl: string | null
   facebookUrl: string | null
   sortOrder: number | null
-  featured: boolean | null
   published: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -58,7 +56,6 @@ export type TeamProfileMaxAggregateOutputType = {
   userId: string | null
   name: string | null
   designation: string | null
-  isTopLeadership: boolean | null
   biography: string | null
   imageUrl: string | null
   department: string | null
@@ -66,7 +63,6 @@ export type TeamProfileMaxAggregateOutputType = {
   instagramUrl: string | null
   facebookUrl: string | null
   sortOrder: number | null
-  featured: boolean | null
   published: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -77,7 +73,6 @@ export type TeamProfileCountAggregateOutputType = {
   userId: number
   name: number
   designation: number
-  isTopLeadership: number
   biography: number
   imageUrl: number
   department: number
@@ -85,7 +80,6 @@ export type TeamProfileCountAggregateOutputType = {
   instagramUrl: number
   facebookUrl: number
   sortOrder: number
-  featured: number
   published: number
   createdAt: number
   updatedAt: number
@@ -106,7 +100,6 @@ export type TeamProfileMinAggregateInputType = {
   userId?: true
   name?: true
   designation?: true
-  isTopLeadership?: true
   biography?: true
   imageUrl?: true
   department?: true
@@ -114,7 +107,6 @@ export type TeamProfileMinAggregateInputType = {
   instagramUrl?: true
   facebookUrl?: true
   sortOrder?: true
-  featured?: true
   published?: true
   createdAt?: true
   updatedAt?: true
@@ -125,7 +117,6 @@ export type TeamProfileMaxAggregateInputType = {
   userId?: true
   name?: true
   designation?: true
-  isTopLeadership?: true
   biography?: true
   imageUrl?: true
   department?: true
@@ -133,7 +124,6 @@ export type TeamProfileMaxAggregateInputType = {
   instagramUrl?: true
   facebookUrl?: true
   sortOrder?: true
-  featured?: true
   published?: true
   createdAt?: true
   updatedAt?: true
@@ -144,7 +134,6 @@ export type TeamProfileCountAggregateInputType = {
   userId?: true
   name?: true
   designation?: true
-  isTopLeadership?: true
   biography?: true
   imageUrl?: true
   department?: true
@@ -152,7 +141,6 @@ export type TeamProfileCountAggregateInputType = {
   instagramUrl?: true
   facebookUrl?: true
   sortOrder?: true
-  featured?: true
   published?: true
   createdAt?: true
   updatedAt?: true
@@ -250,7 +238,6 @@ export type TeamProfileGroupByOutputType = {
   userId: string | null
   name: string
   designation: string
-  isTopLeadership: boolean
   biography: string
   imageUrl: string
   department: string | null
@@ -258,7 +245,6 @@ export type TeamProfileGroupByOutputType = {
   instagramUrl: string | null
   facebookUrl: string | null
   sortOrder: number
-  featured: boolean
   published: boolean
   createdAt: Date
   updatedAt: Date
@@ -292,7 +278,6 @@ export type TeamProfileWhereInput = {
   userId?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
   name?: Prisma.StringFilter<"TeamProfile"> | string
   designation?: Prisma.StringFilter<"TeamProfile"> | string
-  isTopLeadership?: Prisma.BoolFilter<"TeamProfile"> | boolean
   biography?: Prisma.StringFilter<"TeamProfile"> | string
   imageUrl?: Prisma.StringFilter<"TeamProfile"> | string
   department?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
@@ -300,7 +285,6 @@ export type TeamProfileWhereInput = {
   instagramUrl?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
   facebookUrl?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
   sortOrder?: Prisma.IntFilter<"TeamProfile"> | number
-  featured?: Prisma.BoolFilter<"TeamProfile"> | boolean
   published?: Prisma.BoolFilter<"TeamProfile"> | boolean
   createdAt?: Prisma.DateTimeFilter<"TeamProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TeamProfile"> | Date | string
@@ -312,7 +296,6 @@ export type TeamProfileOrderByWithRelationInput = {
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
   designation?: Prisma.SortOrder
-  isTopLeadership?: Prisma.SortOrder
   biography?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   department?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -320,7 +303,6 @@ export type TeamProfileOrderByWithRelationInput = {
   instagramUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   facebookUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
-  featured?: Prisma.SortOrder
   published?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -335,7 +317,6 @@ export type TeamProfileWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.TeamProfileWhereInput | Prisma.TeamProfileWhereInput[]
   name?: Prisma.StringFilter<"TeamProfile"> | string
   designation?: Prisma.StringFilter<"TeamProfile"> | string
-  isTopLeadership?: Prisma.BoolFilter<"TeamProfile"> | boolean
   biography?: Prisma.StringFilter<"TeamProfile"> | string
   imageUrl?: Prisma.StringFilter<"TeamProfile"> | string
   department?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
@@ -343,7 +324,6 @@ export type TeamProfileWhereUniqueInput = Prisma.AtLeast<{
   instagramUrl?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
   facebookUrl?: Prisma.StringNullableFilter<"TeamProfile"> | string | null
   sortOrder?: Prisma.IntFilter<"TeamProfile"> | number
-  featured?: Prisma.BoolFilter<"TeamProfile"> | boolean
   published?: Prisma.BoolFilter<"TeamProfile"> | boolean
   createdAt?: Prisma.DateTimeFilter<"TeamProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TeamProfile"> | Date | string
@@ -355,7 +335,6 @@ export type TeamProfileOrderByWithAggregationInput = {
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
   designation?: Prisma.SortOrder
-  isTopLeadership?: Prisma.SortOrder
   biography?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   department?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -363,7 +342,6 @@ export type TeamProfileOrderByWithAggregationInput = {
   instagramUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   facebookUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
-  featured?: Prisma.SortOrder
   published?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -382,7 +360,6 @@ export type TeamProfileScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringNullableWithAggregatesFilter<"TeamProfile"> | string | null
   name?: Prisma.StringWithAggregatesFilter<"TeamProfile"> | string
   designation?: Prisma.StringWithAggregatesFilter<"TeamProfile"> | string
-  isTopLeadership?: Prisma.BoolWithAggregatesFilter<"TeamProfile"> | boolean
   biography?: Prisma.StringWithAggregatesFilter<"TeamProfile"> | string
   imageUrl?: Prisma.StringWithAggregatesFilter<"TeamProfile"> | string
   department?: Prisma.StringNullableWithAggregatesFilter<"TeamProfile"> | string | null
@@ -390,7 +367,6 @@ export type TeamProfileScalarWhereWithAggregatesInput = {
   instagramUrl?: Prisma.StringNullableWithAggregatesFilter<"TeamProfile"> | string | null
   facebookUrl?: Prisma.StringNullableWithAggregatesFilter<"TeamProfile"> | string | null
   sortOrder?: Prisma.IntWithAggregatesFilter<"TeamProfile"> | number
-  featured?: Prisma.BoolWithAggregatesFilter<"TeamProfile"> | boolean
   published?: Prisma.BoolWithAggregatesFilter<"TeamProfile"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"TeamProfile"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"TeamProfile"> | Date | string
@@ -400,7 +376,6 @@ export type TeamProfileCreateInput = {
   id?: string
   name: string
   designation: string
-  isTopLeadership?: boolean
   biography: string
   imageUrl: string
   department?: string | null
@@ -408,7 +383,6 @@ export type TeamProfileCreateInput = {
   instagramUrl?: string | null
   facebookUrl?: string | null
   sortOrder?: number
-  featured?: boolean
   published?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -420,7 +394,6 @@ export type TeamProfileUncheckedCreateInput = {
   userId?: string | null
   name: string
   designation: string
-  isTopLeadership?: boolean
   biography: string
   imageUrl: string
   department?: string | null
@@ -428,7 +401,6 @@ export type TeamProfileUncheckedCreateInput = {
   instagramUrl?: string | null
   facebookUrl?: string | null
   sortOrder?: number
-  featured?: boolean
   published?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -438,7 +410,6 @@ export type TeamProfileUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   designation?: Prisma.StringFieldUpdateOperationsInput | string
-  isTopLeadership?: Prisma.BoolFieldUpdateOperationsInput | boolean
   biography?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -446,7 +417,6 @@ export type TeamProfileUpdateInput = {
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facebookUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -458,7 +428,6 @@ export type TeamProfileUncheckedUpdateInput = {
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   designation?: Prisma.StringFieldUpdateOperationsInput | string
-  isTopLeadership?: Prisma.BoolFieldUpdateOperationsInput | boolean
   biography?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -466,7 +435,6 @@ export type TeamProfileUncheckedUpdateInput = {
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facebookUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -477,7 +445,6 @@ export type TeamProfileCreateManyInput = {
   userId?: string | null
   name: string
   designation: string
-  isTopLeadership?: boolean
   biography: string
   imageUrl: string
   department?: string | null
@@ -485,7 +452,6 @@ export type TeamProfileCreateManyInput = {
   instagramUrl?: string | null
   facebookUrl?: string | null
   sortOrder?: number
-  featured?: boolean
   published?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -495,7 +461,6 @@ export type TeamProfileUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   designation?: Prisma.StringFieldUpdateOperationsInput | string
-  isTopLeadership?: Prisma.BoolFieldUpdateOperationsInput | boolean
   biography?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -503,7 +468,6 @@ export type TeamProfileUpdateManyMutationInput = {
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facebookUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -514,7 +478,6 @@ export type TeamProfileUncheckedUpdateManyInput = {
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   designation?: Prisma.StringFieldUpdateOperationsInput | string
-  isTopLeadership?: Prisma.BoolFieldUpdateOperationsInput | boolean
   biography?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -522,7 +485,6 @@ export type TeamProfileUncheckedUpdateManyInput = {
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facebookUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -538,7 +500,6 @@ export type TeamProfileCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   designation?: Prisma.SortOrder
-  isTopLeadership?: Prisma.SortOrder
   biography?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   department?: Prisma.SortOrder
@@ -546,7 +507,6 @@ export type TeamProfileCountOrderByAggregateInput = {
   instagramUrl?: Prisma.SortOrder
   facebookUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
-  featured?: Prisma.SortOrder
   published?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -561,7 +521,6 @@ export type TeamProfileMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   designation?: Prisma.SortOrder
-  isTopLeadership?: Prisma.SortOrder
   biography?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   department?: Prisma.SortOrder
@@ -569,7 +528,6 @@ export type TeamProfileMaxOrderByAggregateInput = {
   instagramUrl?: Prisma.SortOrder
   facebookUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
-  featured?: Prisma.SortOrder
   published?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -580,7 +538,6 @@ export type TeamProfileMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   designation?: Prisma.SortOrder
-  isTopLeadership?: Prisma.SortOrder
   biography?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   department?: Prisma.SortOrder
@@ -588,7 +545,6 @@ export type TeamProfileMinOrderByAggregateInput = {
   instagramUrl?: Prisma.SortOrder
   facebookUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
-  featured?: Prisma.SortOrder
   published?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -634,7 +590,6 @@ export type TeamProfileCreateWithoutUserInput = {
   id?: string
   name: string
   designation: string
-  isTopLeadership?: boolean
   biography: string
   imageUrl: string
   department?: string | null
@@ -642,7 +597,6 @@ export type TeamProfileCreateWithoutUserInput = {
   instagramUrl?: string | null
   facebookUrl?: string | null
   sortOrder?: number
-  featured?: boolean
   published?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -652,7 +606,6 @@ export type TeamProfileUncheckedCreateWithoutUserInput = {
   id?: string
   name: string
   designation: string
-  isTopLeadership?: boolean
   biography: string
   imageUrl: string
   department?: string | null
@@ -660,7 +613,6 @@ export type TeamProfileUncheckedCreateWithoutUserInput = {
   instagramUrl?: string | null
   facebookUrl?: string | null
   sortOrder?: number
-  featured?: boolean
   published?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -686,7 +638,6 @@ export type TeamProfileUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   designation?: Prisma.StringFieldUpdateOperationsInput | string
-  isTopLeadership?: Prisma.BoolFieldUpdateOperationsInput | boolean
   biography?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -694,7 +645,6 @@ export type TeamProfileUpdateWithoutUserInput = {
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facebookUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -704,7 +654,6 @@ export type TeamProfileUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   designation?: Prisma.StringFieldUpdateOperationsInput | string
-  isTopLeadership?: Prisma.BoolFieldUpdateOperationsInput | boolean
   biography?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -712,7 +661,6 @@ export type TeamProfileUncheckedUpdateWithoutUserInput = {
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facebookUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -725,7 +673,6 @@ export type TeamProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   userId?: boolean
   name?: boolean
   designation?: boolean
-  isTopLeadership?: boolean
   biography?: boolean
   imageUrl?: boolean
   department?: boolean
@@ -733,7 +680,6 @@ export type TeamProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   instagramUrl?: boolean
   facebookUrl?: boolean
   sortOrder?: boolean
-  featured?: boolean
   published?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -745,7 +691,6 @@ export type TeamProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   userId?: boolean
   name?: boolean
   designation?: boolean
-  isTopLeadership?: boolean
   biography?: boolean
   imageUrl?: boolean
   department?: boolean
@@ -753,7 +698,6 @@ export type TeamProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   instagramUrl?: boolean
   facebookUrl?: boolean
   sortOrder?: boolean
-  featured?: boolean
   published?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -765,7 +709,6 @@ export type TeamProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   userId?: boolean
   name?: boolean
   designation?: boolean
-  isTopLeadership?: boolean
   biography?: boolean
   imageUrl?: boolean
   department?: boolean
@@ -773,7 +716,6 @@ export type TeamProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   instagramUrl?: boolean
   facebookUrl?: boolean
   sortOrder?: boolean
-  featured?: boolean
   published?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -785,7 +727,6 @@ export type TeamProfileSelectScalar = {
   userId?: boolean
   name?: boolean
   designation?: boolean
-  isTopLeadership?: boolean
   biography?: boolean
   imageUrl?: boolean
   department?: boolean
@@ -793,13 +734,12 @@ export type TeamProfileSelectScalar = {
   instagramUrl?: boolean
   facebookUrl?: boolean
   sortOrder?: boolean
-  featured?: boolean
   published?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type TeamProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "designation" | "isTopLeadership" | "biography" | "imageUrl" | "department" | "linkedinUrl" | "instagramUrl" | "facebookUrl" | "sortOrder" | "featured" | "published" | "createdAt" | "updatedAt", ExtArgs["result"]["teamProfile"]>
+export type TeamProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "designation" | "biography" | "imageUrl" | "department" | "linkedinUrl" | "instagramUrl" | "facebookUrl" | "sortOrder" | "published" | "createdAt" | "updatedAt", ExtArgs["result"]["teamProfile"]>
 export type TeamProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.TeamProfile$userArgs<ExtArgs>
 }
@@ -820,7 +760,6 @@ export type $TeamProfilePayload<ExtArgs extends runtime.Types.Extensions.Interna
     userId: string | null
     name: string
     designation: string
-    isTopLeadership: boolean
     biography: string
     imageUrl: string
     department: string | null
@@ -828,7 +767,6 @@ export type $TeamProfilePayload<ExtArgs extends runtime.Types.Extensions.Interna
     instagramUrl: string | null
     facebookUrl: string | null
     sortOrder: number
-    featured: boolean
     published: boolean
     createdAt: Date
     updatedAt: Date
@@ -1260,7 +1198,6 @@ export interface TeamProfileFieldRefs {
   readonly userId: Prisma.FieldRef<"TeamProfile", 'String'>
   readonly name: Prisma.FieldRef<"TeamProfile", 'String'>
   readonly designation: Prisma.FieldRef<"TeamProfile", 'String'>
-  readonly isTopLeadership: Prisma.FieldRef<"TeamProfile", 'Boolean'>
   readonly biography: Prisma.FieldRef<"TeamProfile", 'String'>
   readonly imageUrl: Prisma.FieldRef<"TeamProfile", 'String'>
   readonly department: Prisma.FieldRef<"TeamProfile", 'String'>
@@ -1268,7 +1205,6 @@ export interface TeamProfileFieldRefs {
   readonly instagramUrl: Prisma.FieldRef<"TeamProfile", 'String'>
   readonly facebookUrl: Prisma.FieldRef<"TeamProfile", 'String'>
   readonly sortOrder: Prisma.FieldRef<"TeamProfile", 'Int'>
-  readonly featured: Prisma.FieldRef<"TeamProfile", 'Boolean'>
   readonly published: Prisma.FieldRef<"TeamProfile", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"TeamProfile", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"TeamProfile", 'DateTime'>

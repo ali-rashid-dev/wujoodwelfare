@@ -54,7 +54,6 @@ const teamProfileSchema = z.object({
   userId: z.string().trim().max(128).optional().or(z.literal(""))
     .transform((value) => value || null),
   designation: z.string().trim().min(1, "Designation is required.").max(160),
-  isTopLeadership: z.boolean(),
   biography: z.string().trim().min(1, "Biography is required.").max(2000),
   imageUrl: imageUrlSchema,
   department: z.string().trim().max(120).optional().or(z.literal(""))
@@ -63,7 +62,6 @@ const teamProfileSchema = z.object({
   instagramUrl: socialUrlSchema(["instagram.com"]),
   facebookUrl: socialUrlSchema(["facebook.com", "fb.com"]),
   sortOrder: z.coerce.number().int().min(0).max(1_000_000),
-  featured: z.boolean(),
   published: z.boolean(),
 });
 
@@ -79,20 +77,14 @@ const adminProfileSelect = {
   instagramUrl: true,
   facebookUrl: true,
   sortOrder: true,
-  featured: true,
   published: true,
-  isTopLeadership: true,
   createdAt: true,
 } as const;
 
 export async function getPublishedTeamProfiles() {
   return prisma.teamProfile.findMany({
-    where: { published: true, isTopLeadership: true },
-    orderBy: [
-      { featured: "desc" },
-      { sortOrder: "asc" },
-      { createdAt: "asc" },
-    ],
+    where: { published: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     select: {
       id: true,
       name: true,
@@ -103,7 +95,6 @@ export async function getPublishedTeamProfiles() {
       linkedinUrl: true,
       instagramUrl: true,
       facebookUrl: true,
-      featured: true,
     },
   });
 }
@@ -112,11 +103,7 @@ export async function getAdminTeamManagementData() {
   await requireAdmin();
   const [profiles, users] = await Promise.all([
     prisma.teamProfile.findMany({
-      orderBy: [
-        { featured: "desc" },
-        { sortOrder: "asc" },
-        { createdAt: "asc" },
-      ],
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
       select: adminProfileSelect,
     }),
     prisma.user.findMany({

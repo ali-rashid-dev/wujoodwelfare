@@ -290,19 +290,17 @@ model TeamProfile {
   user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   name            String
   designation     String
-  isTopLeadership Boolean  @default(true)
   biography       String
   imageUrl        String
   department      String?
   linkedinUrl     String?
   instagramUrl    String?
-  facebookUrl     String?
-  sortOrder       Int      @default(0)
-  featured        Boolean  @default(false)
-  published       Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  facebookUrl    String?
+  sortOrder   Int      @default(0)
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  @@index([published, isTopLeadership, featured, sortOrder, createdAt])
+  @@index([published, sortOrder, createdAt])
   @@map("team_profile")
 }

@@ -230,20 +230,14 @@ export function TeamManagement({
                 >
                   {profile.published ? "Published" : "Draft"}
                 </Badge>
-                {profile.featured && (
-                  <Badge className="absolute right-3 top-3" variant="outline">
-                    Featured
-                  </Badge>
-                )}
               </div>
               <div className="space-y-3 p-4">
                 <div>
                   <p className="font-semibold">{profile.name}</p>
                   <p className="text-sm text-muted-foreground">{profile.designation}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {profile.isTopLeadership ? "Top leadership" : "Other team member"}
-                    {profile.department ? ` · ${profile.department}` : ""}
-                  </p>
+                  {profile.department && (
+                    <p className="mt-1 text-xs text-muted-foreground">{profile.department}</p>
+                  )}
                   <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
                     {profile.biography}
                   </p>
@@ -382,7 +376,6 @@ function TeamProfileDialog({
   const [name, setName] = useState(profile?.name ?? "");
   const [userId, setUserId] = useState(profile?.userId ?? "");
   const [designation, setDesignation] = useState(profile?.designation ?? "");
-  const [isTopLeadership, setIsTopLeadership] = useState(profile?.isTopLeadership ?? true);
   const [biography, setBiography] = useState(profile?.biography ?? "");
   const [imageUrl, setImageUrl] = useState(profile?.imageUrl ?? "");
   const [department, setDepartment] = useState(profile?.department ?? "");
@@ -390,7 +383,6 @@ function TeamProfileDialog({
   const [instagramUrl, setInstagramUrl] = useState(profile?.instagramUrl ?? "");
   const [facebookUrl, setFacebookUrl] = useState(profile?.facebookUrl ?? "");
   const [sortOrder, setSortOrder] = useState(String(profile?.sortOrder ?? 0));
-  const [featured, setFeatured] = useState(profile?.featured ?? false);
   const [published, setPublished] = useState(profile?.published ?? false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -407,7 +399,6 @@ function TeamProfileDialog({
         name,
         userId,
         designation,
-        isTopLeadership,
         biography,
         imageUrl,
         department,
@@ -415,7 +406,6 @@ function TeamProfileDialog({
         instagramUrl,
         facebookUrl,
         sortOrder: Number(sortOrder),
-        featured,
         published,
       };
       const result = profile
@@ -583,7 +573,7 @@ function TeamProfileDialog({
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Display order" id="team-profile-sort-order">
               <Input
                 id="team-profile-sort-order"
@@ -595,18 +585,6 @@ function TeamProfileDialog({
                 required
               />
             </Field>
-            <CheckboxField
-              id="team-profile-top-leadership"
-              label="Show in Top Leadership"
-              checked={isTopLeadership}
-              onChange={setIsTopLeadership}
-            />
-            <CheckboxField
-              id="team-profile-featured"
-              label="Featured profile"
-              checked={featured}
-              onChange={setFeatured}
-            />
             <CheckboxField
               id="team-profile-published"
               label="Published"
@@ -651,15 +629,12 @@ function TeamProfileDetails({
           </div>
           <p className="whitespace-pre-wrap text-sm leading-relaxed">{profile.biography}</p>
           <p className="text-sm text-muted-foreground">
-            {profile.isTopLeadership ? "Top leadership" : "Other team member"}
-            {profile.department ? ` · ${profile.department}` : ""}
-            {` · Display order ${profile.sortOrder}`}
+            {[profile.department, `Display order ${profile.sortOrder}`].filter(Boolean).join(" · ")}
           </p>
           <div className="flex flex-wrap gap-2">
             <Badge variant={profile.published ? "default" : "secondary"}>
               {profile.published ? "Published" : "Draft"}
             </Badge>
-            {profile.featured && <Badge variant="outline">Featured</Badge>}
           </div>
           <SocialLinks profile={profile} />
         </DialogContent>

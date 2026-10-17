@@ -13,7 +13,7 @@ const links = [
   { to: "/programs", label: "Programs" },
   { to: "/projects", label: "Projects" },
   { to: "/gallery", label: "Gallery" },
-  { to: "/our-team", label: "Leadership" },
+  { to: "/our-team", label: "Our Team" },
   { to: "/volunteer", label: "Volunteer" },
   { to: "/contact", label: "Contact" },
 ] as const;

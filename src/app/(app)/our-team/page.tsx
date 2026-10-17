@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { ExternalLink, Star, Users } from "lucide-react";
+import { ExternalLink, Users } from "lucide-react";
 import { connection } from "next/server";
 import { getPublishedTeamProfiles } from "@/actions/team";
 
 export const metadata: Metadata = {
-  title: "Our Leadership",
-  description: "Meet the top leadership team at Wujood Welfare.",
+  title: "Our Team",
+  description: "Meet the team at Wujood Welfare.",
   alternates: {
     canonical: "/our-team",
   },
@@ -24,10 +24,10 @@ export default async function OurTeamPage() {
             Wujood Welfare
           </p>
           <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-            Top Leadership
+            Our Team
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Meet the leaders guiding Wujood Welfare and supporting our communities.
+            Meet the people working together to support our communities.
           </p>
         </div>
       </section>
@@ -36,23 +36,23 @@ export default async function OurTeamPage() {
         {profiles.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border px-6 py-16 text-center">
             <Users className="mx-auto h-10 w-10 text-muted-foreground" />
-            <h2 className="mt-4 text-xl font-semibold">Leadership profiles coming soon</h2>
+            <h2 className="mt-4 text-xl font-semibold">Team profiles coming soon</h2>
             <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
               Our team profiles will appear here once they are published.
             </p>
           </div>
         ) : (
-          <section aria-labelledby="top-leadership-heading" className="scroll-mt-24">
+          <section aria-labelledby="team-heading" className="scroll-mt-24">
             <div className="mb-7 flex items-end justify-between gap-4 border-b border-border pb-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
                   Wujood Welfare
                 </p>
                 <h2
-                  id="top-leadership-heading"
+                  id="team-heading"
                   className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl"
                 >
-                  Top Leadership
+                  Our Team
                 </h2>
               </div>
               <span className="shrink-0 text-sm text-muted-foreground">
@@ -79,12 +79,6 @@ export default async function OurTeamPage() {
                         sizes="(min-width: 1024px) 50vw, 100vw"
                         className="object-cover transition-transform duration-500 hover:scale-[1.03]"
                       />
-                      {profile.featured && (
-                        <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-background/90 px-3 py-1 text-xs font-semibold text-primary shadow-sm">
-                          <Star className="h-3.5 w-3.5 fill-current" />
-                          Featured
-                        </span>
-                      )}
                     </div>
                     <div
                       className={`order-2 flex flex-col justify-center space-y-5 p-6 sm:p-8 lg:p-10 ${

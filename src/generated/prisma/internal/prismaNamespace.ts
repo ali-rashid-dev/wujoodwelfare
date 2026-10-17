@@ -2065,7 +2065,6 @@ export const TeamProfileScalarFieldEnum = {
   userId: 'userId',
   name: 'name',
   designation: 'designation',
-  isTopLeadership: 'isTopLeadership',
   biography: 'biography',
   imageUrl: 'imageUrl',
   department: 'department',
@@ -2073,7 +2072,6 @@ export const TeamProfileScalarFieldEnum = {
   instagramUrl: 'instagramUrl',
   facebookUrl: 'facebookUrl',
   sortOrder: 'sortOrder',
-  featured: 'featured',
   published: 'published',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
