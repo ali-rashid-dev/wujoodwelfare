@@ -34,7 +34,7 @@ export function ProgramsPreview({ items }: { items: ProgramRecord[] }) {
       <Stagger className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {programs.map((program) => (
           <StaggerItem key={program.id}>
-            <article className="group h-full overflow-hidden rounded-2xl border border-border bg-card shadow-xs transition-colors hover:border-primary/40">
+            <article className="group card-lift h-full overflow-hidden rounded-2xl border border-border bg-card shadow-xs transition-colors hover:border-primary/40">
               {program.imageUrl && (
                 <div className="relative h-48 overflow-hidden bg-muted">
                   <Image
@@ -42,7 +42,7 @@ export function ProgramsPreview({ items }: { items: ProgramRecord[] }) {
                     alt={program.title}
                     fill
                     sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="image-hover-zoom object-cover"
                   />
                   <Badge
                     variant="secondary"

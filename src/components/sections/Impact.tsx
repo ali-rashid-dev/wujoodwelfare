@@ -1,5 +1,6 @@
 import { Counter } from "@/components/site/Counter";
 import { Reveal } from "@/components/site/Reveal";
+import { MOTION_STAGGER_DELAY } from "@/lib/motion";
 
 const items = [
   { value: 1000, prefix: "", suffix: "+", label: "Donors" },
@@ -20,7 +21,7 @@ export function Impact() {
         </Reveal>
         <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-6">
           {items.map((it, i) => (
-            <Reveal key={it.label} delay={i} className="text-center rounded-2xl border border-primary-foreground/15 bg-primary-foreground/5 backdrop-blur p-6">
+            <Reveal key={it.label} delay={i * MOTION_STAGGER_DELAY} className="text-center rounded-2xl border border-primary-foreground/15 bg-primary-foreground/5 backdrop-blur p-6">
               <p className="text-4xl md:text-5xl font-bold text-secondary">
                 <Counter to={it.value} prefix={it.prefix} suffix={it.suffix} />
               </p>

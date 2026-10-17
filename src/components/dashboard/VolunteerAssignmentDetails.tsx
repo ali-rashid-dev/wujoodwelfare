@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { format } from "date-fns";
-import { ArrowLeft, CalendarDays, Check, MapPin, Play, X } from "lucide-react";
+import { ArrowLeft, CalendarDays, Check, CheckCircle2, Loader2, MapPin, Play, X } from "lucide-react";
 import { toast } from "sonner";
 import { updateVolunteerAssignment } from "@/actions/volunteer-work";
 import { updateOpportunityParticipation } from "@/actions/work-opportunities";
@@ -12,6 +13,7 @@ import type { VolunteerAssignmentModel } from "@/generated/prisma/models/Volunte
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { MOTION_DURATION_INTERACTION, MOTION_EASE } from "@/lib/motion";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -50,11 +52,20 @@ export function VolunteerAssignmentDetails({
 }) {
   const router = useRouter();
   const [completionNotes, setCompletionNotes] = useState("");
-  const [pending, setPending] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<
+    "accepted" | "declined" | "in_progress" | "completed" | null
+  >(null);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [confirmedMessage, setConfirmedMessage] = useState<string | null>(null);
+  const pendingRef = useRef(false);
+  const reduceMotion = useReducedMotion();
+  const pending = pendingStatus !== null;
 
   async function updateStatus(status: "accepted" | "declined" | "in_progress" | "completed") {
-    setPending(true);
+    if (pendingRef.current) return;
+    pendingRef.current = true;
+    setPendingStatus(status);
+    setConfirmedMessage(null);
     try {
       const result = assignment.opportunityId
         ? await updateOpportunityParticipation(
@@ -72,21 +83,23 @@ export function VolunteerAssignmentDetails({
         return;
       }
       setWithdrawOpen(false);
-      toast.success(
+      const message =
         status === "accepted"
           ? "Assignment accepted."
           : status === "declined"
             ? "Assignment declined."
             : status === "in_progress"
               ? "Assignment marked as working."
-              : "Work marked complete and sent to the organization.",
-      );
+              : "Work marked complete and sent to the organization.";
+      setConfirmedMessage(message);
+      toast.success(message);
       router.refresh();
     } catch (error) {
       console.error("Volunteer assignment transition failed:", error);
       toast.error("Could not update this assignment.");
     } finally {
-      setPending(false);
+      pendingRef.current = false;
+      setPendingStatus(null);
     }
   }
 
@@ -98,6 +111,27 @@ export function VolunteerAssignmentDetails({
       >
         <ArrowLeft className="h-4 w-4" /> Back to assignments
       </Link>
+
+      {confirmedMessage && (
+        <motion.p
+          key={confirmedMessage}
+          role="status"
+          aria-live="polite"
+          initial={reduceMotion ? false : { opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: MOTION_DURATION_INTERACTION, ease: MOTION_EASE }}
+          className="motion-entrance flex items-center gap-2 text-sm font-medium text-success"
+        >
+          <motion.span
+            initial={reduceMotion ? false : { opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: MOTION_DURATION_INTERACTION, ease: MOTION_EASE }}
+          >
+            <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+          </motion.span>
+          {confirmedMessage}
+        </motion.p>
+      )}
 
       <article className="overflow-hidden rounded-3xl border border-border bg-card">
         <div className="border-b border-border bg-muted/30 p-6 sm:p-8">
@@ -168,7 +202,12 @@ export function VolunteerAssignmentDetails({
                 disabled={pending}
                 onClick={() => updateStatus("accepted")}
               >
-                <Check /> Accept assignment
+                {pendingStatus === "accepted" ? (
+                  <Loader2 className="animate-spin" aria-hidden="true" />
+                ) : (
+                  <Check />
+                )}
+                {pendingStatus === "accepted" ? "Accepting..." : "Accept assignment"}
               </Button>
             </div>
           )}
@@ -254,7 +293,7 @@ export function VolunteerAssignmentDetails({
               disabled={pending}
               onClick={() => updateStatus("declined")}
             >
-              {pending ? "Withdrawing..." : "Withdraw"}
+              {pendingStatus === "declined" ? "Withdrawing..." : "Withdraw"}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

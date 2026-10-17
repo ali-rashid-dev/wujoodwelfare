@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { BriefcaseBusiness, CalendarDays, Check, Clock3, MapPin, Users } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import { BriefcaseBusiness, CalendarDays, Check, Clock3, Loader2, MapPin, Users } from "lucide-react";
 import { toast } from "sonner";
 import {
   acceptWorkOpportunity,
@@ -12,6 +13,7 @@ import {
 } from "@/actions/work-opportunities";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { MOTION_DURATION_INTERACTION, MOTION_EASE } from "@/lib/motion";
 
 type VolunteerOpportunities = Awaited<
   ReturnType<typeof getVolunteerWorkOpportunities>
@@ -32,8 +34,12 @@ export function VolunteerWorkOpportunities({
 }) {
   const router = useRouter();
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [confirmedId, setConfirmedId] = useState<string | null>(null);
+  const pendingRef = useRef(false);
 
   async function acceptOpportunity(opportunity: Opportunity) {
+    if (pendingRef.current) return;
+    pendingRef.current = true;
     setPendingId(opportunity.id);
     try {
       const result = await acceptWorkOpportunity(opportunity.id);
@@ -42,12 +48,14 @@ export function VolunteerWorkOpportunities({
         router.refresh();
         return;
       }
+      setConfirmedId(opportunity.id);
       toast.success("Position accepted. Find this work in My Work.");
       router.refresh();
     } catch (error) {
       console.error("Opportunity acceptance request failed:", error);
       toast.error("Could not accept this opportunity.");
     } finally {
+      pendingRef.current = false;
       setPendingId(null);
     }
   }
@@ -87,6 +95,8 @@ export function VolunteerWorkOpportunities({
               key={opportunity.id}
               opportunity={opportunity}
               pending={pendingId === opportunity.id}
+              acceptDisabled={pendingId !== null}
+              confirmed={confirmedId === opportunity.id}
               onAccept={() => acceptOpportunity(opportunity)}
             />
           ))}
@@ -99,12 +109,17 @@ export function VolunteerWorkOpportunities({
 function OpportunityCard({
   opportunity,
   pending,
+  acceptDisabled,
+  confirmed,
   onAccept,
 }: {
   opportunity: Opportunity;
   pending: boolean;
+  acceptDisabled: boolean;
+  confirmed: boolean;
   onAccept: () => void;
 }) {
+  const reduceMotion = useReducedMotion();
   const participationStatus = opportunity.participation?.status;
   const alreadyParticipated = Boolean(opportunity.participation);
   const displayedStatus =
@@ -179,7 +194,17 @@ function OpportunityCard({
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-muted/10 px-5 py-3">
         {participationStatus ? (
           <span className="inline-flex items-center gap-2 text-sm font-medium">
-            <Check className="h-4 w-4 text-emerald-600" />
+            {participationStatus === "accepted" && confirmed ? (
+              <motion.span
+                initial={reduceMotion ? false : { opacity: 0, scale: 0.85 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: MOTION_DURATION_INTERACTION, ease: MOTION_EASE }}
+              >
+                <Check className="h-4 w-4 text-success" aria-hidden="true" />
+              </motion.span>
+            ) : (
+              <Check className="h-4 w-4 text-success" aria-hidden="true" />
+            )}
             {participationStatus === "declined"
               ? "You withdrew from this opportunity"
               : `Your status: ${participationStatus === "in_progress" ? "Working" : participationStatus}`}
@@ -199,7 +224,8 @@ function OpportunityCard({
             View My Work
           </Button>
         ) : opportunity.status === "open" && !opportunity.full ? (
-          <Button size="sm" onClick={onAccept} disabled={pending}>
+          <Button size="sm" onClick={onAccept} disabled={acceptDisabled}>
+            {pending ? <Loader2 className="animate-spin" aria-hidden="true" /> : null}
             {pending ? "Claiming..." : "Accept position"}
           </Button>
         ) : null}

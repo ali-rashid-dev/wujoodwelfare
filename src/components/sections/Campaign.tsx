@@ -1,8 +1,9 @@
-"use client"; 
+"use client";
 import { Reveal } from "@/components/site/Reveal";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight, Baby, GraduationCap, Heart, Megaphone, Stethoscope, Users, Utensils } from "lucide-react";
 import Link from "next/link";
+import { MOTION_DURATION_INTERACTION, MOTION_STAGGER_DELAY } from "@/lib/motion";
 
 const campaigns = [
   {
@@ -86,6 +87,8 @@ const campaigns = [
 ];
 
 export function Campaign() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section className="section-y container-x">
       <Reveal>
@@ -106,14 +109,14 @@ export function Campaign() {
         {campaigns.map((campaign, idx) => {
           const Icon = campaign.icon;
           return (
-            <Reveal key={campaign.id} delay={idx * 0.08}>
+            <Reveal key={campaign.id} delay={idx * MOTION_STAGGER_DELAY}>
               <motion.div
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.3 }}
+                whileHover={reduceMotion ? undefined : { y: -2 }}
+                transition={{ duration: MOTION_DURATION_INTERACTION }}
                 className={`group relative rounded-2xl border bg-card p-6 overflow-hidden hover:shadow-xl transition-shadow ${campaign.major ? "md:col-span-2 lg:col-span-1 ring-1 ring-primary/20" : ""}`}
               >
                 {/* Background gradient */}
-                <div className={`absolute inset-0 bg-linear-to-br ${campaign.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                <div className={`absolute inset-0 bg-linear-to-br ${campaign.color} opacity-0 transition-opacity duration-200 group-hover:opacity-100`} />
 
                 <div className="relative">
                   <div className="flex items-start justify-between mb-4">

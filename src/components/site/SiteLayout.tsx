@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { MessageCircle } from "lucide-react";
+import { PageEntrance } from "@/components/motion/PageEntrance";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
@@ -14,7 +15,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       </a>
       <Navbar />
       <main id="main-content" tabIndex={-1} className="flex-1 pt-16 md:pt-20">
-        {children}
+        <PageEntrance>{children}</PageEntrance>
       </main>
       <Footer />
       <a

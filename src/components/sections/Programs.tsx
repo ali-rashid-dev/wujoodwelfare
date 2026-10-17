@@ -78,7 +78,7 @@ export function Programs({ items }: ProgramsProps) {
 
           return (
             <StaggerItem key={p.id}>
-              <article className="group relative h-full flex flex-col rounded-2xl border border-border bg-card overflow-hidden card-lift shadow-xs hover:border-primary/40 transition-all duration-300">
+              <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-xs transition-[border-color,box-shadow] duration-150 card-lift hover:border-primary/40">
                 {/* Image Header */}
                 {p.imageUrl ? (
                   <div className="relative h-48 w-full overflow-hidden bg-muted shrink-0">
@@ -86,7 +86,7 @@ export function Programs({ items }: ProgramsProps) {
                       src={p.imageUrl}
                       alt={p.title}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="image-hover-zoom object-cover"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />

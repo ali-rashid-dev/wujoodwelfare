@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import Image from "next/image";
 import { Reveal } from "@/components/site/Reveal";
@@ -16,6 +16,7 @@ type ImpactStory = {
 
 export function Stories({ stories }: { stories: ImpactStory[] }) {
   const [index, setIndex] = useState(0);
+  const reduceMotion = useReducedMotion();
 
   if (stories.length === 0) return null;
 
@@ -60,10 +61,10 @@ export function Stories({ stories }: { stories: ImpactStory[] }) {
         <AnimatePresence mode="wait">
           <motion.div
             key={story.id}
-            initial={{ opacity: 0, x: 20 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.4 }}
+            exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
             className="relative lg:col-span-2"
           >
             <div className="overflow-hidden rounded-3xl border border-border shadow-blue">
@@ -85,10 +86,10 @@ export function Stories({ stories }: { stories: ImpactStory[] }) {
         <AnimatePresence mode="wait">
           <motion.div
             key={`${story.id}-quote`}
-            initial={{ opacity: 0, y: 10 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.4 }}
+            exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
             className="rounded-3xl border border-border bg-card p-8 md:p-10 lg:col-span-3"
           >
             <p className="text-xl leading-relaxed text-foreground/90 md:text-2xl">

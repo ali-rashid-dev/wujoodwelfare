@@ -17,6 +17,8 @@ import {
   BriefcaseBusiness,
   Check,
 } from "lucide-react";
+import { DashboardCard } from "@/components/motion/DashboardCard";
+import { Stagger } from "@/components/site/Reveal";
 
 export type AdminDashboardStats = {
   approvedVolunteers: number;
@@ -156,25 +158,28 @@ export function AdminDashboardView({ stats }: { stats: AdminDashboardStats }) {
             Overview
           </h2>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <Stagger className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {overviewStats.map(({ label, value, icon: Icon, href, color }) => (
-            <Link
+            <DashboardCard
               key={label}
-              href={href}
-              className="rounded-lg border border-border bg-card p-4 transition-[border-color,box-shadow,transform] duration-150 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-sm sm:p-5"
             >
-              <div className="flex items-start justify-between gap-2">
-                <span className="text-xs font-medium leading-relaxed text-muted-foreground sm:text-sm">
-                  {label}
-                </span>
-                <Icon className={`h-4 w-4 shrink-0 ${color}`} />
-              </div>
-              <p className="mt-3 text-2xl font-bold tabular-nums sm:text-3xl">
-                {value}
-              </p>
-            </Link>
+              <Link
+                href={href}
+                className="block h-full rounded-lg border border-border bg-card p-4 transition-[border-color,box-shadow] duration-150 hover:border-primary/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:p-5"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-xs font-medium leading-relaxed text-muted-foreground sm:text-sm">
+                    {label}
+                  </span>
+                  <Icon className={`h-4 w-4 shrink-0 ${color}`} />
+                </div>
+                <p className="mt-3 text-2xl font-bold tabular-nums sm:text-3xl">
+                  {value}
+                </p>
+              </Link>
+            </DashboardCard>
           ))}
-        </div>
+        </Stagger>
       </section>
 
       <section aria-labelledby="work-queue-heading" className="space-y-4">
@@ -258,32 +263,35 @@ export function AdminDashboardView({ stats }: { stats: AdminDashboardStats }) {
             {adminLinks.length} Modules Available
           </span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Stagger className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {adminLinks.map(({ href, icon: Icon, label, desc, color, accent }) => (
-            <Link
+            <DashboardCard
               key={href}
-              href={href}
-              className={`group flex flex-col justify-between rounded-lg border border-border bg-card p-5 shadow-xs transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md ${accent}`}
             >
-              <div className="flex items-start gap-3.5">
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${color}`}>
-                  <Icon className="h-5 w-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
-                      {label}
-                    </p>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground/50 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:text-primary transition-all" />
+              <Link
+                href={href}
+                className={`group flex h-full flex-col justify-between rounded-lg border border-border bg-card p-5 shadow-xs transition-[border-color,box-shadow] duration-150 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${accent}`}
+              >
+                <div className="flex items-start gap-3.5">
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${color}`}>
+                    <Icon className="h-5 w-5" />
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                    {desc}
-                  </p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-bold text-foreground transition-colors group-hover:text-primary">
+                        {label}
+                      </p>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground/50 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:text-primary group-hover:opacity-100" />
+                    </div>
+                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                      {desc}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </DashboardCard>
           ))}
-        </div>
+        </Stagger>
       </div>
 
       <div className="flex flex-col items-start justify-between gap-4 rounded-lg border border-border bg-card p-5 sm:flex-row sm:items-center">

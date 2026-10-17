@@ -1,11 +1,16 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { Reveal } from "@/components/site/Reveal";
 import type { GalleryItemRecord } from "@/actions/gallery";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type GalleryItem = Pick<
   GalleryItemRecord,
@@ -53,23 +58,19 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
       {filtered.length > 0 ? (
         <div className="mt-10 grid grid-cols-2 md:grid-cols-3 auto-rows-[180px] md:auto-rows-[220px] gap-4">
           {filtered.map((item, index) => (
-            <motion.button
+            <button
               key={item.id}
-              layout
               onClick={() => setOpenItem(item)}
               className={`group relative overflow-hidden rounded-2xl border border-border ${
                 index % 3 === 0 ? "row-span-2" : ""
               }`}
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.35, delay: index * 0.05 }}
             >
               <Image
                 src={item.imageUrl}
                 alt={item.title}
                 fill
                 sizes="(min-width: 768px) 33vw, 50vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                className="image-hover-zoom object-cover"
               />
               <div className="absolute inset-0 bg-linear-to-t from-primary-dark/85 via-primary-dark/10 to-transparent" />
               <div className="absolute inset-x-3 bottom-3 text-left">
@@ -80,7 +81,7 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                   {item.title}
                 </span>
               </div>
-            </motion.button>
+            </button>
           ))}
         </div>
       ) : (
@@ -91,40 +92,32 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
         </p>
       )}
 
-      <AnimatePresence>
-        {openItem && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setOpenItem(null)}
-            className="fixed inset-0 z-100 grid place-items-center bg-primary-dark/95 backdrop-blur p-6"
-          >
-            <button
-              aria-label="Close image"
-              onClick={() => setOpenItem(null)}
-              className="absolute top-5 right-5 grid h-10 w-10 place-items-center rounded-full bg-primary-foreground/10 text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
-            >
-              <X className="h-5 w-5" />
-            </button>
-            <div
-              className="max-w-[95vw] space-y-3"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <motion.div
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                className="relative h-[65vh] w-[min(90vw,1100px)]"
-              >
+      <Dialog
+        open={Boolean(openItem)}
+        onOpenChange={(open) => {
+          if (!open) setOpenItem(null);
+        }}
+      >
+        <DialogContent
+          overlayClassName="bg-primary-dark/95 supports-backdrop-filter:backdrop-blur-sm"
+          className="w-[min(90vw,1100px)] max-w-[95vw] border-none bg-primary-dark p-5 text-primary-foreground ring-0 sm:max-w-[min(90vw,1100px)]"
+        >
+          <DialogHeader className="sr-only">
+            <DialogTitle>{openItem?.title ?? "Gallery image"}</DialogTitle>
+            <DialogDescription>{openItem?.category ?? "Gallery image"}</DialogDescription>
+          </DialogHeader>
+          {openItem && (
+            <>
+              <div className="relative h-[65vh] max-h-[700px] min-h-48 w-full">
                 <Image
                   src={openItem.imageUrl}
                   alt={openItem.title}
                   fill
                   sizes="90vw"
-                  className="rounded-2xl object-contain shadow-2xl"
+                  className="rounded-lg object-contain"
                 />
-              </motion.div>
-              <div className="text-center text-primary-foreground">
+              </div>
+              <div className="text-center">
                 <p className="font-semibold">{openItem.title}</p>
                 <p className="mt-1 text-sm text-primary-foreground/70">
                   {openItem.category}
@@ -135,10 +128,10 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                   </p>
                 )}
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

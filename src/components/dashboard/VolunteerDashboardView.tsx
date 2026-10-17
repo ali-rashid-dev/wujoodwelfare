@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DashboardCard } from "@/components/motion/DashboardCard";
+import { Stagger } from "@/components/site/Reveal";
 import type { VolunteerAssignmentModel } from "@/generated/prisma/models/VolunteerAssignment";
 
 type Assignment = Pick<
@@ -95,50 +97,53 @@ export function VolunteerDashboardView({
             </p>
           </div>
         ) : (
-          <div className="grid gap-4 lg:grid-cols-3">
+          <Stagger className="grid gap-4 lg:grid-cols-3">
             {availableOpportunities.map((opportunity) => (
-              <Link
+              <DashboardCard
                 key={opportunity.id}
-                href="/volunteer/opportunities"
-                className="flex min-w-0 flex-col rounded-lg border border-border bg-card p-4 transition-[border-color,box-shadow,transform] duration-150 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <Badge variant="secondary" className="mb-3 self-start">
-                  {opportunity.category}
-                </Badge>
-                <h3 className="font-semibold leading-snug">{opportunity.title}</h3>
-                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                  {opportunity.description}
-                </p>
-                <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs text-muted-foreground">
-                  <p className="flex items-center gap-2">
-                    <CalendarDays className="h-3.5 w-3.5 shrink-0" />
-                    {opportunity.date
-                      ? format(opportunity.date, "MMM d, yyyy")
-                      : "Date to be announced"}
-                    {opportunity.timeCommitment && ` · ${opportunity.timeCommitment}`}
+                <Link
+                  href="/volunteer/opportunities"
+                  className="flex h-full min-w-0 flex-col rounded-lg border border-border bg-card p-4 transition-[border-color,box-shadow] duration-150 hover:border-primary/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <Badge variant="secondary" className="mb-3 self-start">
+                    {opportunity.category}
+                  </Badge>
+                  <h3 className="font-semibold leading-snug">{opportunity.title}</h3>
+                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                    {opportunity.description}
                   </p>
-                  <p className="flex items-center gap-2">
-                    <MapPin className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{opportunity.location}</span>
+                  <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs text-muted-foreground">
+                    <p className="flex items-center gap-2">
+                      <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                      {opportunity.date
+                        ? format(opportunity.date, "MMM d, yyyy")
+                        : "Date to be announced"}
+                      {opportunity.timeCommitment && ` · ${opportunity.timeCommitment}`}
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <MapPin className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">{opportunity.location}</span>
+                    </p>
+                  </div>
+                  <p className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary">
+                    <UsersRound className="h-4 w-4" />
+                    {opportunity.remainingPositions}{" "}
+                    {opportunity.remainingPositions === 1 ? "position" : "positions"} available
                   </p>
-                </div>
-                <p className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary">
-                  <UsersRound className="h-4 w-4" />
-                  {opportunity.remainingPositions}{" "}
-                  {opportunity.remainingPositions === 1 ? "position" : "positions"} available
-                </p>
-              </Link>
+                </Link>
+              </DashboardCard>
             ))}
-          </div>
+          </Stagger>
         )}
       </section>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <Stagger className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryCard label="Pending responses" value={stats.pendingResponses} icon={Clock3} href="/volunteer/assignments?view=available" />
         <SummaryCard label="Accepted assignments" value={stats.acceptedAssignments} icon={CheckCircle2} href="/volunteer/assignments?view=active" />
         <SummaryCard label="Current work" value={stats.currentWork} icon={BriefcaseBusiness} href="/volunteer/assignments?view=active" />
         <SummaryCard label="Completed assignments" value={stats.completedAssignments} icon={Check} href="/volunteer/assignments?view=completed" />
-      </div>
+      </Stagger>
 
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-4">
@@ -225,15 +230,17 @@ function SummaryCard({
   href: string;
 }) {
   return (
-    <Link
-      href={href}
-      className="rounded-lg border border-border bg-card p-5 transition-[border-color,box-shadow,transform] duration-150 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-muted-foreground">{label}</span>
-        <Icon className="h-4 w-4 text-primary" />
-      </div>
-      <p className="mt-3 text-3xl font-bold">{value}</p>
-    </Link>
+    <DashboardCard>
+      <Link
+        href={href}
+        className="block h-full rounded-lg border border-border bg-card p-5 transition-[border-color,box-shadow] duration-150 hover:border-primary/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-muted-foreground">{label}</span>
+          <Icon className="h-4 w-4 text-primary" />
+        </div>
+        <p className="mt-3 text-3xl font-bold">{value}</p>
+      </Link>
+    </DashboardCard>
   );
 }

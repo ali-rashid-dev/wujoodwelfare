@@ -107,7 +107,7 @@ export default async function ProjectsPage() {
                           alt={p.title}
                           fill
                           sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 95vw"
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
+                          className="image-hover-zoom object-cover"
                         />
 
                         {/* Status badge */}

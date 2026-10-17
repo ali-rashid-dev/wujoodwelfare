@@ -1,7 +1,9 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { submitContactMessage } from "@/actions/contact";
+import { MOTION_DURATION_INTERACTION, MOTION_EASE } from "@/lib/motion";
 import {
   initialContactSubmissionState,
   type ContactFormField,
@@ -20,6 +22,7 @@ export function ContactForm() {
     initialContactSubmissionState,
   );
   const formRef = useRef<HTMLFormElement>(null);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (state.status === "success") formRef.current?.reset();
@@ -71,9 +74,15 @@ export function ContactForm() {
               className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring aria-invalid:border-destructive"
             />
             {state.fieldErrors[name] && (
-              <p id={`contact-${name}-error`} className="mt-1 text-xs text-destructive">
+              <motion.p
+                id={`contact-${name}-error`}
+                initial={reduceMotion ? false : { opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: MOTION_DURATION_INTERACTION, ease: MOTION_EASE }}
+                className="mt-1 text-xs text-destructive"
+              >
                 {state.fieldErrors[name]}
-              </p>
+              </motion.p>
             )}
           </div>
         ))}
@@ -95,20 +104,30 @@ export function ContactForm() {
             className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring aria-invalid:border-destructive"
           />
           {state.fieldErrors.message && (
-            <p id="contact-message-error" className="mt-1 text-xs text-destructive">
+            <motion.p
+              id="contact-message-error"
+              initial={reduceMotion ? false : { opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: MOTION_DURATION_INTERACTION, ease: MOTION_EASE }}
+              className="mt-1 text-xs text-destructive"
+            >
               {state.fieldErrors.message}
-            </p>
+            </motion.p>
           )}
         </div>
       </div>
 
       {state.message && (
-        <p
+        <motion.p
+          key={`${state.status}-${state.message}`}
           role={state.status === "error" ? "alert" : "status"}
+          initial={reduceMotion ? false : { opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: MOTION_DURATION_INTERACTION, ease: MOTION_EASE }}
           className={`mt-4 text-sm ${state.status === "error" ? "text-destructive" : "text-emerald-700 dark:text-emerald-400"}`}
         >
           {state.message}
-        </p>
+        </motion.p>
       )}
 
       <button

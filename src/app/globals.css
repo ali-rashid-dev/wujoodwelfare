@@ -174,11 +174,19 @@
     transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
   }
 
+  .image-hover-zoom {
+    transition: transform 180ms ease;
+  }
+
   @media (hover: hover) and (pointer: fine) {
     .card-lift:hover {
       transform: translateY(-2px);
       border-color: var(--color-border);
       box-shadow: 0 8px 22px -14px color-mix(in oklab, var(--color-foreground) 30%, transparent);
+    }
+
+    .group:hover .image-hover-zoom {
+      transform: scale(1.02);
     }
   }
 
@@ -220,5 +228,30 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .card-lift:hover,
+  .group:hover .image-hover-zoom {
+    transform: none !important;
+  }
+
+  .motion-entrance,
+  .motion-entrance * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .animate-pulse,
+  [data-slot="dialog-overlay"],
+  [data-slot="dialog-content"],
+  [data-slot="dropdown-menu-content"] {
+    animation: none !important;
+  }
+
+  button:active:not([aria-haspopup]),
+  [role="button"]:active:not([aria-haspopup]) {
+    transform: none !important;
   }
 }

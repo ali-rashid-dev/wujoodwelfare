@@ -1,6 +1,7 @@
 import { Target, Eye, Sparkles, Heart, HandHeart, ShieldCheck } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import Image from "next/image";
+import { MOTION_STAGGER_DELAY } from "@/lib/motion";
 
 const valueIcons = {
   target: Target,
@@ -67,7 +68,7 @@ export function About({
           {values.map((value, i) => {
             const Icon = valueIcons[value.icon as keyof typeof valueIcons] ?? Sparkles;
             return (
-            <Reveal key={value.id} delay={i}>
+            <Reveal key={value.id} delay={i * MOTION_STAGGER_DELAY}>
               <div className="flex gap-4 rounded-2xl border border-border bg-card p-5 card-lift">
                 <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl gradient-blue text-primary-foreground">
                   <Icon className="h-5 w-5" />

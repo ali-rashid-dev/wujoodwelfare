@@ -235,7 +235,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                         src={img}
                         alt={`${project.title} – photo ${idx + 2}`}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="image-hover-zoom object-cover"
                         sizes="(min-width: 640px) 20vw, 45vw"
                       />
                     </div>

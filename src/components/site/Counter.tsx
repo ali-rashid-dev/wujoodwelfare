@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useInView, animate } from "framer-motion";
+import { useInView, animate, useReducedMotion } from "motion/react";
 
 export function Counter({
   to,
@@ -15,22 +15,23 @@ export function Counter({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.5 });
+  const reduceMotion = useReducedMotion();
   const [n, setN] = useState(0);
 
   useEffect(() => {
-    if (!inView) return;
+    if (!inView || reduceMotion) return;
     const controls = animate(0, to, {
       duration,
       ease: "easeOut",
       onUpdate: (v) => setN(v),
     });
     return () => controls.stop();
-  }, [inView, to, duration]);
+  }, [inView, to, duration, reduceMotion]);
 
   return (
     <span ref={ref}>
       {prefix}
-      {Math.round(n).toLocaleString()}
+      {Math.round(reduceMotion ? to : n).toLocaleString()}
       {suffix}
     </span>
   );

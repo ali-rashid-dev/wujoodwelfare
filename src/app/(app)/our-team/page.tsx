@@ -43,29 +43,13 @@ export default async function OurTeamPage() {
           </div>
         ) : (
           <section aria-labelledby="team-heading" className="scroll-mt-24">
-            <div className="mb-7 flex items-end justify-between gap-4 border-b border-border pb-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                  Wujood Welfare
-                </p>
-                <h2
-                  id="team-heading"
-                  className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl"
-                >
-                  Our Team
-                </h2>
-              </div>
-              <span className="shrink-0 text-sm text-muted-foreground">
-                {profiles.length} {profiles.length === 1 ? "profile" : "profiles"}
-              </span>
-            </div>
             <div className="space-y-6 sm:space-y-8">
               {profiles.map((profile, index) => {
                 const imageOnRight = index % 2 === 0;
                 return (
                   <article
                     key={profile.id}
-                    className="grid overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow hover:shadow-lg lg:grid-cols-2"
+                    className="group card-lift grid overflow-hidden rounded-2xl border border-border bg-card shadow-sm lg:grid-cols-2"
                   >
                     <div
                       className={`relative order-1 min-h-64 overflow-hidden bg-muted sm:min-h-80 lg:min-h-[28rem] ${
@@ -77,7 +61,7 @@ export default async function OurTeamPage() {
                         alt={profile.name}
                         fill
                         sizes="(min-width: 1024px) 50vw, 100vw"
-                        className="object-cover transition-transform duration-500 hover:scale-[1.03]"
+                        className="image-hover-zoom object-cover"
                       />
                     </div>
                     <div

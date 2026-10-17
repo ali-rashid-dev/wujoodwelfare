@@ -39,7 +39,7 @@ export function TeamPreview({ profiles }: { profiles: TeamPreviewProfile[] }) {
           {profiles.slice(0, 4).map((profile) => (
             <article
               key={profile.id}
-              className="overflow-hidden rounded-lg border border-border bg-card transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-md"
+              className="card-lift overflow-hidden rounded-lg border border-border bg-card"
             >
               <div className="relative aspect-[4/3] bg-muted">
                 <Image

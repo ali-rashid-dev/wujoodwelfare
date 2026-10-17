@@ -37,7 +37,7 @@ export function GalleryPreview({ items }: { items: GalleryPreviewItem[] }) {
                   alt={item.title}
                   fill
                   sizes="(min-width: 768px) 33vw, 50vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="image-hover-zoom object-cover"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-primary-dark/85 via-primary-dark/10 to-transparent" />
                 <div className="absolute inset-x-3 bottom-3">

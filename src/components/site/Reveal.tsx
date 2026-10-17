@@ -1,16 +1,13 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
-
-const variants: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  show: (i: number = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.2, 0.8, 0.2, 1], delay: i * 0.08 },
-  }),
-};
+import {
+  staggerContainerVariants,
+  staggerItemVariants,
+  revealVariants,
+} from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 export function Reveal({
   children,
@@ -23,15 +20,16 @@ export function Reveal({
   className?: string;
   as?: "div" | "section" | "h1" | "h2" | "p";
 }) {
+  const reduceMotion = useReducedMotion();
   const Comp = motion[as] as typeof motion.div;
   return (
     <Comp
-      className={className}
-      initial="hidden"
-      whileInView="show"
+      className={cn("motion-entrance", className)}
+      initial={reduceMotion ? false : "hidden"}
+      whileInView={reduceMotion ? undefined : "visible"}
       viewport={{ once: true, amount: 0.2 }}
       custom={delay}
-      variants={variants}
+      variants={revealVariants}
     >
       {children}
     </Comp>
@@ -39,16 +37,15 @@ export function Reveal({
 }
 
 export function Stagger({ children, className }: { children: ReactNode; className?: string }) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <motion.div
-      className={className}
-      initial="hidden"
-      whileInView="show"
+      className={cn("motion-entrance", className)}
+      initial={reduceMotion ? false : "hidden"}
+      whileInView={reduceMotion ? undefined : "visible"}
       viewport={{ once: true, amount: 0.15 }}
-      variants={{
-        hidden: {},
-        show: { transition: { staggerChildren: 0.08 } },
-      }}
+      variants={staggerContainerVariants}
     >
       {children}
     </motion.div>
@@ -57,7 +54,10 @@ export function Stagger({ children, className }: { children: ReactNode; classNam
 
 export function StaggerItem({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <motion.div className={className} variants={variants}>
+    <motion.div
+      className={cn("motion-entrance", className)}
+      variants={staggerItemVariants}
+    >
       {children}
     </motion.div>
   );

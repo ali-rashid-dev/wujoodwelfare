@@ -185,7 +185,7 @@ export function AppSidebar({ user, role: propRole }: AppSidebarProps) {
                         render={<Link href={item.url} />}
                         isActive={active}
                         tooltip={item.title}
-                        className={`flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
+                        className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold transition-[background-color,color,border-color] duration-150 ${
                           active
                             ? "bg-primary/10 text-primary border-l-2 border-primary"
                             : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"

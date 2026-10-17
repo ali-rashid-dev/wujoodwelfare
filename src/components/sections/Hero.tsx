@@ -1,8 +1,14 @@
 "use client";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight, HandHeart, Heart } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import {
+  MOTION_DURATION_ENTER,
+  MOTION_EASE,
+  staggerContainerVariants,
+  staggerItemVariants,
+} from "@/lib/motion";
 
 export function Hero() {
   const shouldReduceMotion = useReducedMotion();
@@ -22,11 +28,15 @@ export function Hero() {
       />
 
       <div className="container-x relative pb-12 md:pb-20 pt-32 text-primary-foreground">
-        <div className="max-w-3xl">
+        <motion.div
+          className="motion-entrance max-w-3xl"
+          initial={shouldReduceMotion ? false : "hidden"}
+          animate="visible"
+          variants={staggerContainerVariants}
+        >
           <motion.span
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.25 }}
+            variants={staggerItemVariants}
+            transition={{ duration: MOTION_DURATION_ENTER, ease: MOTION_EASE }}
             className="inline-flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-secondary-foreground"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />
@@ -34,9 +44,8 @@ export function Hero() {
           </motion.span>
 
           <motion.h1
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.3, delay: shouldReduceMotion ? 0 : 0.05 }}
+            variants={staggerItemVariants}
+            transition={{ duration: MOTION_DURATION_ENTER, ease: MOTION_EASE }}
             className="mt-5 text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight"
           >
             Giving Hope. <br />
@@ -45,9 +54,8 @@ export function Hero() {
           </motion.h1>
 
           <motion.p
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.3, delay: shouldReduceMotion ? 0 : 0.1 }}
+            variants={staggerItemVariants}
+            transition={{ duration: MOTION_DURATION_ENTER, ease: MOTION_EASE }}
             className="font-urdu mt-5 text-2xl md:text-3xl text-secondary"
             dir="rtl"
           >
@@ -55,9 +63,8 @@ export function Hero() {
           </motion.p>
 
           <motion.p
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.3, delay: shouldReduceMotion ? 0 : 0.15 }}
+            variants={staggerItemVariants}
+            transition={{ duration: MOTION_DURATION_ENTER, ease: MOTION_EASE }}
             className="mt-5 max-w-xl text-base md:text-lg text-primary-foreground/85 leading-relaxed"
           >
             Wujood Welfare is dedicated to supporting vulnerable communities through
@@ -65,9 +72,8 @@ export function Hero() {
           </motion.p>
 
           <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.3, delay: shouldReduceMotion ? 0 : 0.2 }}
+            variants={staggerItemVariants}
+            transition={{ duration: MOTION_DURATION_ENTER, ease: MOTION_EASE }}
             className="mt-8 flex flex-wrap gap-3"
           >
             <Link
@@ -84,7 +90,7 @@ export function Hero() {
               <HandHeart className="h-4 w-4" /> Become Volunteer
             </Link>
           </motion.div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -47,7 +47,7 @@ export function Projects({ items }: { items: ProjectRecord[] }) {
 
             return (
               <StaggerItem key={project.id}>
-                <article className="group h-full overflow-hidden rounded-2xl border border-border bg-card shadow-xs transition-all duration-300 hover:border-primary/40 card-lift">
+                <article className="group card-lift h-full overflow-hidden rounded-2xl border border-border bg-card shadow-xs transition-[border-color,box-shadow] duration-150 hover:border-primary/40">
                   <Link href={`/projects/${project.slug}`} className="block h-full">
                     <div className="relative aspect-4/3 overflow-hidden bg-muted">
                       <Image
@@ -55,7 +55,7 @@ export function Projects({ items }: { items: ProjectRecord[] }) {
                         alt={project.title}
                         fill
                         sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="image-hover-zoom object-cover"
                       />
                       <span className="absolute left-3 top-3 rounded-full bg-background/90 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary backdrop-blur">
                         {project.status}
@@ -89,7 +89,7 @@ export function Projects({ items }: { items: ProjectRecord[] }) {
                           </span>
                         )}
                       </div>
-                      <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-primary transition-all group-hover:gap-2">
+                      <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-primary transition-[gap] duration-150 group-hover:gap-2">
                         View project <ArrowUpRight className="h-4 w-4" />
                       </span>
                     </div>
