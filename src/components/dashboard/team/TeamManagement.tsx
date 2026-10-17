@@ -20,7 +20,10 @@ import {
   updateTeamProfile,
   type getAdminTeamManagementData,
 } from "@/actions/team";
-import { UploadDropzone } from "@/lib/uploadthing";
+import {
+  UploadDropzone,
+  uploadDropzoneButtonClassName,
+} from "@/lib/uploadthing";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -472,7 +475,7 @@ function TeamProfileDialog({
                 appearance={{
                   container: "border-border bg-muted/30",
                   label: "text-foreground",
-                  button: "bg-primary text-primary-foreground",
+                  button: uploadDropzoneButtonClassName,
                 }}
               />
             )}

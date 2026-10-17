@@ -24,7 +24,10 @@ import {
   updateWhoWeAreValue,
   type getAdminWhoWeAre,
 } from "@/actions/who-we-are";
-import { UploadDropzone } from "@/lib/uploadthing";
+import {
+  UploadDropzone,
+  uploadDropzoneButtonClassName,
+} from "@/lib/uploadthing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -452,7 +455,7 @@ function WhoWeAreContentForm({
                   appearance={{
                     container: "border-border bg-muted/30",
                     label: "text-foreground",
-                    button: "bg-primary text-primary-foreground",
+                    button: uploadDropzoneButtonClassName,
                   }}
                 />
               )

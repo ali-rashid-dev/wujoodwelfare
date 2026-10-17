@@ -19,7 +19,10 @@ import {
   updateGalleryItem,
   type GalleryItemRecord,
 } from "@/actions/gallery";
-import { UploadDropzone } from "@/lib/uploadthing";
+import {
+  UploadDropzone,
+  uploadDropzoneButtonClassName,
+} from "@/lib/uploadthing";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -418,7 +421,7 @@ function GalleryItemDialog({
                 appearance={{
                   container: "border-border bg-muted/30",
                   label: "text-foreground",
-                  button: "bg-primary text-primary-foreground",
+                  button: uploadDropzoneButtonClassName,
                 }}
               />
             )}

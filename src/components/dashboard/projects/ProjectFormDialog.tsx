@@ -33,7 +33,10 @@ import {
   EyeOff,
 } from "lucide-react";
 import Image from "next/image";
-import { UploadDropzone } from "@/lib/uploadthing";
+import {
+  UploadDropzone,
+  uploadDropzoneButtonClassName,
+} from "@/lib/uploadthing";
 import { Badge } from "@/components/ui/badge";
 
 interface ProjectFormDialogProps {
@@ -467,6 +470,7 @@ export function ProjectFormDialog({
                   console.error("Upload error:", err);
                   toast.error("Image upload failed.");
                 }}
+                appearance={{ button: uploadDropzoneButtonClassName }}
                 className="ut-label:text-xs ut-label:font-semibold ut-label:text-foreground ut-allowed-content:text-muted-foreground ut-button:bg-primary ut-button:text-primary-foreground ut-button:rounded-lg ut-button:text-xs border-border bg-background"
               />
             </div>

@@ -21,7 +21,10 @@ import { createProgram, updateProgram, type ProgramRecord } from "@/actions/prog
 import { toast } from "sonner";
 import { Loader2, Sparkles, Image as ImageIcon, X } from "lucide-react";
 import Image from "next/image";
-import { UploadDropzone } from "@/lib/uploadthing";
+import {
+  UploadDropzone,
+  uploadDropzoneButtonClassName,
+} from "@/lib/uploadthing";
 
 interface ProgramFormDialogProps {
   open: boolean;
@@ -294,6 +297,7 @@ export function ProgramFormDialog({
                 onUploadError={(err) => {
                   console.error("Upload error:", err);
                 }}
+                appearance={{ button: uploadDropzoneButtonClassName }}
                 className="ut-label:text-xs ut-label:font-semibold ut-label:text-foreground ut-allowed-content:text-muted-foreground ut-button:bg-primary ut-button:text-primary-foreground ut-button:rounded-lg ut-button:text-xs border-border bg-background"
               />
             )}
